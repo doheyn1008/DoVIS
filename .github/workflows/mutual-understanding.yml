@@ -2,6 +2,7 @@ name: Mutual understanding lab
 
 on:
   push:
+    branches: [main]
     paths:
       - 'experiments/mutual-understanding/**'
       - '.github/workflows/mutual-understanding.yml'

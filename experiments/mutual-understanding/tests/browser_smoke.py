@@ -16,7 +16,7 @@ from mutual_lab.server import make_server
 
 
 def main() -> None:
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import expect, sync_playwright
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--artifacts-dir", default="browser-artifacts")
@@ -38,17 +38,17 @@ def main() -> None:
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.on("console", lambda message: errors.append(message.text) if message.type == "error" else None)
                     page.goto(f"http://127.0.0.1:{server.server_port}", wait_until="networkidle")
-                    page.wait_for_function("document.querySelector('#exchanges').textContent !== '—'")
+                    expect(page.locator("#exchanges")).not_to_have_text("—")
                     assert page.locator("#shared-image").is_visible()
                     page.locator("#intervals").check()
                     other = page.locator("#compare option").nth(1).get_attribute("value")
                     assert other
                     page.locator("#compare").select_option(other)
-                    page.wait_for_function("document.querySelector('#compare-label').textContent.length > 0")
+                    expect(page.locator("#compare-label")).to_contain_text("Seed")
                     page.locator("#next").click()
                     assert page.locator("#replay-count").inner_text().startswith("2 /")
                     page.locator("#play").click()
-                    page.wait_for_function("Number(document.querySelector('#scrub').value) >= 2")
+                    expect(page.locator("#scrub")).not_to_have_value("1")
                     page.locator("#play").click()
                     with page.expect_download() as download:
                         page.locator("#export").click()
@@ -63,16 +63,21 @@ def main() -> None:
                     page.locator("#lang-a").select_option("ko")
                     page.locator("#lang-b").select_option("ja")
                     page.locator("#launch").click()
-                    page.wait_for_function("document.querySelector('#run-list .active small')?.textContent.includes('Seed 29')")
-                    page.wait_for_function("document.querySelector('#status').textContent === 'COMPLETED'")
+                    expect(page.locator("#run-list .active small")).to_contain_text("Seed 29", timeout=15000)
+                    expect(page.locator("#status")).to_have_text("COMPLETED", timeout=15000)
                     assert page.locator("#exchanges").inner_text() == "10회"
                     page.set_viewport_size({"width": 390, "height": 844})
                     page.locator("#shared-image").scroll_into_view_if_needed()
-                    assert not page.evaluate("document.documentElement.scrollWidth > window.innerWidth"), "Mobile overflow"
+                    assert not page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"), "Mobile overflow"
                     page.screenshot(path=str(artifacts / "mobile.png"), full_page=True)
                     assert not errors, errors
                     print(json.dumps({"desktop": "1440x1120", "mobile": "390x844", "errors": errors,
                                       "launch": "ko/ja seed 29 completed", "export": "valid ZIP"}))
+                except BaseException:
+                    if "page" in locals() and not page.is_closed():
+                        page.screenshot(path=str(artifacts / "failure.png"), full_page=True)
+                    (artifacts / "errors.json").write_text(json.dumps(errors), encoding="utf-8")
+                    raise
                 finally:
                     browser.close()
         finally:

@@ -32,6 +32,7 @@ class Dashboard:
         self.lock = threading.Lock()
         self.running = False
         self.job_error = None
+        self.demo_run_id = None
 
     def run_path(self, run_id: str) -> Path:
         if not re.fullmatch(r"[A-Za-z0-9_-]+", run_id):
@@ -57,10 +58,14 @@ class Dashboard:
                 raise RuntimeError("A demo is already running")
             self.running = True
             self.job_error = None
+            self.demo_run_id = None
+
+        def progress(event: dict) -> None:
+            self.demo_run_id = event["run_id"]
 
         def task():
             try:
-                run_experiment(config, self.root)
+                run_experiment(config, self.root, progress)
             except (ExperimentFailed, ValueError, OSError) as exc:
                 self.job_error = str(exc)
             finally:
@@ -120,7 +125,8 @@ def make_server(root: str | Path, port: int = 8765) -> tuple[ThreadingHTTPServer
                             if summary:
                                 summaries.append(summary)
                     summaries.sort(key=lambda item: item.get("started_at", ""), reverse=True)
-                    self.json(200, {"runs": summaries, "demo_running": app.running, "job_error": app.job_error})
+                    self.json(200, {"runs": summaries, "demo_running": app.running,
+                                    "demo_run_id": app.demo_run_id, "job_error": app.job_error})
                 elif path.startswith("/api/run/"):
                     parts = path.split("/")
                     if len(parts) not in {4, 5}:

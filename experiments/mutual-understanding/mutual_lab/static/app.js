@@ -1,7 +1,7 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
 const names = {en:"English",ko:"한국어",ja:"日本語"};
-const state = {selected:null,runs:[],data:null,compare:null,replay:0,timer:null,refreshing:false};
+const state = {selected:null,runs:[],data:null,compare:null,replay:0,timer:null,refreshing:false,followingDemo:false};
 const percent = (value) => `${(value * 100).toFixed(1)}%`;
 const initialNotice = $("notice").textContent;
 async function api(path, options) {
@@ -39,7 +39,7 @@ function renderList() {
   if ([...$("compare").options].some(option => option.value === previous)) $("compare").value = previous;
 }
 async function selectRun(id) {
-  stopPlayback(); state.selected = id; state.replay = 0; state.compare = null; $("compare").value = "";
+  stopPlayback(); state.followingDemo = false; state.selected = id; state.replay = 0; state.compare = null; $("compare").value = "";
   await loadSelected(); renderList();
 }
 async function loadSelected() {
@@ -56,8 +56,11 @@ async function refresh() {
     const result = await api("/api/runs"); state.runs = result.runs;
     $("launch").disabled = result.demo_running;
     $("launch").firstChild.textContent = result.demo_running ? "실험 진행 중 " : "실험 시작 ";
-    if (result.job_error) announce(result.job_error, true);
-    if (!state.selected && state.runs.length) state.selected = state.runs[0].run_id;
+    if (result.job_error) { announce(result.job_error, true); state.followingDemo = false; }
+    if (state.followingDemo && result.demo_run_id) {
+      state.selected = result.demo_run_id; state.followingDemo = false; state.compare = null;
+    }
+    if (!state.selected && state.runs.length && !state.followingDemo) state.selected = state.runs[0].run_id;
     renderList(); await loadSelected();
   } catch(error) { announce(`기록을 불러오지 못했어: ${error.message}`, true); }
   finally { state.refreshing = false; }
@@ -168,7 +171,7 @@ $("curve").addEventListener("pointerleave",()=>$("chart-tooltip").classList.add(
 new ResizeObserver(drawChart).observe($("chart-wrap"));
 $("demo-form").addEventListener("submit",async event=>{
   event.preventDefault();$("launch").disabled=true;
-  try{await api("/api/demo",{method:"POST",headers:{"Content-Type":"application/json","X-Mutual-Lab":"1"},body:JSON.stringify({seed:Number($("seed").value),max_exchanges:Number($("maximum").value),lang_a:$("lang-a").value,lang_b:$("lang-b").value})});state.selected=null;state.replay=0;stopPlayback();announce("새 실험을 시작했어. 측정 결과가 순서대로 표시돼.");await refresh();}
+  try{await api("/api/demo",{method:"POST",headers:{"Content-Type":"application/json","X-Mutual-Lab":"1"},body:JSON.stringify({seed:Number($("seed").value),max_exchanges:Number($("maximum").value),lang_a:$("lang-a").value,lang_b:$("lang-b").value})});state.selected=null;state.followingDemo=true;state.replay=0;stopPlayback();announce("새 실험을 시작했어. 측정 결과가 순서대로 표시돼.");await refresh();}
   catch(error){announce(error.message,true);$("launch").disabled=false;}
 });
 refresh();setInterval(refresh,2500);

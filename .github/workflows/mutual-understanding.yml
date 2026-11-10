@@ -1,0 +1,59 @@
+name: Mutual understanding lab
+
+on:
+  push:
+    paths:
+      - 'experiments/mutual-understanding/**'
+      - '.github/workflows/mutual-understanding.yml'
+  pull_request:
+    paths:
+      - 'experiments/mutual-understanding/**'
+      - '.github/workflows/mutual-understanding.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    defaults:
+      run:
+        working-directory: experiments/mutual-understanding
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Test without third-party dependencies
+        run: python -m unittest discover -s tests -v
+      - name: Validate configurations
+        run: |
+          python -m mutual_lab validate configs/demo.json
+          python -m mutual_lab validate configs/local.example.json
+      - name: Run an offline end-to-end demonstration
+        run: python -m mutual_lab demo --seed 7 --quiet
+
+  browser:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/mutual-understanding
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install optional browser check dependencies
+        run: |
+          python -m pip install -e '.[browser]'
+          python -m playwright install --with-deps chromium
+      - name: Check desktop and mobile dashboard interactions
+        run: python tests/browser_smoke.py --artifacts-dir browser-artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutual-lab-browser
+          path: experiments/mutual-understanding/browser-artifacts/

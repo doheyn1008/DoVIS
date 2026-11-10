@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DoVIS · Mutual Lab</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Mutual Lab 홈"><span class="brand-icon">M</span><span>Mutual Lab<small>DO.V.I.S RESEARCH</small></span></a>
+    <div class="side-heading">새로운 실험 <span class="pill">DEMO</span></div>
+    <form id="demo-form">
+      <label>에이전트 A의 언어<select id="lang-a"><option value="en">English</option><option value="ko">한국어</option><option value="ja">日本語</option></select></label>
+      <label>에이전트 B의 언어<select id="lang-b"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option></select></label>
+      <div class="form-grid"><label>시드<input id="seed" type="number" min="0" max="4294967295" value="7" required></label><label>최대 대화<input id="maximum" type="number" min="5" max="1000" value="80" required></label></div>
+      <button class="primary" id="launch" type="submit">실험 시작 <span>↗</span></button>
+      <p class="hint">API 호출 없이 관찰·학습·평가 흐름을 확인해.</p>
+    </form>
+    <div class="side-heading runs-heading">실험 기록 <span id="run-count">0</span></div>
+    <div id="run-list" class="run-list"><p class="hint">첫 실험을 시작해봐.</p></div>
+    <div class="side-footer"><span class="online-dot"></span> LOCAL WORKSPACE <small>실제 모델은 CLI 설정으로 연결</small></div>
+  </aside>
+  <main>
+    <header class="page-header"><div><div class="eyebrow">GROUNDED LANGUAGE LEARNING</div><h1>언어가 통하는 순간까지.</h1><p>같은 그림에서 출발해, 서로의 말을 이해하는 과정을 기록해.</p></div><a id="export" class="button secondary disabled" aria-disabled="true">결과 내보내기 ↓</a></header>
+    <div id="notice" class="notice" role="status" aria-live="polite">템플릿 화자와 기호학습 수신자를 사용하는 데모야. 곡선은 실제 계산 결과이며 자연어의 난이도를 뜻하지 않아.</div>
+    <section class="run-bar"><div><span id="mode" class="pill">실험 대기</span><span id="run-id">새 실험을 시작하거나 기록을 선택해.</span></div><span id="status" class="status">READY</span></section>
+    <section class="stat-grid" aria-label="현재 실험 요약">
+      <article class="stat"><span>진행한 대화</span><strong id="exchanges">—</strong><small>공유 그림 1장 + 발화 2개 / 대화</small></article>
+      <article class="stat"><span class="blue-text">A → B 이해도</span><strong id="score-ab">—</strong><small id="detail-ab">A의 발화를 B가 이해한 비율</small></article>
+      <article class="stat"><span class="purple-text">B → A 이해도</span><strong id="score-ba">—</strong><small id="detail-ba">B의 발화를 A가 이해한 비율</small></article>
+      <article class="stat"><span>목표 도달 확인</span><strong id="threshold-time">—</strong><small id="threshold-detail">두 방향 모두 연속 기준을 통과한 시점</small></article>
+    </section>
+    <section class="panel chart-panel">
+      <div class="panel-heading"><div><h2>상호 이해도 곡선</h2><p>학습 전 기준점부터, 학습에 쓰지 않은 그림 조합으로 평가.</p></div><div class="chart-options"><label class="check"><input id="intervals" type="checkbox">95% 구간</label><select id="compare" aria-label="다른 실행과 비교"><option value="">다른 실행과 비교</option></select></div></div>
+      <div class="legend"><span><i class="legend-blue"></i>A → B</span><span><i class="legend-purple"></i>B → A</span><span><i class="legend-target"></i><span id="target-label">목표 90%</span></span><span><i class="legend-chance"></i>무작위 25%</span><span id="compare-label"></span></div>
+      <div id="chart-wrap"><canvas id="curve" role="img" aria-label="대화 횟수에 따른 양방향 이해도 곡선. 아래 평가 기록에서 정확한 수치를 확인할 수 있습니다."></canvas><div id="chart-tooltip" class="tooltip hidden"></div><div id="chart-empty" class="empty">실험이 시작되면 이해도 곡선이 여기에 나타나.</div></div>
+      <div class="chart-foot"><span>대화 횟수 →</span><span>이해도: 고정된 발화에 맞는 그림을 고른 비율</span></div>
+    </section>
+    <section class="lower-grid">
+      <article class="panel replay-panel"><div class="panel-heading"><div><h2>대화 다시 보기</h2><p id="replay-caption">같은 그림을 각자의 언어로 설명해.</p></div><span id="replay-count" class="pill">0 / 0</span></div><div class="replay-stage"><div class="image-frame"><img id="shared-image" alt="두 에이전트가 함께 본 색과 모양의 장면" hidden><span id="image-empty">SHARED VIEW</span></div><div id="messages" class="messages"><div class="empty-message">아직 기록된 대화가 없어.</div></div></div><div class="playback"><button id="previous" class="icon-button" aria-label="이전 대화">←</button><button id="play" class="icon-button" aria-label="대화 재생">▶</button><input id="scrub" type="range" min="0" max="0" value="0" aria-label="대화 선택"><button id="next" class="icon-button" aria-label="다음 대화">→</button></div></article>
+      <article class="panel detail-panel"><div class="panel-heading"><div><h2>측정 조건</h2><p>결과를 해석할 때 함께 확인해.</p></div></div><dl id="conditions"><div><dt>평가 방식</dt><dd>그림 4지선다</dd></div><div><dt>학습·평가 분리</dt><dd>물체 쌍 단위</dd></div><div><dt>초기 평가</dt><dd>대화 0회</dd></div><div><dt>판정 기준</dt><dd>90% · 2회 연속</dd></div></dl><p class="measurement-note" id="measurement-note">목표에 도달하지 못한 실행도 그대로 남겨. 최대 대화 횟수를 도달 시간으로 바꾸지 않아.</p></article>
+    </section>
+    <details class="panel evaluation-table"><summary>평가 기록 · 정확도와 95% 구간</summary><div class="table-scroll"><table><thead><tr><th>대화</th><th>방향</th><th>정답 / 전체</th><th>이해도</th><th>95% 구간</th><th>형식 오류</th></tr></thead><tbody id="evaluation-rows"></tbody></table></div></details>
+    <footer class="page-footer">Mutual Lab <span>작은 장면에서 시작하는 상호 이해의 실험.</span></footer>
+  </main>
+</body>
+</html>

@@ -111,6 +111,37 @@ class RunnerTests(unittest.TestCase):
         summary = json.loads((caught.exception.run_path / "summary.json").read_text())
         self.assertEqual(summary["status"], "cancelled")
 
+    def test_baseline_threshold_stops_at_zero_and_runs_common_completion(self):
+        config = replace(ExperimentConfig(), seed=1, threshold=.25, sustained_checks=1,
+                         max_exchanges=5, eval_every=5, eval_items=4)
+        progress = []
+        path = run_experiment(config, self.root, progress.append)
+        summary = json.loads((path / "summary.json").read_text())
+        self.assertEqual(summary["status"], "completed")
+        self.assertEqual(summary["exchanges_completed"], 0)
+        self.assertEqual(summary["utterances_completed"], 0)
+        self.assertEqual(summary["stop_reason"], "sustained_threshold_both_directions")
+        self.assertEqual([d["sustained_threshold_confirmed_exchange"] for d in summary["directions"]], [0, 0])
+        evaluations = json.loads((path / "evaluations.json").read_text())
+        self.assertEqual([p["exchange"] for p in evaluations], [0, 0])
+        events = [json.loads(line) for line in (path / "events.jsonl").read_text().splitlines()]
+        self.assertFalse(any(event["type"] == "dialogue" for event in events))
+        self.assertEqual(events[-1]["type"], "run_completed")
+        self.assertEqual(progress[-1]["summary"], summary)
+
+    def test_baseline_threshold_respects_disabled_stop_and_sustained_checks(self):
+        base = replace(ExperimentConfig(), seed=1, threshold=.25, sustained_checks=1,
+                       max_exchanges=5, eval_every=5, eval_items=4)
+        for config in (replace(base, stop_on_threshold=False), replace(base, sustained_checks=2)):
+            with self.subTest(stop=config.stop_on_threshold, checks=config.sustained_checks):
+                path = run_experiment(config, self.root)
+                summary = json.loads((path / "summary.json").read_text())
+                self.assertEqual(summary["exchanges_completed"], 5)
+                points = json.loads((path / "evaluations.json").read_text())
+                self.assertEqual([p["exchange"] for p in points], [0, 0, 5, 5])
+                if not config.stop_on_threshold:
+                    self.assertEqual(summary["stop_reason"], "max_exchanges")
+
     def test_seed_sweep_counts_unreached_runs(self):
         path = sweep(self.config, [7, 11], self.root, quiet=True)
         aggregate = json.loads((path / "aggregate.json").read_text())

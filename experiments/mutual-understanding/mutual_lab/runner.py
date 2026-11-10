@@ -67,6 +67,12 @@ def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
         if progress:
             progress({"run_id": store.run_id, "exchange": exchange, "points": current})
 
+    def should_stop() -> bool:
+        if not config.stop_on_threshold:
+            return False
+        directions = summarize_points(points, config.threshold, config.sustained_checks)
+        return len(directions) == 2 and all(not item["right_censored"] for item in directions)
+
     snapshot("running")
     try:
         dataset_data = dataset.to_dict()
@@ -84,30 +90,32 @@ def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
                     for agent in agents}
         write_json(store.path / "frozen_captions.json", captions)
         checkpoint()  # Measure multilingual pretraining / chance before any adaptation.
-        rng = random.Random(config.seed + 104729)
-        order = list(dataset.train)
-        rng.shuffle(order)
-        for next_exchange in range(1, config.max_exchanges + 1):
-            offset = (next_exchange - 1) % len(order)
-            if offset == 0 and next_exchange > 1:
-                rng.shuffle(order)
-            scene = order[offset]
-            first, second = (agents[0], agents[1]) if next_exchange % 2 else (agents[1], agents[0])
-            first_text = speak(first, scene)
-            second_text = speak(second, scene, first_text)
-            # Commit the shared exchange only after both utterances complete.
-            observe(second, scene, first_text)
-            observe(first, scene, second_text)
-            exchange = next_exchange
-            store.event({"type": "dialogue", "exchange": exchange, "image": store.image(scene),
-                         "messages": [{"speaker": first.config.name, "language": first.config.language, "text": first_text},
-                                      {"speaker": second.config.name, "language": second.config.language, "text": second_text}]})
-            if exchange % config.eval_every == 0 or exchange == config.max_exchanges:
-                checkpoint()
-                directions = summarize_points(points, config.threshold, config.sustained_checks)
-                if config.stop_on_threshold and all(not item["right_censored"] for item in directions):
-                    reason = "sustained_threshold_both_directions"
-                    break
+        if should_stop():
+            reason = "sustained_threshold_both_directions"
+        else:
+            rng = random.Random(config.seed + 104729)
+            order = list(dataset.train)
+            rng.shuffle(order)
+            for next_exchange in range(1, config.max_exchanges + 1):
+                offset = (next_exchange - 1) % len(order)
+                if offset == 0 and next_exchange > 1:
+                    rng.shuffle(order)
+                scene = order[offset]
+                first, second = (agents[0], agents[1]) if next_exchange % 2 else (agents[1], agents[0])
+                first_text = speak(first, scene)
+                second_text = speak(second, scene, first_text)
+                # Commit the shared exchange only after both utterances complete.
+                observe(second, scene, first_text)
+                observe(first, scene, second_text)
+                exchange = next_exchange
+                store.event({"type": "dialogue", "exchange": exchange, "image": store.image(scene),
+                             "messages": [{"speaker": first.config.name, "language": first.config.language, "text": first_text},
+                                          {"speaker": second.config.name, "language": second.config.language, "text": second_text}]})
+                if exchange % config.eval_every == 0 or exchange == config.max_exchanges:
+                    checkpoint()
+                    if should_stop():
+                        reason = "sustained_threshold_both_directions"
+                        break
         summary = snapshot("completed")
         store.event({"type": "run_completed", "exchange": exchange, "stop_reason": reason})
         if progress:

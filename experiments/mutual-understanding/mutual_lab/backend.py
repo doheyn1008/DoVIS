@@ -71,7 +71,22 @@ class ChatTransport:
             if len(raw) > 4_000_000:
                 raise BackendError("Model response exceeds 4 MB")
             data = json.loads(raw)
+            if not isinstance(data, dict):
+                raise ValueError("Chat Completions response must be an object")
+            # The server can bill for a failed generation. Account for valid reported
+            # counts before inspecting choices/content, without estimating missing values.
+            reported_usage = data.get("usage")
+            usage = {}
+            if isinstance(reported_usage, dict):
+                for field in ("prompt_tokens", "completion_tokens"):
+                    count = reported_usage.get(field)
+                    if type(count) is int and count >= 0:
+                        usage[field] = count
+                        setattr(self.budget, field, getattr(self.budget, field) + count)
+            metadata.update(usage=usage, served_model=data.get("model"),
+                            system_fingerprint=data.get("system_fingerprint"))
             choice = data["choices"][0]
+            metadata["finish_reason"] = choice.get("finish_reason")
             if choice.get("finish_reason") == "length":
                 raise BackendError("Generation reached max_tokens; increase it before rerunning")
             content = choice["message"]["content"]
@@ -79,14 +94,7 @@ class ChatTransport:
                 content = "".join(part.get("text", "") for part in content if part.get("type") == "text")
             if not isinstance(content, str) or not content.strip() or len(content) > 20_000:
                 raise BackendError("Model returned empty, non-text, or oversized content")
-            usage = data.get("usage") or {}
-            for field, attribute in (("prompt_tokens", "prompt_tokens"), ("completion_tokens", "completion_tokens")):
-                count = usage.get(field, 0)
-                if type(count) is int and count >= 0:
-                    setattr(self.budget, attribute, getattr(self.budget, attribute) + count)
-            metadata.update(status="ok", served_model=data.get("model"),
-                            system_fingerprint=data.get("system_fingerprint"), usage=usage,
-                            finish_reason=choice.get("finish_reason"))
+            metadata["status"] = "ok"
             return content.strip()
         except HTTPError as exc:
             metadata["status"] = f"http_{exc.code}"

@@ -13,7 +13,7 @@ from mutual_lab.agents import EndpointAgent, SharedImage
 from mutual_lab.backend import BackendError, ChatTransport, parse_choice
 from mutual_lab.config import AgentConfig, ExperimentConfig
 from mutual_lab.images import scene_png
-from mutual_lab.runner import run_experiment
+from mutual_lab.runner import ExperimentFailed, run_experiment
 from mutual_lab.world import make_dataset
 
 
@@ -26,6 +26,9 @@ class FixtureServer:
         self.finish_reason = "stop"
         self.malformed = False
         self.answer = "1"
+        self.caption = "A red circle is to the left of a blue square."
+        self.usage = {"prompt_tokens": 8, "completion_tokens": 2}
+        self.response_override = None
         fixture = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -38,10 +41,12 @@ class FixtureServer:
                 fixture.headers.append(dict(self.headers))
                 content = body["messages"][-1]["content"][0]["text"]
                 selecting = "one digit" in content or "숫자" in content or "数字" in content
-                message = fixture.answer if selecting else "A red circle is to the left of a blue square."
+                message = fixture.answer if selecting else fixture.caption
                 data = {"model": "fixture-model", "system_fingerprint": "fixture-v1", "choices": [
                     {"message": {"role": "assistant", "content": message}, "finish_reason": fixture.finish_reason}],
-                    "usage": {"prompt_tokens": 8, "completion_tokens": 2}}
+                    "usage": fixture.usage}
+                if fixture.response_override is not None:
+                    data = fixture.response_override
                 raw = b"invalid-json" if fixture.malformed else json.dumps(data).encode()
                 self.send_response(fixture.status)
                 if fixture.status == 302:
@@ -135,10 +140,92 @@ class EndpointTests(unittest.TestCase):
         self.fixture.finish_reason = "length"
         with self.assertRaisesRegex(BackendError, "max_tokens"):
             agent.speak(image)
+        self.assertEqual(len(self.fixture.requests), 1)
+        self.assertEqual(self.transport.budget.prompt_tokens, 8)
+        self.assertEqual(self.transport.budget.completion_tokens, 2)
+        self.assertEqual(self.records[-1]["usage"], {"prompt_tokens": 8, "completion_tokens": 2})
+        self.assertEqual(self.records[-1]["finish_reason"], "length")
+        self.assertEqual(self.records[-1]["status"], "invalid_generation")
         self.fixture.finish_reason = "stop"
         self.fixture.malformed = True
         with self.assertRaisesRegex(BackendError, "invalid Chat Completions"):
             agent.speak(image)
+
+    def test_empty_generation_preserves_reported_usage(self):
+        self.fixture.caption = "  "
+        with self.assertRaisesRegex(BackendError, "empty"):
+            EndpointAgent(self.agent, self.config, self.transport).speak(SharedImage(scene_png(self.scene)))
+        self.assertEqual(len(self.fixture.requests), 1)
+        self.assertEqual(self.transport.budget.prompt_tokens, 8)
+        self.assertEqual(self.transport.budget.completion_tokens, 2)
+        self.assertEqual(self.records[-1]["usage"], self.fixture.usage)
+        self.assertEqual(self.records[-1]["finish_reason"], "stop")
+        self.assertEqual(self.records[-1]["status"], "invalid_generation")
+
+    def test_only_valid_reported_usage_fields_are_counted(self):
+        cases = [
+            (None, {}), ([], {}), ("unknown", {}), (8, {}),
+            ({"prompt_tokens": True, "completion_tokens": -2}, {}),
+            ({"prompt_tokens": "8", "completion_tokens": 2}, {"completion_tokens": 2}),
+            ({"prompt_tokens": 8, "completion_tokens": 2.5}, {"prompt_tokens": 8}),
+            ({"prompt_tokens": 0, "completion_tokens": 2, "total_tokens": 999},
+             {"prompt_tokens": 0, "completion_tokens": 2}),
+        ]
+        for reported, valid in cases:
+            with self.subTest(usage=reported):
+                self.fixture.usage = reported
+                records = []
+                transport = ChatTransport(self.config, records.append)
+                agent = EndpointAgent(self.agent, self.config, transport)
+                self.assertTrue(agent.speak(SharedImage(scene_png(self.scene))))
+                self.assertEqual(transport.budget.prompt_tokens, valid.get("prompt_tokens", 0))
+                self.assertEqual(transport.budget.completion_tokens, valid.get("completion_tokens", 0))
+                self.assertEqual(records[-1]["usage"], valid)
+                self.assertEqual(records[-1]["status"], "ok")
+
+    def test_malformed_choices_keep_usage_but_non_object_response_does_not_invent_it(self):
+        for response, expected in (({"choices": [], "usage": self.fixture.usage}, self.fixture.usage),
+                                   ([], {})):
+            with self.subTest(response=response):
+                self.fixture.response_override = response
+                records = []
+                transport = ChatTransport(self.config, records.append)
+                with self.assertRaisesRegex(BackendError, "invalid Chat Completions"):
+                    EndpointAgent(self.agent, self.config, transport).speak(SharedImage(scene_png(self.scene)))
+                self.assertEqual(transport.budget.prompt_tokens, expected.get("prompt_tokens", 0))
+                self.assertEqual(transport.budget.completion_tokens, expected.get("completion_tokens", 0))
+                self.assertEqual(records[-1].get("usage", {}), expected)
+                self.assertEqual(records[-1]["status"], "invalid_response")
+
+    def test_failed_run_preserves_usage_of_its_truncated_request(self):
+        self.fixture.finish_reason = "length"
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(ExperimentFailed) as caught:
+                run_experiment(self.config, directory)
+            path = caught.exception.run_path
+            summary = json.loads((path / "summary.json").read_text())
+            self.assertEqual(summary["status"], "failed")
+            self.assertEqual(summary["transport"]["requests"], 1)
+            self.assertEqual(summary["transport"]["reported_prompt_tokens"], 8)
+            self.assertEqual(summary["transport"]["reported_completion_tokens"], 2)
+            events = [json.loads(line) for line in (path / "events.jsonl").read_text().splitlines()]
+            request = next(event for event in events if event["type"] == "model_request")
+            self.assertEqual(request["usage"], self.fixture.usage)
+            self.assertEqual(request["status"], "invalid_generation")
+            self.assertEqual(request["finish_reason"], "length")
+        self.assertEqual(len(self.fixture.requests), 1)
+
+    def test_endpoint_baseline_can_stop_without_dialogue_requests(self):
+        config = replace(self.config, stop_on_threshold=True, threshold=.25, sustained_checks=1)
+        with tempfile.TemporaryDirectory() as directory:
+            path = run_experiment(config, directory)
+            summary = json.loads((path / "summary.json").read_text())
+            self.assertEqual(summary["status"], "completed")
+            self.assertEqual(summary["exchanges_completed"], 0)
+            self.assertEqual(summary["transport"]["requests"], 4 * config.eval_items)
+            events = [json.loads(line) for line in (path / "events.jsonl").read_text().splitlines()]
+            self.assertFalse(any(event.get("purpose") == "dialogue" for event in events))
+        self.assertEqual(len(self.fixture.requests), 4 * config.eval_items)
 
     def test_request_budget_stops_before_extra_http_call(self):
         transport = ChatTransport(replace(self.config, max_requests=1), self.records.append)

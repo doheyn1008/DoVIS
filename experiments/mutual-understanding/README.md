@@ -105,7 +105,13 @@ python -m unittest discover -s tests -v
 
 표준 라이브러리 테스트만 사용합니다. 데이터 누출 방지, 학습 전 기준점, 평가의 상태 불변성, 고정 문장, 재현성, 목표 미도달 처리, HTTP 프로토콜, 요청 예산·오류·키 비저장, 대시보드 API를 검사합니다. HTTP 테스트 서버는 프로토콜 검증용이며 실제 모델 성능 시험이 아닙니다.
 
-선택적 브라우저 검사는 데스크톱·모바일 화면, 실행·비교·재생·ZIP 다운로드를 확인합니다. GitHub Actions에서도 실행합니다.
+비교 응답이 늦게 도착하거나 순서가 뒤바뀌는 경우는 실제 대시보드 스크립트와 제어 가능한 fetch 대역으로 검사합니다. Node.js 22 이상에서 실행할 수 있습니다.
+
+```bash
+node --test tests/test_dashboard_state.mjs
+```
+
+선택적 브라우저 검사는 데스크톱·모바일 화면, 실행·비교·재생·ZIP 다운로드를 확인합니다. GitHub Actions에서는 비동기 비교 검사와 브라우저 검사를 모두 실행합니다.
 
 ```bash
 python -m pip install -e '.[browser]'

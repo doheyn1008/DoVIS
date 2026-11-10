@@ -1,6 +1,6 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
-const names = {en:"English",ko:"한국어",ja:"日本語"};
+const names = {en:"English",ko:"한국어",ja:"日本語",es:"Español"};
 const state = {selected:null,runs:[],data:null,compare:null,compareRequest:0,replay:0,timer:null,refreshing:false,followingDemo:false};
 const percent = (value) => `${(value * 100).toFixed(1)}%`;
 const initialNotice = $("notice").textContent;
@@ -26,7 +26,7 @@ function renderList() {
     const dot = document.createElement("span"); dot.className = `run-dot ${run.status}`;
     heading.append(dot, document.createTextNode(runTitle(run)));
     const detail = document.createElement("small");
-    detail.textContent = `Seed ${run.seed} · ${run.exchanges_completed}회 · ${run.mode === "demo" ? "데모" : "모델"} · ${new Date(run.started_at).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit"})}`;
+    detail.textContent = `Seed ${run.seed} · ${run.exchanges_completed}회 · ${{demo:"데모",endpoint:"문맥 적응",neural:"누적 학습"}[run.mode] || run.mode} · ${new Date(run.started_at).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit"})}`;
     button.append(heading, detail);
     button.addEventListener("click", () => selectRun(run.run_id));
     $("run-list").append(button);
@@ -73,7 +73,7 @@ async function refresh() {
 }
 function renderData() {
   const {summary:run,points} = state.data; if (!run) return;
-  text("mode", run.mode === "demo" ? "PIPELINE DEMO" : "MODEL PILOT");
+  text("mode", {demo:"PIPELINE DEMO",endpoint:"CONTEXT PILOT",neural:"PERSISTENT LEARNING"}[run.mode] || run.mode);
   text("run-id", run.run_id); text("status", ({completed:"COMPLETED",running:"RUNNING",failed:"FAILED",cancelled:"CANCELLED"})[run.status] || run.status);
   text("exchanges", `${run.exchanges_completed}회`);
   $("export").href = `/api/run/${encodeURIComponent(run.run_id)}/export`;
@@ -82,22 +82,24 @@ function renderData() {
   for (let i=0;i<2;i++) {
     const direction = directions[i]; const suffix = i === 0 ? "ab" : "ba";
     text(`score-${suffix}`, direction ? percent(direction.last_accuracy) : "—");
-    text(`detail-${suffix}`, direction ? `${names[direction.source_language]} 발화 → ${names[direction.listener_language]} 화자` : "초기 평가를 준비하고 있어.");
+    text(`detail-${suffix}`, direction ? `${names[direction.source_language]} 발화 → ${names[direction.listener_language]} 화자 · 보정 ${percent(direction.last_corrected_accuracy ?? (direction.last_accuracy-.25)/.75)}` : "초기 평가를 준비하고 있어.");
   }
-  const complete = directions.length === 2 && directions.every(d => !d.right_censored);
-  text("threshold-time", complete ? `${Math.max(...directions.map(d => d.sustained_threshold_confirmed_exchange))}회` : run.status === "completed" ? "미도달" : "측정 중");
-  text("threshold-detail", `${percent(run.threshold)} · ${run.sustained_checks}회 연속 평가 통과`);
-  text("target-label", `목표 ${Math.round(run.threshold*100)}%`);
-  const conditionValues = ["그림 4지선다", "물체 쌍 단위", `대화 0회 · ${directions[0]?.eval_items || "—"}문항/방향`, `${percent(run.threshold)} · ${run.sustained_checks}회 연속`];
+  const complete = directions.length === 2 && directions.every(d => d.sustained_threshold_confirmed_exchange != null);
+  const scale = run.threshold_scale === "corrected" ? "우연 보정" : "원정답률";
+  text("threshold-time", complete ? `${Math.max(...directions.map(d => d.sustained_threshold_confirmed_exchange))}회` : run.status === "completed" ? "미도달" : ["failed","cancelled"].includes(run.status) ? "중단" : "측정 중");
+  text("threshold-detail", `${scale} ${percent(run.threshold)} · ${run.sustained_checks}회 연속 평가 통과`);
+  text("target-label", `${scale} 목표 ${Math.round(run.threshold*100)}%`);
+  const conditionValues = ["그림 4지선다 · 곡선은 원정답률", "물체 쌍 단위", `대화 0회 · ${directions[0]?.eval_items || "—"}문항/방향`, `${scale} ${percent(run.threshold)} · ${run.sustained_checks}회 연속`];
   [...$("conditions").querySelectorAll("dd")].forEach((node,i) => node.textContent = conditionValues[i]);
-  const modelNote = run.mode === "demo" ? "기호학습 데모 · 완전한 시각 인식을 가정해. 언어 사이의 실제 난이도 비교에는 사용할 수 없어." : `고정 가중치 + 대화 기록으로 적응해. 초기 외국어 지식은 검증되지 않았어. 모델 요청 ${run.transport.requests}회.`;
+  const inclusionLabels = {primary:"1차 조건 충족",positive_baseline_extension:"양수 초기 이해도 확장",uncertain:"초기 이해도 판정 보류",ineligible:"모국어 적격성 미충족",control:"대조 조건"};
+  const modelNote = run.mode === "demo" ? "기호학습 데모 · 완전한 시각 인식을 가정해. 언어 사이의 실제 난이도 비교에는 사용할 수 없어." : run.mode === "neural" ? `모국어 이해 가중치로 누적 학습 · ${run.model_profile?.id || ""} · ${inclusionLabels[run.inclusion?.analysis_group] || "사전검사 중"}. 공통 곡선 구간 ${run.common_horizon}회.` : `고정 가중치 + 대화 기록으로 적응해. 초기 외국어 지식은 검증되지 않았어. 모델 요청 ${run.transport.requests}회.`;
   text("measurement-note", `${modelNote} 목표 미도달 실행도 그대로 기록해.`);
   if (run.error) announce(run.error, true);
-  else announce(run.mode === "demo" ? initialNotice : "모델 파일럿 실행이야. 초기 외국어 지식, 그림 설명의 정확성, 언어 유지 여부를 별도로 확인해야 해.");
+  else announce(run.mode === "demo" ? initialNotice : run.mode === "neural" ? "제한된 자연어 영역의 누적 학습 파일럿이야. 모국어 검사와 사전검사를 통과한 실행만 해당 분석에 포함해." : "모델 파일럿 실행이야. 초기 외국어 지식, 그림 설명의 정확성, 언어 유지 여부를 별도로 확인해야 해.");
   $("evaluation-rows").replaceChildren();
   for (const point of points) {
     const tr = document.createElement("tr");
-    const values = [point.exchange, `${point.source} → ${point.listener}`, `${point.hits} / ${point.n}`, percent(point.accuracy), `${percent(point.wilson_low)} – ${percent(point.wilson_high)}`, point.invalid_answers];
+    const values = [point.exchange, `${point.source} 발화 → ${point.listener} 화자`, `${point.hits} / ${point.n}`, percent(point.accuracy), percent(point.corrected_accuracy ?? (point.accuracy-.25)/.75), `${percent(point.wilson_low)} – ${percent(point.wilson_high)}`, point.invalid_answers];
     for (const value of values) { const td=document.createElement("td");td.textContent=String(value);tr.append(td); }
     $("evaluation-rows").append(tr);
   }
@@ -141,6 +143,10 @@ $("compare").addEventListener("change",async()=>{
   try {
     const data = await api(`/api/run/${encodeURIComponent(id)}`);
     if (!isCurrent()) return;
+    const baseRun = state.data?.summary, otherRun = data.summary;
+    if (baseRun?.mode !== otherRun.mode || ["model_profile","native_training_profile","acquisition_profile","evaluation_profile"].some(key => baseRun?.[key] && JSON.stringify(baseRun[key]) !== JSON.stringify(otherRun[key]))) {
+      announce("학습 방식이나 모델 능력 조건이 다른 실행은 같은 조건으로 비교할 수 없어.", true); return;
+    }
     state.compare = data; drawChart();
   } catch(error) {
     if (isCurrent()) announce(error.message,true);
@@ -159,7 +165,9 @@ function drawChart(){
   ctx.font="10px system-ui";ctx.textAlign="right";ctx.textBaseline="middle";
   for(const value of [0,.25,.5,.75,1]){ctx.strokeStyle="#edf0f6";ctx.lineWidth=1;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x(0),y(value));ctx.lineTo(x(maxX),y(value));ctx.stroke();ctx.fillStyle="#99a5b7";ctx.fillText(`${Math.round(value*100)}%`,g.left-9,y(value));}
   ctx.textAlign="center";for(let i=0;i<=5;i++){const value=maxX*i/5;ctx.fillStyle="#99a5b7";ctx.fillText(String(Math.round(value)),x(value),g.height-12);}
-  for(const [value,color] of [[.25,"#cbd4df"],[state.data?.summary.threshold || .9,"#7dae99"]]){ctx.strokeStyle=color;ctx.lineWidth=1;ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(x(0),y(value));ctx.lineTo(x(maxX),y(value));ctx.stroke();}
+  const summary=state.data?.summary;
+  const rawTarget=summary?.threshold_raw_equivalent ?? (summary?.threshold_scale === "corrected" ? .25+.75*summary.threshold : summary?.threshold ?? .9);
+  for(const [value,color] of [[.25,"#cbd4df"],[rawTarget,"#7dae99"]]){ctx.strokeStyle=color;ctx.lineWidth=1;ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(x(0),y(value));ctx.lineTo(x(maxX),y(value));ctx.stroke();}
   function series(collection,comparison){
     const sources=[...new Set(collection.map(p=>p.source))];
     sources.forEach((source,index)=>{

@@ -188,3 +188,24 @@ test('ordinary refresh preserves a pending comparison on the same base',async()=
   assert.equal(app.element('compare').value,'B');
   assert.equal(app.state().compare.summary.run_id,'B');
 });
+
+test('model capability conditions cannot be silently overlaid',async()=>{
+  const app=await dashboard();
+  app.details.get('A').summary.model_profile={id:'small',hidden_dim:16};
+  app.details.get('B').summary.model_profile={id:'large',hidden_dim:128};
+  await app.compare('B');
+  assert.equal(app.state().compare,null);
+  assert.match(app.element('notice').textContent,/능력 조건/);
+});
+
+test('corrected targets and negative corrected scores are explicitly labelled',async()=>{
+  const app=await dashboard();
+  const data=app.details.get('A');
+  data.summary.threshold_scale='corrected'; data.summary.threshold=.9;
+  data.summary.directions=[{last_accuracy:0,last_corrected_accuracy:-1/3,
+    source_language:'ja',listener_language:'ko',sustained_threshold_confirmed_exchange:null}];
+  await app.select('A');
+  assert.match(app.element('detail-ab').textContent,/-33\.3%/);
+  assert.match(app.element('target-label').textContent,/우연 보정/);
+  assert.equal(app.element('threshold-time').textContent,'미도달');
+});

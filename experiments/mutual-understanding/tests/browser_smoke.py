@@ -20,6 +20,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--artifacts-dir", default="browser-artifacts")
+    parser.add_argument("--browser-executable", help="Optional installed Chromium path for offline environments")
     args = parser.parse_args()
     artifacts = Path(args.artifacts_dir).resolve()
     artifacts.mkdir(parents=True, exist_ok=True)
@@ -32,7 +33,7 @@ def main() -> None:
         errors: list[str] = []
         try:
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch()
+                browser = playwright.chromium.launch(executable_path=args.browser_executable)
                 try:
                     page = browser.new_page(viewport={"width": 1440, "height": 1120})
                     page.on("pageerror", lambda error: errors.append(str(error)))

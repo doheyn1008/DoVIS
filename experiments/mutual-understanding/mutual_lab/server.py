@@ -150,7 +150,7 @@ def make_server(root: str | Path, port: int = 8765) -> tuple[ThreadingHTTPServer
                         buffer = io.BytesIO()
                         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
                             for file in sorted(run.rglob("*")):
-                                if file.is_file() and not file.is_symlink() and file.suffix in {".json", ".jsonl", ".csv", ".png"}:
+                                if file.is_file() and not file.is_symlink() and file.suffix in {".json", ".jsonl", ".csv", ".png", ".pt"}:
                                     archive.write(file, arcname=str(file.relative_to(run)))
                         self.respond(200, buffer.getvalue(), "application/zip",
                                      Content_Disposition=f'attachment; filename="{run.name}.zip"')

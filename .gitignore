@@ -8,5 +8,6 @@ dist/
 .env.*
 !.env.example
 experiments/mutual-understanding/runs/
+experiments/mutual-understanding/checkpoints/
 experiments/mutual-understanding/browser-artifacts/
 experiments/mutual-understanding/configs/*.private.json

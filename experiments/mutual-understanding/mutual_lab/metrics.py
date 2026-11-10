@@ -9,6 +9,17 @@ from .agents import choose
 from .world import Dataset
 
 
+def corrected_accuracy(raw: float, choices: int = 4) -> float:
+    """chance-correction-v1: deliberately preserves below-chance negative values."""
+    return (raw - 1 / choices) / (1 - 1 / choices)
+
+
+def raw_threshold(threshold: float, scale: str, choices: int = 4) -> float:
+    if scale not in {"raw", "corrected"}:
+        raise ValueError("threshold scale must be raw or corrected")
+    return threshold if scale == "raw" else 1 / choices + threshold * (1 - 1 / choices)
+
+
 def wilson(hits: int, n: int) -> tuple[float, float]:
     z = 1.959963984540054
     p = hits / n
@@ -34,10 +45,27 @@ def evaluate(agents: list, dataset: Dataset, captions: dict[str, list[str]], exc
         hits = sum(trial["correct"] for trial in trials)
         n = len(trials)
         low, high = wilson(hits, n)
+        # Four probes in an unordered-pair cluster are correlated. Screening uses
+        # independent pair means and a bounded Hoeffding interval, with Bonferroni
+        # coverage for the two directions. Small pilots will often be inconclusive.
+        clusters = {}
+        for probe, trial in zip(dataset.probes, trials):
+            clusters.setdefault(probe.scene.group, []).append(int(trial["correct"]))
+        cluster_mean = sum(sum(v) / len(v) for v in clusters.values()) / len(clusters)
+        radius = math.sqrt(math.log(80) / (2 * len(clusters)))
         points.append({"exchange": exchange, "source": source.config.name,
                        "listener": listener.config.name, "source_language": source.config.language,
                        "listener_language": listener.config.language, "listener_exposures": listener.exposures,
-                       "accuracy": hits / n, "hits": hits, "n": n,
+                       "learner_native_language": listener.config.language,
+                       "target_language": source.config.language, "speaker_language": source.config.language,
+                       "accuracy": hits / n, "raw_accuracy": hits / n,
+                       "corrected_accuracy": corrected_accuracy(hits / n),
+                       "correction_version": "chance-correction-v1", "choice_count": 4,
+                       "corrected_wilson_low": corrected_accuracy(low),
+                       "corrected_wilson_high": corrected_accuracy(high), "hits": hits, "n": n,
+                       "screening_low": max(0, cluster_mean - radius),
+                       "screening_high": min(1, cluster_mean + radius), "screening_clusters": len(clusters),
+                       "screening_interval_method": "pair-mean Hoeffding; two-direction family coverage >=95%",
                        "invalid_answers": sum(not trial["valid"] for trial in trials),
                        "wilson_low": low, "wilson_high": high, "trials": trials})
     if states != [agent.state_digest() for agent in agents]:
@@ -45,11 +73,36 @@ def evaluate(agents: list, dataset: Dataset, captions: dict[str, list[str]], exc
     return points
 
 
-def summarize_direction(points: list[dict], threshold: float, sustained_checks: int) -> dict:
+def common_curve_metrics(points: list[dict], horizon: int | None, scale: str = "raw") -> dict:
+    key = "accuracy" if scale == "raw" else "corrected_accuracy"
+    result = {"horizon": horizon, "scale": scale, "normalized_auc": None, "fixed_exposure_accuracy": None,
+              "available": False, "reason": "common horizon not preregistered"}
+    if horizon is None:
+        return result
+    data = [p for p in points if p["exchange"] <= horizon]
+    if not data or data[0]["exchange"] != 0 or data[-1]["exchange"] != horizon:
+        return {**result, "reason": "common horizon not fully observed; no extrapolation"}
+    area = sum((b["exchange"] - a["exchange"]) * (a[key] + b[key]) / 2 for a, b in zip(data, data[1:]))
+    return {**result, "available": True, "reason": None, "normalized_auc": area / horizon,
+            "fixed_exposure_accuracy": data[-1][key]}
+
+
+def compare_common_auc(directions: list[dict]) -> list[float]:
+    """Prevent accidentally comparing averages over unequal observed exposure intervals."""
+    windows = [d["common_curve"] for d in directions]
+    if (not windows or not all(w["available"] for w in windows)
+            or len({(w["horizon"], w["scale"]) for w in windows}) != 1):
+        raise ValueError("AUC comparisons require the same fully observed preregistered horizon and scale")
+    return [w["normalized_auc"] for w in windows]
+
+
+def summarize_direction(points: list[dict], threshold: float, sustained_checks: int,
+                        scale: str = "raw", common_horizon: int | None = None,
+                        status: str = "completed") -> dict:
     streak = 0
     started = confirmed = first = None
     for index, point in enumerate(points):
-        if point["accuracy"] >= threshold:
+        if point["accuracy"] >= raw_threshold(threshold, scale):
             if first is None:
                 first = point["exchange"]
             streak += 1
@@ -66,17 +119,55 @@ def summarize_direction(points: list[dict], threshold: float, sustained_checks: 
     last = points[-1]
     return {"source": last["source"], "listener": last["listener"],
             "source_language": last["source_language"], "listener_language": last["listener_language"],
+            "learner_native_language": last["listener_language"],
+            "target_language": last["source_language"], "speaker_language": last["source_language"],
+            "threshold_scale": scale, "threshold_raw_equivalent": raw_threshold(threshold, scale),
             "baseline_accuracy": points[0]["accuracy"], "last_accuracy": last["accuracy"],
+            "baseline_corrected_accuracy": corrected_accuracy(points[0]["accuracy"]),
+            "last_corrected_accuracy": corrected_accuracy(last["accuracy"]),
             "last_wilson_interval": [last["wilson_low"], last["wilson_high"]],
             "first_observed_threshold_exchange": first,
             "sustained_threshold_started_exchange": started,
             "sustained_threshold_confirmed_exchange": confirmed,
-            "right_censored": confirmed is None,
-            "censoring_exchange": end if confirmed is None else None,
-            "normalized_auc_observed": auc, "eval_items": last["n"]}
+            "right_censored": confirmed is None and status == "completed",
+            "threshold_outcome": "reached" if confirmed is not None else
+                {"completed": "right_censored", "failed": "failed", "cancelled": "cancelled"}.get(status, "in_progress"),
+            "censoring_exchange": end if confirmed is None and status == "completed" else None,
+            "normalized_auc_observed": auc, "auc_observed_end": end,
+            "auc_observed_comparable": False,
+            "common_curve": common_curve_metrics(points, common_horizon, scale), "eval_items": last["n"]}
 
 
-def summarize_points(points: list[dict], threshold: float, sustained_checks: int) -> list[dict]:
+def summarize_points(points: list[dict], threshold: float, sustained_checks: int,
+                     scale: str = "raw", common_horizon: int | None = None,
+                     status: str = "completed") -> list[dict]:
     pairs = list(dict.fromkeys((point["source"], point["listener"]) for point in points))
     return [summarize_direction([point for point in points if (point["source"], point["listener"]) == pair],
-                                threshold, sustained_checks) for pair in pairs]
+                                threshold, sustained_checks, scale, common_horizon, status) for pair in pairs]
+
+
+def classify_initial(pretest: list[dict], native_eligibility: list[bool], margin: float,
+                     *, verified_foreign_exposure: bool) -> dict:
+    """Preregistered equivalence-band inclusion, never 'p > .05 implies zero'."""
+    checks = []
+    for point in pretest:
+        low, high = point["screening_low"], point["screening_high"]
+        label = ("chance_equivalent" if .25 - margin <= low and high <= .25 + margin else
+                 "positive_baseline" if low > .25 + margin else
+                 "below_chance" if high < .25 - margin else "uncertain")
+        checks.append({"learner_native_language": point["listener_language"],
+                       "target_language": point["source_language"], "raw_accuracy": point["accuracy"],
+                       "corrected_accuracy": point["corrected_accuracy"],
+                       "wilson_interval": [point["wilson_low"], point["wilson_high"]],
+                       "screening_interval": [low, high], "classification": label})
+    if not verified_foreign_exposure or len(native_eligibility) != 2 or not all(native_eligibility):
+        group, reason = "ineligible", "L1 qualification or foreign-training provenance requirement unmet"
+    elif len(checks) == 2 and all(p["classification"] == "chance_equivalent" for p in checks):
+        group, reason = "primary", "both independent pretest intervals within preregistered chance band"
+    elif any(p["classification"] == "positive_baseline" for p in checks):
+        group, reason = "positive_baseline_extension", "at least one direction above preregistered chance band"
+    else:
+        group, reason = "uncertain", "pretest precision insufficient or outside inclusion band"
+    return {"analysis_group": group, "reason": reason, "raw_chance_band": [.25 - margin, .25 + margin],
+            "interval_method": "pair-mean Hoeffding; two-direction family coverage >=95%; small pilots have low power",
+            "foreign_training_exposure_verified_zero": verified_foreign_exposure, "directions": checks}

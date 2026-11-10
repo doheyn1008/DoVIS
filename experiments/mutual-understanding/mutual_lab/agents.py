@@ -14,7 +14,7 @@ from .backend import ChatTransport, parse_choice
 from .config import AgentConfig, ExperimentConfig
 from .images import choice_sheet, data_url, scene_png
 from .prompts import PROMPTS
-from .world import Scene, controlled_caption
+from .world import Scene, controlled_caption, variants
 
 
 @dataclass(frozen=True)
@@ -145,5 +145,13 @@ def observe(agent, scene: Scene, utterance: str) -> None:
 
 
 def choose(agent, utterance: str, choices: tuple[Scene, ...], rng: random.Random) -> tuple[int | None, str]:
-    visible = choices if isinstance(agent, SymbolicAgent) else SharedImage(choice_sheet(choices))
+    visible = (choices if isinstance(agent, SymbolicAgent) else
+               tuple(SharedImage(scene_png(s)) for s in choices) if getattr(agent, "persistent", False) else
+               SharedImage(choice_sheet(choices)))
     return agent.choose(utterance, visible, rng)
+
+
+def observe_persistent(agent, shared_scene: Scene, utterance: str) -> None:
+    """Renderer is outside the learner; learner receives no Scene/label/translation."""
+    choices = tuple(SharedImage(scene_png(s)) for s in variants(shared_scene.group))
+    agent.observe(SharedImage(scene_png(shared_scene)), utterance, choices)

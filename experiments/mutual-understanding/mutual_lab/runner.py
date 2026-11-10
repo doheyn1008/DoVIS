@@ -10,7 +10,7 @@ from .agents import EndpointAgent, SymbolicAgent, observe, speak
 from .backend import ChatTransport
 from .config import ExperimentConfig
 from .images import choice_sheet
-from .metrics import evaluate, summarize_points
+from .metrics import evaluate, raw_threshold, summarize_points
 from .storage import RunStore, now, write_json
 from .world import make_dataset
 
@@ -24,6 +24,9 @@ class ExperimentFailed(RuntimeError):
 def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
                    progress: Callable[[dict], None] | None = None) -> Path:
     config.validate()
+    if config.mode == "neural":
+        from .research import run_neural_experiment
+        return run_neural_experiment(config, output, progress)
     dataset = make_dataset(config)
     if config.request_upper_bound() > config.max_requests:
         raise ValueError(f"Worst-case {config.request_upper_bound()} requests exceeds max_requests="
@@ -47,19 +50,24 @@ def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
 
     def snapshot(status: str, error: str | None = None) -> dict:
         summary = {"schema_version": 1, "run_id": store.run_id, "status": status, "mode": config.mode,
+                   "learning_mode": "symbolic_demo" if config.mode == "demo" else "bounded_context_adaptation",
+                   "analysis_eligibility": "not a qualified monolingual persistent learner",
                    "seed": config.seed, "started_at": store.started_at, "updated_at": now(),
                    "exchanges_completed": exchange, "utterances_completed": 2 * exchange,
-                   "threshold": config.threshold, "sustained_checks": config.sustained_checks,
+                   "threshold": config.threshold, "threshold_scale": config.evaluation_profile.threshold_scale,
+                   "threshold_raw_equivalent": raw_threshold(config.threshold, config.evaluation_profile.threshold_scale),
+                   "sustained_checks": config.sustained_checks,
                    "stop_reason": reason if status == "completed" else None,
                    "dataset_sha256": dataset.fingerprint, "transport": transport.budget.to_dict(),
                    "agents": [agent.config.__dict__ for agent in agents],
-                   "directions": summarize_points(points, config.threshold, config.sustained_checks) if points else [],
+                   "directions": summarize_points(points, config.threshold, config.sustained_checks,
+                       config.evaluation_profile.threshold_scale, config.evaluation_profile.common_horizon, status) if points else [],
                    "limitations": limitations, "error": error}
         write_json(store.path / "summary.json", summary)
         return summary
 
     def checkpoint() -> None:
-        current = evaluate(agents, dataset, captions, exchange, config.seed)
+        current = evaluate(agents, dataset, captions, exchange, config.effective_seed("evaluation"))
         points.extend(current)
         store.metrics(points)
         store.event({"type": "evaluation", "exchange": exchange, "points": current})
@@ -70,8 +78,9 @@ def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
     def should_stop() -> bool:
         if not config.stop_on_threshold:
             return False
-        directions = summarize_points(points, config.threshold, config.sustained_checks)
-        return len(directions) == 2 and all(not item["right_censored"] for item in directions)
+        directions = summarize_points(points, config.threshold, config.sustained_checks,
+                                      config.evaluation_profile.threshold_scale)
+        return len(directions) == 2 and all(item["threshold_outcome"] == "reached" for item in directions)
 
     snapshot("running")
     try:
@@ -93,7 +102,7 @@ def run_experiment(config: ExperimentConfig, output: str | Path = "runs",
         if should_stop():
             reason = "sustained_threshold_both_directions"
         else:
-            rng = random.Random(config.seed + 104729)
+            rng = random.Random(config.effective_seed("dialogue") + 104729)
             order = list(dataset.train)
             rng.shuffle(order)
             for next_exchange in range(1, config.max_exchanges + 1):

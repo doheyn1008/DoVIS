@@ -1,128 +1,162 @@
 # Mutual Lab — 언어 상호학습 실험 환경
 
-같은 그림을 보는 두 에이전트가 각자의 언어로 대화한 뒤, **대화 횟수에 따라 상대 언어 이해도가 얼마나 증가하는지 양방향으로 측정**합니다. 학습 전 점수, 고정된 평가 문장, 학습에 없던 물체 조합, 반복 시드, 목표 미도달 결과를 함께 기록합니다.
+공유 그림을 보고 자기 언어로 말하는 두 학습자의 **상대 언어 습득 비용을 방향별로 기록**합니다. 모국어 이해 가중치를 재사용하는 누적 신경망 학습, 독립 사전검사, 우연 보정 이해도, 체크포인트 재개, 모델·경험 반복을 지원합니다.
 
-첫 구현의 범위는 **색·모양·상대 위치를 설명하는 제한된 시각 과제**입니다. 논문의 최종 실험이나 보편적인 언어 거리 측정이 아니라, 실험을 검증하고 확장하기 위한 실행 환경입니다. 설계와 해석 범위는 [실험 방법](docs/methodology.md)에 정리했습니다.
+현재는 색·모양·상대 위치를 다루는 **제한된 자연어 영역의 파이프라인**입니다. 유효한 언어 거리나 충분한 모국어 숙련도를 갖춘 본실험 결과를 확보했다는 뜻이 아닙니다. 적격성·발화 정확성·사전검사를 못 넘은 실행도 사유와 함께 남깁니다. [프로토콜과 해석 범위](docs/methodology.md)를 먼저 확인하세요.
 
-## 바로 실행
+## 추가 설치 없이 장치 확인
 
-Python **3.11 이상**. 런타임 의존성, API 키, GPU, 인터넷 연결 없이 데모를 실행할 수 있습니다.
+Python **3.11 이상**에서 API 키·GPU·외부 패키지 없이 실행합니다.
 
 ```bash
 cd experiments/mutual-understanding
-python -m mutual_lab demo
+python -m mutual_lab demo --lang-a ko --lang-b es
 python -m mutual_lab serve
 ```
 
-브라우저에서 **http://127.0.0.1:8765**를 엽니다.
+**http://127.0.0.1:8765**에서 실행·곡선·대화 재생·비교·ZIP 내보내기를 볼 수 있습니다. 지원 언어는 영어·한국어·일본어·스페인어입니다. 화면의 실행 버튼은 기호학습 데모만 시작하며 학습 비용이 발생하는 신경망 훈련을 시작하지 않습니다. CLI로 저장한 신경망 실행은 같은 대시보드에서 조회합니다.
 
-- 언어 조합(영어·한국어·일본어), 시드, 최대 대화 수를 골라 데모 실행
-- A → B / B → A 이해도 곡선, 25% 무작위 기준선, 목표선, 95% 구간 확인
-- 실행 간 곡선 비교, 공유 그림과 두 발화의 순서 재생
-- 전체 결과 ZIP 내보내기: 원본 로그·설정·CSV·평가 결과·그림 포함
+| 모드 | 변화하는 것 | 결과의 의미 |
+| --- | --- | --- |
+| `demo` | 빈 naive Bayes 수신자의 기호 통계 | 모국어 전이가 없는 측정 장치 검사 |
+| `endpoint` | 고정 VLM에 전달하는 최근 대화 기록 | 초기 외국어 지식이 미검증인 문맥 적응 파일럿 |
+| `neural` | 모국어로 훈련한 이해 GRU의 실제 가중치 | 제한된 과제의 누적 습득. 분석 포함 조건을 별도 판정 |
 
-**데모**는 자기 언어의 제한된 템플릿으로 말하는 화자와, 시각 특징에 단어·어순을 연관시키는 기호학습 수신자를 사용합니다. 점수는 매번 실제 학습과 평가로 계산합니다. 완전한 시각 인식을 가정하므로, 데모의 한국어·영어 차이를 실제 언어 습득 난이도로 해석하면 안 됩니다. 데모로 인공언어 실험을 선행해야 한다는 뜻도 아닙니다.
+## 모국어부터 신경망 학습
 
-설치형 명령이 필요하면 선택적으로 `python -m pip install -e .`를 실행한 뒤 `mutual-lab`을 사용할 수 있습니다.
+작은 GRU를 CPU에서 직접 훈련합니다. 공개 다국어 가중치나 학습된 토크나이저를 사용하지 않습니다. 기본 프로파일은 경로 확인용 초소형 모델이며 모국어 적격성 통과나 실행 시간을 보장하지 않습니다.
 
-## 실제 모델 두 개 연결
+```bash
+# CPU wheel을 먼저 설치하려는 경우
+python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -e '.[neural]'
 
-각 모델을 **이미지 입력을 지원하는 Chat Completions 호환 서버**로 먼저 실행합니다. 클라이언트는 `POST /v1/chat/completions`에 텍스트와 base64 PNG `image_url`을 전달합니다. 모델을 내려받거나 GPU 서버를 자동 생성하지 않습니다.
+python -m mutual_lab validate configs/neural.example.json
+python -m mutual_lab train-native configs/neural.example.json --language ko --output checkpoints/ko.pt
+python -m mutual_lab train-native configs/neural.example.json --language ja --output checkpoints/ja.pt
+python -m mutual_lab run configs/neural.example.json
+python -m mutual_lab serve
+```
 
-1. [configs/local.example.json](configs/local.example.json)을 `configs/local.private.json`으로 복사합니다.
-2. 두 `model`과 `base_url`을 실제 서버에 맞춥니다. 예시는 한국어 화자 A, 일본어 화자 B입니다.
-3. 인증이 필요하면 키를 환경변수로 설정하고 `api_key_env`에 **변수 이름만** 적습니다.
-4. 요청 상한을 확인하고 실행합니다.
+언어별 복제본은 같은 초기화 시드와 구조에서 자기 언어 자료만 배웁니다. 기본 L1 조건은 같은 step·batch 예산입니다. 실제 이해·생성 점수는 서로 다를 수 있어 함께 기록합니다. 상대 언어를 배울 때는 **L1 이해 embedding·GRU·head를 그대로 이어서** 업데이트합니다. 원어 생성용 GRU는 별도이며 만남 뒤 고정합니다. 둘 모두 발화한 후 양쪽을 업데이트합니다.
+
+[neural.example.json](configs/neural.example.json)의 설정은 다음처럼 분리되어 있습니다.
+
+| 설정 | 통제 내용 |
+| --- | --- |
+| `model_profile` | GRU 구조·용량·입력 단위·최대 길이 |
+| `native_training_profile` | L1 자료 버전·훈련 예산·적격성 기준 |
+| `acquisition_profile` | 노출당 업데이트·Adam·학습률·자기 언어/외국어 복습 |
+| `evaluation_profile` | 목표 척도·사전검사·독립 최종 평가·공통 노출 구간 |
+
+`tiny-gru-v1`과 더 큰 `gru-12m-v1` 예시가 있으며, 유효한 GRU 차원을 직접 지정할 수도 있습니다. 실제 매개변수 수와 모국어 성취도를 기록하며 크기를 지능 점수로 취급하지 않습니다. 지원되지 않는 구조·자료·학습 규칙과 호환되지 않는 체크포인트는 거부합니다.
+
+기본 입력은 UTF-8입니다. `model_profile.tokenizer="unicode-bmp"`는 학습된 vocabulary 없이 고정 BMP 코드포인트를 쓰는 민감도 조건입니다. vocabulary 크기·실제 매개변수 수가 달라지므로 별도 프로파일로 비교하세요. 같은 바이트/토큰 예산을 같은 의미 경험이라고 가정하지 않습니다.
+
+대조 조건은 `acquisition_profile`에서 지정합니다.
+
+```json
+{"updates_per_exposure": 0}
+```
+
+또는 `association="shuffled"`, `reset_l1_understanding=true`를 사용합니다. 기본값인 `aligned`, L1 가중치 유지, 노출당 1회 업데이트와 구분해 기록합니다. 원어 가중치를 초기화해 초기 점수를 억지로 0에 맞추지 않습니다.
+
+## 독립 모델 × 경험 반복 × 모든 언어 쌍
+
+```bash
+# 훈련 없이 전체 작업 목록과 예산 확인
+python -m mutual_lab grid-plan configs/grid.example.json
+
+# 기본: 모델 조건 1 × 독립 L1 모델 2 × 경험 반복 2 × 언어 4개의 6쌍 = 24실행
+python -m mutual_lab grid configs/grid.example.json
+
+# 파일럿으로 pending 작업 1개만 실행
+python -m mutual_lab grid configs/grid.example.json --limit 1
+
+# 같은 계획의 미실행 작업 계속 실행
+python -m mutual_lab grid configs/grid.example.json --resume-dir runs/grids/GRID_DIRECTORY
+```
+
+실제 생성된 `GRID_DIRECTORY` 경로를 사용하세요. 예산은 모델별 L1 step과 최대 L2 업데이트 수입니다. 시간·GPU 메모리를 임의로 추정하지 않으므로 작은 계획부터 실제 장치에서 측정하세요.
+
+각 독립 모델 반복은 다른 최초 가중치와 L1 표본 순서로 **다시 훈련**합니다. 한 반복 안에서는 언어별 최초 가중치·의미 범위를 대응시킵니다. 각 쌍/경험은 같은 원본 L1 체크포인트를 새로 로드하므로 이전 외국어 학습이 다음 쌍으로 넘어가지 않습니다.
+
+같은 경험 반복의 모든 쌍에 공통 장면·대화·평가 시드를 사용합니다. 일본어를 목표로 모국어만 바꾸는 비교에는 동일한 일본어 생성 체크포인트와 그림·발화 스트림이 들어갑니다. 현재 grid는 장면 분할을 고정하고 경험별 대화 순서·평가 보기 순서를 바꿉니다. 분할까지 바꾸려면 새 L1 모델을 준비한 별도 계획을 만드세요.
+
+`grid.json`과 `outcomes.json`은 미실행·실행 중·완료·실패·취소를 구분합니다. `aggregate.json`은 모델 프로파일과 적격성 분류를 나누고, **독립 모델마다 그 안의 경험 반복을 보존**합니다. 같은 체크포인트에서 대화 100번을 반복한 것을 독립 모델 100개로 세지 않습니다. 실패·취소는 자동 재시도하지 않고, 재개 시 미실행 작업을 진행합니다.
+
+기존 `sweep`은 데모/endpoint 시드 반복용이며 신경망 독립 모델 반복을 대신하지 않습니다.
+
+```bash
+python -m mutual_lab sweep configs/demo.json --seeds 7,11,23
+```
+
+## 점수와 분석 포함 기준
+
+원정답률 p와 우연 보정값 `q=(p−0.25)/0.75`를 함께 저장합니다. 25%가 보정 0, 100%가 보정 1이며 음수도 그대로 남깁니다.
+
+- 기존 설정의 90% 목표는 원정답률입니다. 조용히 재해석하지 않습니다.
+- `threshold_scale="corrected"`의 90%는 원정답률 **92.5%**입니다. 신경망 예시는 이 조건을 명시합니다.
+- 화면의 곡선은 원정답률이고 보정값은 별도 열에 표시합니다. 목표 척도도 라벨에 적습니다.
+- `A → B`는 **A 발화를 B 화자가 이해**한다는 뜻입니다. 결과의 `learner_native_language`, `target_language`, `speaker_language`로 방향을 명확히 합니다.
+- 노출 1회는 공유 장면 1장과 각자 받은 상대 발화 1개입니다. 문자·바이트·입력 unit·복습·업데이트·시간·계산량 대용치도 별도 저장합니다.
+
+신경망 모드에는 학습·L1 검사·사전검사·곡선·최종 평가가 물체 쌍 단위로 분리됩니다. 초기 점수가 우연과 유의하게 다르지 않다는 이유만으로 0이라고 하지 않습니다. 사전에 정한 우연 주변 구간 안에 **쌍 단위의 보수적 불확실성 구간 전체**가 들어와야 1차 포함 조건을 충족합니다. 현재 36개 물체 쌍의 작은 세계는 이 검정력이 부족해 우연 수준의 동등성을 확정할 수 없습니다. 표본 확대가 필요한 파일럿이며 판정 보류를 정상 결과로 취급합니다.
+
+`summary.json`의 `inclusion.analysis_group`은 `primary`, `positive_baseline_extension`, `uncertain`, `ineligible`, `control`을 구분합니다. 모국어/출처/고정 발화 검사 실패, 정밀도 부족과 대조 조건을 이유와 함께 남깁니다. 문항을 사후 제거해 점수를 맞추지 않습니다.
+
+목표는 0회부터 동일하게 검사하며 최초 통과·연속 통과 시작·확인 시점을 따로 남깁니다. 완료 상한까지 미도달이면 도달량은 `null`이고 `right_censored`입니다. 실패·취소와 구분합니다. 도달 실행만의 중앙값에는 미도달 비율도 함께 표시합니다.
+
+조기 종료한 실행의 `normalized_auc_observed`는 실행별 실제 관측 구간의 기술적 평균입니다. 동일 노출 비교에는 사전등록한 `common_horizon`의 AUC와 고정 노출 정확도를 사용합니다. 구간을 끝까지 못 봤으면 결측이며 외삽하지 않습니다. 신경망 예시는 곡선 비교를 위해 조기 종료를 끕니다.
+
+## 체크포인트와 실행 재개
+
+```bash
+python -m mutual_lab resume runs/RUN_DIRECTORY
+```
+
+두 학습자가 모두 저장된 마지막 완전한 체크포인트에서 **새 실행**을 시작합니다. 원래 고정 문장·시드·분할·학습 계획과 평가 이력을 보존하며 원래 실행도 남습니다. 가중치·optimizer·복습 버퍼·난수 상태·노출 카운터를 복원하므로 저장 지점 뒤의 학습을 이어갑니다. 저장 지점 뒤 미완료 작업은 재실행합니다.
+
+| 결과 파일 | 내용 |
+| --- | --- |
+| `summary.json` | 실행 상태·모국어 적격성·포함 사유·방향별 비용·노출/업데이트/시간 |
+| `metrics.csv`, `evaluations.json` | 원정답률·보정값·문항별 선택·Wilson 구간·방향 매핑 |
+| `pretest.json`, `final_evaluations.json` | 별도 사전검사와 독립 최종 평가 |
+| `native_qualification.json`, `caption_audit.json` | 모국어 이해·생성 성취도, 고정 발화 감사 |
+| `config.json`, `manifest.json`, `prompts.json` | 실제 프로파일·코드/설정 해시·언어 준비 상태·환경 |
+| `dataset.json`, `all_frozen_captions.json`, `dialogue_plan.json` | 고정 분할·평가 원어 발화·시드별 노출 계획 |
+| `native/` | 원본 L1 체크포인트와 SHA256 sidecar 사본 |
+| `checkpoints/`, `learning_checkpoint.json` | 실험 중 두 학습자의 누적 상태와 재개 포인터 |
+| `events.jsonl`, `assets/` | 발화·학습 그림·평가·실패 로그와 이미지 |
+
+`neural`은 원본 L1과 누적 학습 체크포인트를 구분합니다. 대시보드 ZIP에는 학습 상태도 포함하므로 큰 모델은 내보내기 파일이 커집니다. 데모/endpoint에는 persistent 체크포인트가 없습니다. 기존 파일명 `frozen_captions.json`도 곡선용 호환 파일로 유지합니다.
+
+## 로컬 VLM의 문맥 적응 측정
+
+이미지를 받는 Chat Completions 호환 서버 두 개를 별도로 실행하고 [local.example.json](configs/local.example.json)을 `configs/local.private.json`으로 복사해 수정하세요.
 
 ```bash
 python -m mutual_lab validate configs/local.private.json
 python -m mutual_lab run configs/local.private.json
-python -m mutual_lab serve
 ```
 
-예시 설정은 최대 **272회** 요청을 계획하고, `max_requests=400`으로 제한합니다. 평가 문장 생성과 대화 0회 평가도 포함한 상한입니다. 상한보다 예산이 작으면 요청 전에 거부합니다. 실패한 요청은 자동 재시도하지 않으며, 사용한 요청 수와 서버가 보고한 토큰 수를 기록합니다.
+서버는 `POST /v1/chat/completions`의 `model`, `messages`, `temperature`, `max_tokens`, `seed`, `stream=false`와 PNG data URL을 받아 문자열 `message.content`를 반환해야 합니다. 예시 요청 상한은 272회, 예산은 400회입니다. 생성 실패도 서버가 유효하게 보고한 토큰 사용량은 집계하고 자동 재시도하지 않습니다. 인증 키는 환경변수에 두고 설정에는 변수 이름만 적습니다.
 
-모델 서버 요구 사항:
+한 요청에 기록 그림 `context_exchanges`장과 현재 그림 1장이 들어갑니다. 모델 이미지 수·컨텍스트 길이 제한을 확인하세요. 호출 사이 숨은 상태나 온라인 학습이 없어야 하며 실제 서버의 비결정성까지 통제하지는 않습니다. 기본 loopback만 허용하고 외부 서버는 `allow_remote=true`를 명시합니다. 클라이언트는 리다이렉트·환경 프록시·웹/번역 도구를 사용하지 않습니다.
 
-- `model`, `messages`, `temperature`, `max_tokens`, `seed`, `stream=false`를 받는 Chat Completions API
-- 문자열 `message.content` 응답과 PNG data URL 이미지 입력
-- 한 요청의 여러 기록 이미지 지원: `context_exchanges + 1`장. 예시는 **최대 9장**
-- 호출 간 숨은 대화 상태나 온라인 가중치 업데이트가 없는 추론 서버
+"자기 언어로만 말하라"는 지시나 인터넷 차단은 다국어 사전학습 지식을 지우지 않습니다. `initialization_note`에 근거를 적더라도 이 모드는 단일언어 지속 학습 본실험으로 자동 승격되지 않습니다.
 
-[vLLM의 멀티모달 입력 문서](https://docs.vllm.ai/en/stable/features/multimodal_inputs/)를 참고할 수 있습니다. 모델별 이미지 수 제한과 컨텍스트 길이에 맞게 서버와 `context_exchanges`를 함께 조정하세요. `seed`를 받더라도 모델 서버의 완전한 결정성을 보장하지 않습니다.
-
-초기 외국어 지식은 별도로 검증해야 합니다. **"한국어로만 말하라"는 지시나 인터넷 차단은 다국어 사전학습 지식을 없애지 않습니다.** `initialization_note`에 체크포인트·학습 데이터·토크나이저·시각 인코더의 근거를 적고 대화 0회 점수를 확인하세요. 이 버전은 가중치를 고정한 **문맥 내 적응**이며, 지속적인 매개변수 학습은 구현하지 않습니다.
-
-기본적으로 loopback 주소만 허용합니다. 다른 컴퓨터의 서버는 `allow_remote=true`를 명시해야 합니다. 클라이언트에는 브라우징·도구 호출·번역 API가 없고, 리다이렉트와 환경변수 프록시를 사용하지 않습니다. 모델 서버 자체의 외부 접근과 네트워크 격리는 별도 운영 조건입니다. 대시보드의 실행 버튼은 항상 무료 기호학습 데모만 시작합니다.
-
-## 반복 실험
+## 자동 검증
 
 ```bash
-python -m mutual_lab sweep configs/demo.json --seeds 7,11,23
-python -m mutual_lab demo --lang-a ko --lang-b ja --seed 11 --max-exchanges 100
-python -m mutual_lab demo --no-early-stop
-```
-
-각 시드는 데이터 분할·대화 순서·보기 순서를 결정합니다. 실행마다 별도 폴더를 만들고, sweep은 도달 실행 수와 **목표 미도달 실행 수**를 모두 집계합니다. 도달 시간의 중앙값은 도달한 실행에 한정된 값이라고 표시합니다. 시드 간에는 평가 물체 조합도 바뀌므로, 변동에 데이터 분할 효과가 포함됩니다.
-
-## 무엇을 측정하나
-
-- **대화 1회** = 공유 그림 1장 + A와 B의 발화 각 1개. 먼저 말하는 쪽을 번갈아 바꿉니다.
-- 각 에이전트는 자기 언어로 그림을 설명합니다. 두 번째 화자는 첫 발화에도 반응할 수 있습니다.
-- 평가 문장은 **대화 시작 전에**, 상대 발화를 본 적 없는 화자에게서 생성하고 고정합니다.
-- 평가 시 수신자는 상대 언어 문장과 번호가 붙은 그림 네 개를 **하나의 보기 이미지**로 받습니다.
-- 정답을 맞힌 문항 비율이 여기서의 이해도입니다. 발화 의미를 90% 설명한다는 정의와는 구분합니다.
-- 네 그림은 같은 물체 두 개를 포함하고 위치·순서가 다릅니다. 단어의 출현만으로 구별하기 어렵게 합니다.
-- 학습·평가는 **색과 모양을 가진 물체의 무순서 쌍**으로 나눕니다. 평가 보기의 모든 장면도 학습에서 제외합니다.
-- 평가 결과·정답·평가 문장을 학습 기록에 추가하지 않습니다. 평가 전후 학습자 상태의 해시도 검사합니다.
-- 기본 목표는 90% 이상 **2회 연속 평가**입니다. 최초 관측, 연속 통과 시작, 확인 시점을 따로 저장합니다.
-- 최대 대화 수까지 목표를 확인하지 못하면 `right_censored=true`, 도달 시점은 `null`로 남깁니다.
-
-그림 설명의 정확성, 자연어 유지 여부, 모델의 초기 지식은 자동 보증되지 않습니다. 고정 문장을 살펴보고 별도의 최종 평가를 설계한 후 연구 결과로 사용하세요.
-
-## 결과 파일
-
-`runs/<실행 ID>/`에 저장합니다. 실행 폴더와 개인 설정 파일은 Git에서 제외됩니다.
-
-| 파일 | 내용 |
-| --- | --- |
-| `summary.json` | 상태, 양방향 점수·목표 도달량·미도달 처리, 요청·토큰 수, 해석 제한 |
-| `metrics.csv` | 대화 수별 정확도, 정답 수, 형식 오류 수, Wilson 95% 구간 |
-| `evaluations.json` | 문항별 선택·정답·원본 응답. 연구자용이며 학습자에게 전달하지 않음 |
-| `events.jsonl` | 대화, 평가, 요청 메타데이터, 실패를 시간순으로 남기는 로그 |
-| `config.json`, `prompts.json` | 실제 사용한 설정과 언어별 지시문. 인증 키 값은 저장하지 않음 |
-| `manifest.json` | 코드 버전, 작업 트리 상태, 설정·지시문 해시, 실행 환경, 측정 단위 |
-| `dataset.json`, `frozen_captions.json` | 분할·평가 보기·고정된 원어 발화 |
-| `assets/` | 공유 그림과 평가용 4지선다 그림 |
-
-중간에 서버가 끊기거나 Ctrl+C로 중단되면 `failed` 또는 `cancelled` 상태와 이미 남긴 로그를 보존합니다. 실행 재개 기능은 아직 없으며 다시 실행하면 새 실행 ID를 만듭니다. 중단된 실행은 최대 대화 수까지 완료된 미도달 실행과 구분하세요.
-
-## 검증과 확장
-
-```bash
+# 외부 의존성이 없으면 신경망 검사만 명시적으로 skip
 python -m unittest discover -s tests -v
-```
-
-표준 라이브러리 테스트만 사용합니다. 데이터 누출 방지, 학습 전 기준점, 평가의 상태 불변성, 고정 문장, 재현성, 목표 미도달 처리, HTTP 프로토콜, 요청 예산·오류·키 비저장, 대시보드 API를 검사합니다. HTTP 테스트 서버는 프로토콜 검증용이며 실제 모델 성능 시험이 아닙니다.
-
-비교 응답이 늦게 도착하거나 순서가 뒤바뀌는 경우는 실제 대시보드 스크립트와 제어 가능한 fetch 대역으로 검사합니다. Node.js 22 이상에서 실행할 수 있습니다.
-
-```bash
 node --test tests/test_dashboard_state.mjs
-```
 
-선택적 브라우저 검사는 데스크톱·모바일 화면, 실행·비교·재생·ZIP 다운로드를 확인합니다. GitHub Actions에서는 비동기 비교 검사와 브라우저 검사를 모두 실행합니다.
-
-```bash
+# 선택적 실제 브라우저 검사
 python -m pip install -e '.[browser]'
 python -m playwright install chromium
 python tests/browser_smoke.py --artifacts-dir browser-artifacts
 ```
 
-- 시각 과제: `world.py`, `images.py`
-- 모델·학습 메커니즘: `agents.py`, `backend.py`
-- 평가·종료 규칙: `metrics.py`, `runner.py`
-- 언어별 지시문: `prompts.py`
-- 대시보드: `server.py`, `static/`
-
-다음 확장 후보는 실사·사건 장면, 모국어 능력의 별도 검사, 단일언어 초기화, 가중치 업데이트 어댑터, 독립적인 최종 평가입니다. 어떤 확장이든 현재 실험과 설정·결과를 구분해 보존해야 합니다.
+CPU 신경망 CI는 실제로 작은 L1 모델을 훈련한 뒤 L1 가중치 재사용·역전파 경로, 원어 생성기 고정, 업데이트 0회/초기화 대조, 스페인어 경로, 평가 상태 불변, 버퍼/optimizer/난수 복원, 중단/재개 동일성, 쌍 간 초기화와 grid 재개를 확인합니다. 특정 모국어가 반드시 빠르게 학습되도록 만든 검사는 없습니다. 짧은 훈련으로 숙련도 미달인 모델은 부적격으로 남는지도 검사합니다. 모델 반복이 충분한 연구 결과를 얻었다는 검사는 아닙니다.

@@ -10,6 +10,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .languages import LANGUAGES
+from .profiles import ModelProfile, NativeTrainingProfile, AcquisitionProfile, EvaluationProfile
+
 
 def integer(value: object, name: str, lower: int, upper: int) -> None:
     if type(value) is not int or not lower <= value <= upper:
@@ -25,15 +28,16 @@ class AgentConfig:
     base_url: str = ""
     api_key_env: str = ""
     initialization_note: str = "Unverified: no monolingual initialization evidence supplied."
+    native_checkpoint: str = ""
 
     def validate(self, allow_remote: bool) -> None:
         if not isinstance(self.name, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,31}", self.name):
             raise ValueError("Agent name must be a short ASCII identifier")
-        if self.language not in {"en", "ko", "ja"}:
-            raise ValueError("Supported instruction languages: en, ko, ja")
-        if self.backend not in {"symbolic", "endpoint"}:
-            raise ValueError("backend must be symbolic or endpoint")
-        for key in ("model", "base_url", "api_key_env", "initialization_note"):
+        if self.language not in LANGUAGES:
+            raise ValueError(f"Unsupported language: {self.language}; registered: {', '.join(LANGUAGES)}")
+        if self.backend not in {"symbolic", "endpoint", "neural"}:
+            raise ValueError("backend must be symbolic, endpoint, or neural")
+        for key in ("model", "base_url", "api_key_env", "initialization_note", "native_checkpoint"):
             if not isinstance(getattr(self, key), str):
                 raise ValueError(f"{key} must be a string")
         if self.backend == "endpoint":
@@ -70,12 +74,31 @@ class ExperimentConfig:
     timeout_seconds: float = 60.0
     max_requests: int = 1000
     allow_remote: bool = False
+    model_profile: ModelProfile = field(default_factory=ModelProfile)
+    native_training_profile: NativeTrainingProfile = field(default_factory=NativeTrainingProfile)
+    acquisition_profile: AcquisitionProfile = field(default_factory=AcquisitionProfile)
+    evaluation_profile: EvaluationProfile = field(default_factory=EvaluationProfile)
+    model_replica_id: str = "unassigned"
+    experience_replica_id: str = "unassigned"
+    pair_id: str = ""
+    scene_split_seed: int | None = None
+    dialogue_seed: int | None = None
+    evaluation_seed: int | None = None
     agents: tuple[AgentConfig, AgentConfig] = field(default_factory=lambda: (
         AgentConfig("A", "en"), AgentConfig("B", "ko"),
     ))
 
     def validate(self) -> "ExperimentConfig":
-        integer(self.schema_version, "schema_version", 1, 1)
+        integer(self.schema_version, "schema_version", 1, 2)
+        for key in ("scene_split_seed", "dialogue_seed", "evaluation_seed"):
+            if getattr(self, key) is not None:
+                integer(getattr(self, key), key, 0, 2**32 - 1)
+        for key in ("model_replica_id", "experience_replica_id", "pair_id"):
+            if not isinstance(getattr(self, key), str):
+                raise ValueError(f"{key} must be a string")
+        for profile in (self.model_profile, self.native_training_profile,
+                        self.acquisition_profile, self.evaluation_profile):
+            profile.validate()
         integer(self.seed, "seed", 0, 2**32 - 1)
         integer(self.max_exchanges, "max_exchanges", 1, 100_000)
         integer(self.eval_every, "eval_every", 1, self.max_exchanges)
@@ -86,7 +109,8 @@ class ExperimentConfig:
         integer(self.context_exchanges, "context_exchanges", 1, 1000)
         integer(self.max_tokens, "max_tokens", 8, 4096)
         integer(self.max_requests, "max_requests", 1, 10_000_000)
-        for key, low, high in (("holdout_fraction", .05, .75), ("threshold", .25, 1.0),
+        minimum = 0 if self.evaluation_profile.threshold_scale == "corrected" else .25
+        for key, low, high in (("holdout_fraction", .05, .75), ("threshold", minimum, 1.0),
                                ("temperature", 0.0, 2.0), ("timeout_seconds", .01, 600.0)):
             value = getattr(self, key)
             if type(value) not in {int, float} or not math.isfinite(value) or not low <= value <= high:
@@ -102,11 +126,23 @@ class ExperimentConfig:
             raise ValueError("Agent names must differ")
         if len({agent.backend for agent in self.agents}) != 1:
             raise ValueError("Both agents must use the same backend type for this pilot")
+        horizon = self.evaluation_profile.common_horizon
+        if horizon is not None and (horizon > self.max_exchanges or
+                                   (horizon % self.eval_every and horizon != self.max_exchanges)):
+            raise ValueError("common_horizon must be a scheduled checkpoint within max_exchanges")
+        if self.mode == "neural" and self.schema_version != 2:
+            raise ValueError("Neural experiments require schema_version=2")
+        if self.mode == "neural" and self.agents[0].language == self.agents[1].language:
+            raise ValueError("First-contact neural experiments require distinct native languages")
         return self
 
     @property
     def mode(self) -> str:
-        return "demo" if self.agents[0].backend == "symbolic" else "endpoint"
+        return {"symbolic": "demo", "endpoint": "endpoint", "neural": "neural"}[self.agents[0].backend]
+
+    def effective_seed(self, kind: str) -> int:
+        explicit = getattr(self, f"{kind}_seed")
+        return self.seed if explicit is None else explicit
 
     def to_dict(self) -> dict:
         data = asdict(self)
@@ -114,7 +150,7 @@ class ExperimentConfig:
         return data
 
     def request_upper_bound(self) -> int:
-        if self.mode == "demo":
+        if self.mode != "endpoint":
             return 0
         # Frozen captions, checkpoint zero + scheduled/final evaluations, two utterances per exchange.
         checkpoints = 1 + math.ceil(self.max_exchanges / self.eval_every)
@@ -126,6 +162,12 @@ class ExperimentConfig:
             raise ValueError("Configuration must be a JSON object")
         data = dict(data)
         try:
+            for key, profile_type in (("model_profile", ModelProfile),
+                                      ("native_training_profile", NativeTrainingProfile),
+                                      ("acquisition_profile", AcquisitionProfile),
+                                      ("evaluation_profile", EvaluationProfile)):
+                if key in data:
+                    data[key] = profile_type(**data[key])
             if "agents" in data:
                 if not isinstance(data["agents"], list):
                     raise ValueError("agents must be a JSON array")

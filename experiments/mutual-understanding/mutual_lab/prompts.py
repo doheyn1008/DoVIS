@@ -1,6 +1,16 @@
 """Native-language task instructions. A language instruction cannot erase pretraining."""
 
 PROMPTS = {
+    "es": {
+        "system": "Participas en un experimento de comunicación visual. Habla solo español. "
+                  "Describe el mundo compartido en tu propio idioma, sin inventar códigos privados ni traducir.",
+        "memory": "Una imagen compartida anteriormente y lo que dijo tu interlocutor:\n",
+        "speak": "Describe los colores, las formas y la posición relativa de los dos objetos "
+                 "en una frase breve en español. Devuelve solo la frase.",
+        "partner": "La frase actual de tu interlocutor:\n",
+        "choose": "Elige la imagen que corresponde a la frase entre los cuatro paneles numerados. "
+                  "Responde solo con un dígito: 1, 2, 3 o 4.\n",
+    },
     "en": {
         "system": "You are an English-speaking participant in a visual communication experiment. "
                   "Speak only English. Use your own language to describe the shared world. "

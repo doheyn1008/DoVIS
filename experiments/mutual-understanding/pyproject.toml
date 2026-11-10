@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dovis-mutual-lab"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reproducible grounded dialogue and bidirectional comprehension experiments"
 requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
 browser = ["playwright>=1.50,<2"]
+neural = ["torch>=2.6,<3", "numpy>=1.26,<3", "Pillow>=10,<13"]
 
 [project.scripts]
 mutual-lab = "mutual_lab.cli:main"

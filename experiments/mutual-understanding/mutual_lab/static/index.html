@@ -13,8 +13,8 @@
     <a class="brand" href="/" aria-label="Mutual Lab 홈"><span class="brand-icon">M</span><span>Mutual Lab<small>DO.V.I.S RESEARCH</small></span></a>
     <div class="side-heading">새로운 실험 <span class="pill">DEMO</span></div>
     <form id="demo-form">
-      <label>에이전트 A의 언어<select id="lang-a"><option value="en">English</option><option value="ko">한국어</option><option value="ja">日本語</option></select></label>
-      <label>에이전트 B의 언어<select id="lang-b"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option></select></label>
+      <label>에이전트 A의 언어<select id="lang-a"><option value="en">English</option><option value="ko">한국어</option><option value="ja">日本語</option><option value="es">Español</option></select></label>
+      <label>에이전트 B의 언어<select id="lang-b"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="es">Español</option></select></label>
       <div class="form-grid"><label>시드<input id="seed" type="number" min="0" max="4294967295" value="7" required></label><label>최대 대화<input id="maximum" type="number" min="5" max="1000" value="80" required></label></div>
       <button class="primary" id="launch" type="submit">실험 시작 <span>↗</span></button>
       <p class="hint">API 호출 없이 관찰·학습·평가 흐름을 확인해.</p>
@@ -43,7 +43,7 @@
       <article class="panel replay-panel"><div class="panel-heading"><div><h2>대화 다시 보기</h2><p id="replay-caption">같은 그림을 각자의 언어로 설명해.</p></div><span id="replay-count" class="pill">0 / 0</span></div><div class="replay-stage"><div class="image-frame"><img id="shared-image" alt="두 에이전트가 함께 본 색과 모양의 장면" hidden><span id="image-empty">SHARED VIEW</span></div><div id="messages" class="messages"><div class="empty-message">아직 기록된 대화가 없어.</div></div></div><div class="playback"><button id="previous" class="icon-button" aria-label="이전 대화">←</button><button id="play" class="icon-button" aria-label="대화 재생">▶</button><input id="scrub" type="range" min="0" max="0" value="0" aria-label="대화 선택"><button id="next" class="icon-button" aria-label="다음 대화">→</button></div></article>
       <article class="panel detail-panel"><div class="panel-heading"><div><h2>측정 조건</h2><p>결과를 해석할 때 함께 확인해.</p></div></div><dl id="conditions"><div><dt>평가 방식</dt><dd>그림 4지선다</dd></div><div><dt>학습·평가 분리</dt><dd>물체 쌍 단위</dd></div><div><dt>초기 평가</dt><dd>대화 0회</dd></div><div><dt>판정 기준</dt><dd>90% · 2회 연속</dd></div></dl><p class="measurement-note" id="measurement-note">목표에 도달하지 못한 실행도 그대로 남겨. 최대 대화 횟수를 도달 시간으로 바꾸지 않아.</p></article>
     </section>
-    <details class="panel evaluation-table"><summary>평가 기록 · 정확도와 95% 구간</summary><div class="table-scroll"><table><thead><tr><th>대화</th><th>방향</th><th>정답 / 전체</th><th>이해도</th><th>95% 구간</th><th>형식 오류</th></tr></thead><tbody id="evaluation-rows"></tbody></table></div></details>
+    <details class="panel evaluation-table"><summary>평가 기록 · 정확도와 95% 구간</summary><div class="table-scroll"><table><thead><tr><th>대화</th><th>방향</th><th>정답 / 전체</th><th>원정답률</th><th>우연 보정</th><th>95% 구간</th><th>형식 오류</th></tr></thead><tbody id="evaluation-rows"></tbody></table></div></details>
     <footer class="page-footer">Mutual Lab <span>작은 장면에서 시작하는 상호 이해의 실험.</span></footer>
   </main>
 </body>

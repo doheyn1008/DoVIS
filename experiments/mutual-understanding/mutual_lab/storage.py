@@ -17,6 +17,7 @@ from pathlib import Path
 from . import __version__
 from .config import ExperimentConfig
 from .images import scene_png
+from .languages import LANGUAGES
 from .prompts import PROMPTS
 from .world import Scene
 
@@ -48,7 +49,9 @@ def revision() -> dict:
 
 
 CSV_FIELDS = ("exchange", "source", "listener", "source_language", "listener_language",
-              "listener_exposures", "accuracy", "hits", "n", "invalid_answers", "wilson_low", "wilson_high")
+              "learner_native_language", "target_language", "speaker_language", "listener_exposures",
+              "accuracy", "raw_accuracy", "corrected_accuracy", "choice_count", "correction_version",
+              "hits", "n", "invalid_answers", "wilson_low", "wilson_high", "corrected_wilson_low", "corrected_wilson_high")
 
 
 class RunStore:
@@ -71,6 +74,7 @@ class RunStore:
             "axis_unit": "one shared image + two native-language utterances",
             "evaluation": "frozen native captions, four-choice image comprehension, held-out object pairs",
             "chance_accuracy": .25,
+            "languages": LANGUAGES,
         })
 
     def event(self, event: dict) -> None:

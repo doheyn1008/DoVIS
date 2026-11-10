@@ -12,12 +12,15 @@ from dataclasses import replace
 from pathlib import Path
 
 from .config import AgentConfig, ExperimentConfig
+from .languages import LANGUAGES
 from .runner import ExperimentFailed, run_experiment
 from .storage import write_json
 from .world import make_dataset
 
 
 def progress(event: dict) -> None:
+    if "native_step" in event:
+        print(f"L1 {event['language']} step {event['native_step']} | loss {event['loss']:.4f}", flush=True)
     if "points" in event:
         scores = " | ".join(f"{p['source']}->{p['listener']}: {p['accuracy']:.1%} ({p['hits']}/{p['n']})"
                             for p in event["points"])
@@ -25,6 +28,8 @@ def progress(event: dict) -> None:
 
 
 def sweep(config: ExperimentConfig, seeds: list[int], output: str | Path, quiet: bool) -> Path:
+    if config.mode == "neural":
+        raise ValueError("Use grid for neural replicas; sweep seeds are not independent L1 models")
     if not seeds or len(seeds) != len(set(seeds)):
         raise ValueError("Supply at least one unique seed")
     for seed in seeds:
@@ -65,8 +70,8 @@ def parser() -> argparse.ArgumentParser:
     commands = root.add_subparsers(dest="command", required=True)
     demo = commands.add_parser("demo", help="Run a synthetic pipeline check without any model/API calls")
     demo.add_argument("--seed", type=int, default=7)
-    demo.add_argument("--lang-a", choices=("en", "ko", "ja"), default="en")
-    demo.add_argument("--lang-b", choices=("en", "ko", "ja"), default="ko")
+    demo.add_argument("--lang-a", choices=tuple(LANGUAGES), default="en")
+    demo.add_argument("--lang-b", choices=tuple(LANGUAGES), default="ko")
     demo.add_argument("--max-exchanges", type=int, default=80)
     demo.add_argument("--eval-every", type=int, default=5)
     demo.add_argument("--eval-items", type=int, default=24)
@@ -87,6 +92,25 @@ def parser() -> argparse.ArgumentParser:
     serve = commands.add_parser("serve", help="Open the local dashboard; its launch button runs synthetic demos only")
     serve.add_argument("--runs-dir", default="runs")
     serve.add_argument("--port", type=int, default=8765)
+    native = commands.add_parser("train-native", help="Train one monolingual GRU and record native qualification")
+    native.add_argument("config")
+    native.add_argument("--language", required=True, choices=tuple(LANGUAGES))
+    native.add_argument("--output", required=True, help="Native .pt checkpoint path")
+    native.add_argument("--initialization-seed", type=int, default=7)
+    native.add_argument("--native-training-seed", type=int, default=11)
+    native.add_argument("--quiet", action="store_true")
+    for name in ("grid-plan", "grid"):
+        batch = commands.add_parser(name, help="Plan or execute the hierarchical all-pairs grid")
+        batch.add_argument("config")
+        if name == "grid":
+            batch.add_argument("--output", default="runs")
+            batch.add_argument("--resume-dir")
+            batch.add_argument("--limit", type=int, help="Run only this many pending tasks")
+            batch.add_argument("--quiet", action="store_true")
+    resume = commands.add_parser("resume", help="Restore both persistent learners from their last complete checkpoint")
+    resume.add_argument("run_path")
+    resume.add_argument("--output", default="runs")
+    resume.add_argument("--quiet", action="store_true")
     return root
 
 
@@ -97,6 +121,29 @@ def main(argv: list[str] | None = None) -> int:
             from .server import serve
             serve(args.runs_dir, args.port)
             return 0
+        if args.command in {"grid-plan", "grid"}:
+            from .grid import GridConfig, plan_grid, run_grid
+            grid = GridConfig.from_dict(json.loads(Path(args.config).read_text(encoding="utf-8")))
+            if args.command == "grid-plan":
+                print(json.dumps(plan_grid(grid), ensure_ascii=False, indent=2))
+            else:
+                if args.limit is not None and args.limit < 1:
+                    raise ValueError("--limit must be positive")
+                path = run_grid(grid, args.output, resume_dir=args.resume_dir, limit=args.limit,
+                                progress=None if args.quiet else progress)
+                print(f"Saved: {path}")
+                outcomes = json.loads((path / "outcomes.json").read_text())
+                return 1 if outcomes["failed"] or outcomes["cancelled"] else 0
+            return 0
+        if args.command == "resume":
+            from .research import run_neural_experiment
+            config = ExperimentConfig.load(Path(args.run_path) / "config.json")
+            if config.mode != "neural":
+                raise ValueError("Only neural runs have persistent restart checkpoints")
+            path = run_neural_experiment(config, args.output, None if args.quiet else progress,
+                                         resume_from=args.run_path)
+            print(f"Saved: {path}")
+            return 0
         if args.command == "demo":
             config = replace(ExperimentConfig(), seed=args.seed, max_exchanges=args.max_exchanges,
                              eval_every=args.eval_every, eval_items=args.eval_items,
@@ -104,10 +151,20 @@ def main(argv: list[str] | None = None) -> int:
                              agents=(AgentConfig("A", args.lang_a), AgentConfig("B", args.lang_b))).validate()
         else:
             config = ExperimentConfig.load(args.config)
+        if args.command == "train-native":
+            from .neural import train_native
+            path = train_native(config, args.language, args.output, initialization_seed=args.initialization_seed,
+                                native_training_seed=args.native_training_seed,
+                                model_replica_id=config.model_replica_id if config.model_replica_id != "unassigned" else "r0",
+                                progress=None if args.quiet else progress)
+            print(f"Saved: {path}")
+            return 0
         if args.command == "validate":
-            dataset = make_dataset(config)
+            from .world import make_research_dataset
+            dataset = make_research_dataset(config) if config.mode == "neural" else make_dataset(config)
             print(json.dumps({"mode": config.mode, "train_scenes": len(dataset.train),
-                              "heldout_scenes": len(dataset.holdout), "eval_items_per_direction": len(dataset.probes),
+                              "heldout_scenes": sum(len(dataset.view(s).probes) for s in ("curve", "pretest", "final", "native"))
+                                  if config.mode == "neural" else len(dataset.holdout), "eval_items_per_direction": len(dataset.probes),
                               "request_upper_bound": config.request_upper_bound(),
                               "request_budget": config.max_requests,
                               "budget_sufficient": config.request_upper_bound() <= config.max_requests,
@@ -122,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
     except ExperimentFailed as exc:
         print(f"Run failed: {exc}\nPartial logs: {exc.run_path}", file=sys.stderr)
         return 1
-    except (ValueError, OSError) as exc:
+    except (ValueError, OSError, ImportError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:

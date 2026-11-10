@@ -66,6 +66,7 @@ def main() -> None:
                     expect(page.locator("#run-list .active small")).to_contain_text("Seed 29", timeout=15000)
                     expect(page.locator("#status")).to_have_text("COMPLETED", timeout=15000)
                     assert page.locator("#exchanges").inner_text() == "10회"
+                    expect(page.locator("#compare")).to_have_value("")
                     page.set_viewport_size({"width": 390, "height": 844})
                     page.locator("#shared-image").scroll_into_view_if_needed()
                     assert not page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"), "Mobile overflow"

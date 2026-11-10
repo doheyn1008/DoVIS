@@ -58,7 +58,7 @@ async function refresh() {
     $("launch").firstChild.textContent = result.demo_running ? "실험 진행 중 " : "실험 시작 ";
     if (result.job_error) { announce(result.job_error, true); state.followingDemo = false; }
     if (state.followingDemo && result.demo_run_id) {
-      state.selected = result.demo_run_id; state.followingDemo = false; state.compare = null;
+      state.selected = result.demo_run_id; state.followingDemo = false; state.compare = null; $("compare").value = "";
     }
     if (!state.selected && state.runs.length && !state.followingDemo) state.selected = state.runs[0].run_id;
     renderList(); await loadSelected();

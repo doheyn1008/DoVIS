@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "languages": ["ko", "ja", "es", "en"],
+  "model_profiles": ["tiny-gru-v1"],
+  "model_replicas": 2,
+  "experience_repeats": 2,
+  "seed": 7,
+  "experiment": {
+    "schema_version": 2,
+    "seed": 7,
+    "max_exchanges": 80,
+    "eval_every": 10,
+    "stop_on_threshold": false,
+    "evaluation_profile": {"threshold_scale": "corrected", "common_horizon": 80}
+  }
+}

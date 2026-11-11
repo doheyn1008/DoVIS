@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "seed": 7,
+  "max_exchanges": 80,
+  "eval_every": 10,
+  "eval_items": 24,
+  "stop_on_threshold": false,
+  "threshold": 0.9,
+  "model_profile": {"id": "tiny-gru-v1", "hidden_dim": 64, "embedding_dim": 32},
+  "native_training_profile": {"steps": 600, "batch_size": 16, "budget_rule": "equal_steps"},
+  "acquisition_profile": {"updates_per_exposure": 1, "native_replay_per_update": 1, "foreign_replay_per_update": 1},
+  "evaluation_profile": {"threshold_scale": "corrected", "common_horizon": 80, "chance_margin": 0.15},
+  "agents": [
+    {"name": "A", "language": "ko", "backend": "neural", "native_checkpoint": "checkpoints/ko.pt"},
+    {"name": "B", "language": "ja", "backend": "neural", "native_checkpoint": "checkpoints/ja.pt"}
+  ]
+}

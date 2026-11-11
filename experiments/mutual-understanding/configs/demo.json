@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "seed": 7,
+  "max_exchanges": 80,
+  "eval_every": 5,
+  "eval_items": 24,
+  "holdout_fraction": 0.25,
+  "threshold": 0.9,
+  "sustained_checks": 2,
+  "stop_on_threshold": true,
+  "agents": [
+    {"name": "A", "language": "en", "backend": "symbolic"},
+    {"name": "B", "language": "ko", "backend": "symbolic"}
+  ]
+}

@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .agents import observe_persistent, speak
 from .metrics import classify_initial, evaluate, raw_threshold, summarize_points
-from .neural import NeuralAgent
+from .neural import NeuralAgent, checkpoint_provenance
 from .storage import RunStore, now, write_json
 from .world import make_research_dataset, native_captions
 
@@ -36,6 +36,7 @@ def run_neural_experiment(config, output="runs", progress=None, *, resume_from=N
         raise ValueError("Resume dataset differs from the checkpoint")
     agents = ([NeuralAgent.restore(old / resume["agents"][a.name], a, config) for a in config.agents] if old else
               [NeuralAgent(a, config) for a in config.agents])
+    starting_provenance = {a.config.name: a.initial_checkpoint_provenance for a in agents}
     store = RunStore(output, config)
     points = resume["points"] if resume else []
     exchange = resume["exchange"] if resume else 0
@@ -67,6 +68,8 @@ def run_neural_experiment(config, output="runs", progress=None, *, resume_from=N
                    "learning_mode": "persistent_weights", "protocol": "frozen-native-producer-v1",
                    "seed": config.seed, "started_at": store.started_at, "updated_at": now(),
                    "agents": [asdict(a.config) for a in agents], "native_models": native,
+                   "initial_checkpoint_provenance": starting_provenance,
+                   "current_learning_provenance": {a.config.name: checkpoint_provenance(a.learning_state()) for a in agents},
                    "model_profile": asdict(config.model_profile),
                    "native_training_profile": asdict(config.native_training_profile),
                    "acquisition_profile": asdict(config.acquisition_profile),
@@ -161,7 +164,8 @@ def run_neural_experiment(config, output="runs", progress=None, *, resume_from=N
             pretest = evaluate(agents, data.view("pretest"), captions["pretest"], 0,
                                config.effective_seed("evaluation"))
             inclusion = classify_initial(pretest, [a.metadata["native_eligible"] for a in agents],
-                                         e.chance_margin, verified_foreign_exposure=True)
+                                         e.chance_margin, verified_foreign_exposure=all(
+                                             p["eligible_for_fresh_experiment"] for p in starting_provenance.values()))
             if not all(all(flags) for split in caption_audit.values() for flags in split.values()):
                 inclusion = {**inclusion, "analysis_group": "ineligible",
                              "reason": "one or more frozen captions failed the preregistered native-caption semantic audit"}

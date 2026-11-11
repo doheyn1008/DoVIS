@@ -183,6 +183,25 @@ def native_split_digest(dataset) -> str:
                    "qualification": sorted(p.scene.key for p in dataset.native_test)})
 
 
+def checkpoint_provenance(payload: dict) -> dict:
+    """Separate the original L1 audit from this checkpoint's actual acquisition state.
+
+    Derived from existing payload fields, so older checkpoints and state digests
+    remain compatible. A zero-exposure acquisition snapshot is still resume-only.
+    """
+    counts = payload.get("counters", {})
+    exposures = counts.get("exposures", 0)
+    updates = counts.get("updates", 0)
+    replay_entries = len(payload.get("foreign_buffer", []))
+    return {"native_metadata_scope": "original L1 training only",
+            "origin_native_checkpoint_id": payload["metadata"]["native_checkpoint_id"],
+            "current_state_kind": payload["kind"], "partner_exposures": exposures,
+            "acquisition_optimizer_updates": updates, "foreign_replay_entries": replay_entries,
+            "eligible_for_fresh_experiment": payload["kind"] == "native" and
+                exposures == 0 and updates == 0 and replay_entries == 0 and
+                payload["metadata"]["foreign_training_languages"] == []}
+
+
 def save_checkpoint(path: str | Path, payload: dict) -> Path:
     path = Path(path).resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -190,18 +209,29 @@ def save_checkpoint(path: str | Path, payload: dict) -> Path:
     torch.save(payload, temporary)
     temporary.replace(path)
     write_json(path.with_suffix(".json"), {"format": "mutual-gru-v1", "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                                         "kind": payload["kind"], "metadata": payload["metadata"]})
+                                         "kind": payload["kind"], "metadata": payload["metadata"],
+                                         "provenance": checkpoint_provenance(payload)})
     return path
 
 
-def load_checkpoint(path: str | Path) -> dict:
+def load_checkpoint(path: str | Path, *, expected_kind: str | None = None) -> dict:
     path = Path(path)
     manifest = json.loads(path.with_suffix(".json").read_text(encoding="utf-8"))
     if manifest["format"] != "mutual-gru-v1" or hashlib.sha256(path.read_bytes()).hexdigest() != manifest["sha256"]:
         raise ValueError("Checkpoint format or SHA256 mismatch")
+    if expected_kind not in {None, "native", "acquisition"}:
+        raise ValueError("Unknown expected checkpoint kind")
+    if expected_kind is not None and manifest["kind"] != expected_kind:
+        raise ValueError(f"Expected {expected_kind} checkpoint, got {manifest['kind']}. "
+                         "New experiments require native_checkpoint; learned states require restore()/resume.")
     state = torch.load(path, map_location="cpu", weights_only=True)
     if state["metadata"] != manifest["metadata"] or state["kind"] != manifest["kind"]:
         raise ValueError("Checkpoint manifest does not match saved state")
+    provenance = checkpoint_provenance(state)
+    if "provenance" in manifest and manifest["provenance"] != provenance:
+        raise ValueError("Checkpoint provenance does not match actual acquisition state")
+    if expected_kind == "native" and not provenance["eligible_for_fresh_experiment"]:
+        raise ValueError("Native checkpoint contains foreign acquisition history; use restore()/resume")
     return state
 
 
@@ -275,9 +305,12 @@ class NeuralAgent:
     """L1 understanding weights continue learning; only pixels + partner text cross the boundary."""
     persistent = True
 
-    def __init__(self, config: AgentConfig, experiment: ExperimentConfig, *, state: dict | None = None):
+    def __init__(self, config: AgentConfig, experiment: ExperimentConfig):
+        state = load_checkpoint(config.native_checkpoint, expected_kind="native")
+        self._initialize(config, experiment, state)
+
+    def _initialize(self, config: AgentConfig, experiment: ExperimentConfig, state: dict):
         configure_cpu()
-        state = load_checkpoint(config.native_checkpoint) if state is None else state
         metadata = state["metadata"]
         if metadata["language"] != config.language or metadata["model_profile"] != asdict(experiment.model_profile):
             raise ValueError("Checkpoint language/architecture/tokenizer is incompatible")
@@ -291,6 +324,7 @@ class NeuralAgent:
             raise ValueError("Checkpoint does not have monolingual training provenance")
         self.config, self.experiment = config, experiment
         self.metadata = copy.deepcopy(metadata)
+        self.initial_checkpoint_provenance = checkpoint_provenance(state)
         self.model = NativeModel(experiment.model_profile, metadata["initialization_seed"])
         self.model.load_state_dict(state["weights"])
         if state["kind"] == "native" and experiment.acquisition_profile.reset_l1_understanding:
@@ -366,4 +400,7 @@ class NeuralAgent:
 
     @classmethod
     def restore(cls, path, config, experiment):
-        return cls(config, experiment, state=load_checkpoint(path))
+        state = load_checkpoint(path, expected_kind="acquisition")
+        agent = cls.__new__(cls)
+        agent._initialize(config, experiment, state)
+        return agent

@@ -173,7 +173,7 @@ def run_grid(grid: GridConfig, output="runs", *, resume_dir=None, limit=None, pr
                                  native_training_seed=task["native_training_seed"], model_replica_id=task["model_replica_id"],
                                  progress=progress)
                 else:
-                    metadata = load_checkpoint(path)["metadata"]
+                    metadata = load_checkpoint(path, expected_kind="native")["metadata"]
                     if (metadata["initialization_seed"] != task["initialization_seed"] or
                             metadata["native_training_seed"] != task["native_training_seed"]):
                         raise ValueError("Cached native checkpoint seed mismatch")

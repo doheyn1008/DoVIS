@@ -216,6 +216,69 @@ class NeuralTests(unittest.TestCase):
         observe_persistent(b, data.train[1], text)
         self.assertEqual(a.state_digest(), b.state_digest())  # optimizer, buffer and RNG restored too
 
+    def acquisition_checkpoint(self, name):
+        a = self.agent()
+        scene = make_research_dataset(self.config).train[0]
+        observe_persistent(a, scene, native_captions(scene, "ja")[0])
+        return a, a.save(self.root / name)
+
+    def test_acquisition_is_rejected_before_fresh_agent_loads_tensors(self):
+        import torch
+        from mutual_lab.neural import NeuralAgent, NativeModel
+        _, path = self.acquisition_checkpoint("not-native.pt")
+        config = replace(self.config.agents[0], native_checkpoint=str(path))
+        with patch("mutual_lab.neural.torch.load", wraps=torch.load) as tensor_load, \
+                patch("mutual_lab.neural.NativeModel", wraps=NativeModel) as model:
+            with self.assertRaisesRegex(ValueError, "native.*acquisition"):
+                NeuralAgent(config, self.config)
+            tensor_load.assert_not_called()
+            model.assert_not_called()
+
+    def test_acquisition_cannot_start_a_new_run_or_create_logs(self):
+        from mutual_lab.runner import run_experiment
+        _, path = self.acquisition_checkpoint("not-a-new-run.pt")
+        config = replace(self.config, agents=(replace(self.config.agents[0], native_checkpoint=str(path)),
+                                              self.config.agents[1]))
+        output = self.root / "rejected-first-contact"
+        with patch("mutual_lab.research.RunStore", side_effect=AssertionError("RunStore must not be created")) as store:
+            with self.assertRaisesRegex(ValueError, "native.*acquisition"):
+                run_experiment(config, output)
+            store.assert_not_called()
+        self.assertFalse(output.exists())
+
+    def test_explicit_restore_requires_acquisition_and_preserves_learned_state(self):
+        from mutual_lab.neural import NeuralAgent
+        a, path = self.acquisition_checkpoint("explicit-resume.pt")
+        b = NeuralAgent.restore(path, self.config.agents[0], self.config)
+        self.assertEqual(a.state_digest(), b.state_digest())
+        self.assertEqual((b.exposures, b.updates, len(b.foreign_buffer)), (1, 1, 1))
+        with self.assertRaisesRegex(ValueError, "acquisition.*native"):
+            NeuralAgent.restore(self.paths["ko"], self.config.agents[0], self.config)
+
+    def test_checkpoint_audit_distinguishes_current_history_from_native_origin(self):
+        from mutual_lab.neural import NeuralAgent, load_checkpoint
+        native = json.loads(self.paths["ko"].with_suffix(".json").read_text())
+        self.assertTrue(native["provenance"]["eligible_for_fresh_experiment"])
+        a, path = self.acquisition_checkpoint("history-audit.pt")
+        manifest = json.loads(path.with_suffix(".json").read_text())
+        self.assertEqual(manifest["metadata"]["foreign_training_languages"], [])  # original L1 only
+        self.assertEqual(manifest["provenance"]["current_state_kind"], "acquisition")
+        self.assertEqual(manifest["provenance"]["origin_native_checkpoint_id"],
+                         native["metadata"]["native_checkpoint_id"])
+        self.assertEqual(manifest["provenance"]["partner_exposures"], 1)
+        self.assertEqual(manifest["provenance"]["acquisition_optimizer_updates"], 1)
+        self.assertEqual(manifest["provenance"]["foreign_replay_entries"], 1)
+        self.assertFalse(manifest["provenance"]["eligible_for_fresh_experiment"])
+        # Older sidecars remain resumable without changing the functional state digest.
+        legacy = {k: v for k, v in manifest.items() if k != "provenance"}
+        path.with_suffix(".json").write_text(json.dumps(legacy))
+        b = NeuralAgent.restore(path, self.config.agents[0], self.config)
+        self.assertEqual(a.state_digest(), b.state_digest())
+        manifest["provenance"]["partner_exposures"] = 0
+        path.with_suffix(".json").write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, "provenance"):
+            load_checkpoint(path)
+
     def test_zero_update_reset_and_label_only_controls(self):
         from mutual_lab.neural import digest, load_checkpoint
         scene = make_research_dataset(self.config).train[0]
@@ -260,6 +323,9 @@ class NeuralTests(unittest.TestCase):
         self.assertEqual(len(summary["pretest"]), 2)
         self.assertEqual(len(summary["final_evaluation"]), 2)
         self.assertEqual(summary["exposure"]["A"]["updates"], 2)
+        self.assertTrue(summary["initial_checkpoint_provenance"]["A"]["eligible_for_fresh_experiment"])
+        self.assertEqual(summary["current_learning_provenance"]["A"]["partner_exposures"], 2)
+        self.assertTrue(summary["inclusion"]["foreign_training_exposure_verified_zero"])
         self.assertTrue((path / "learning_checkpoint.json").exists())
         for d in summary["directions"]:
             self.assertTrue(d["common_curve"]["available"])
@@ -297,6 +363,9 @@ class NeuralTests(unittest.TestCase):
         a = json.loads((full / "learning_checkpoint.json").read_text())
         b = json.loads((resumed / "learning_checkpoint.json").read_text())
         self.assertEqual(a["state_sha256"], b["state_sha256"])
+        resumed_summary = json.loads((resumed / "summary.json").read_text())
+        self.assertEqual(resumed_summary["initial_checkpoint_provenance"]["A"]["current_state_kind"], "acquisition")
+        self.assertEqual(resumed_summary["initial_checkpoint_provenance"]["A"]["partner_exposures"], 1)
 
     def test_grid_resume_reuses_native_models_but_resets_l2_for_each_experience(self):
         from mutual_lab.grid import run_grid

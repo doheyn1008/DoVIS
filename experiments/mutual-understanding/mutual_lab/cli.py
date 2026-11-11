@@ -19,6 +19,11 @@ from .world import make_dataset
 
 
 def progress(event: dict) -> None:
+    if "diagnostic_step" in event:
+        values = " | ".join(f"{name}: understand {event[name]['comprehension_accuracy']:.1%}, "
+                             f"generate {event[name]['generation_exact_accuracy']:.1%}"
+                             for name in ("train", "dev"))
+        print(f"Diagnostic step {event['diagnostic_step']} | {values}", flush=True)
     if "native_step" in event:
         print(f"L1 {event['language']} step {event['native_step']} | loss {event['loss']:.4f}", flush=True)
     if "points" in event:
@@ -111,6 +116,22 @@ def parser() -> argparse.ArgumentParser:
     resume.add_argument("run_path")
     resume.add_argument("--output", default="runs")
     resume.add_argument("--quiet", action="store_true")
+    diagnostic = commands.add_parser("diagnose-native", help="Development-only small train/dev learning diagnosis; excluded from research")
+    diagnostic.add_argument("config")
+    diagnostic.add_argument("--language", choices=tuple(LANGUAGES), required=True)
+    diagnostic.add_argument("--steps", type=int, default=600)
+    diagnostic.add_argument("--eval-every", type=int, default=100)
+    diagnostic.add_argument("--train-pairs", type=int, default=2)
+    diagnostic.add_argument("--dev-pairs", type=int, default=2)
+    diagnostic.add_argument("--data-seed", type=int, default=19003)
+    diagnostic.add_argument("--initialization-seed", type=int, default=19007)
+    diagnostic.add_argument("--training-seed", type=int, default=19009)
+    diagnostic.add_argument("--output", default="runs/diagnostics")
+    diagnostic.add_argument("--quiet", action="store_true")
+    screening = commands.add_parser("plan-screening", help="Simulate inclusion probabilities under explicit pair-cluster assumptions")
+    screening.add_argument("plan", help="Planning JSON; does not change experiment settings")
+    screening.add_argument("--output", default="runs/diagnostics")
+    screening.add_argument("--quiet", action="store_true")
     return root
 
 
@@ -120,6 +141,28 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "serve":
             from .server import serve
             serve(args.runs_dir, args.port)
+            return 0
+        if args.command == "plan-screening":
+            from .screening_plan import ScreeningPlan, write_screening_plan
+            plan = ScreeningPlan.from_dict(json.loads(Path(args.plan).read_text(encoding="utf-8")))
+            def show_case(row):
+                print(f"{row['scenario_id']} | {row['pairs']} pairs | both equivalent {row['primary_probability']:.1%}", flush=True)
+            path = write_screening_plan(plan, args.output, None if args.quiet else show_case)
+            print(f"Saved development-only plan: {path}")
+            return 0
+        if args.command == "diagnose-native":
+            from .diagnostics import DiagnosticFailed, DiagnosticOptions, run_native_diagnostic
+            config = ExperimentConfig.load(args.config)
+            options = DiagnosticOptions(steps=args.steps, eval_every=args.eval_every,
+                train_pairs=args.train_pairs, dev_pairs=args.dev_pairs, data_seed=args.data_seed,
+                initialization_seed=args.initialization_seed, training_seed=args.training_seed)
+            try:
+                path = run_native_diagnostic(config, args.language, options, args.output,
+                                              None if args.quiet else progress)
+            except DiagnosticFailed as exc:
+                print(f"Diagnostic failed: {exc}\nPartial report: {exc.report_path}", file=sys.stderr)
+                return 1
+            print(f"Saved development-only diagnosis: {path}")
             return 0
         if args.command in {"grid-plan", "grid"}:
             from .grid import GridConfig, plan_grid, run_grid

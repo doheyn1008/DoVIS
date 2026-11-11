@@ -29,6 +29,35 @@ def wilson(hits: int, n: int) -> tuple[float, float]:
     return max(0.0, center - radius), min(1.0, center + radius)
 
 
+SCREENING_VERSION = "pair-mean-hoeffding-family-v1"
+
+
+def screening_interval(mean: float, pairs: int) -> tuple[float, float]:
+    """Existing two-direction family bound, shared by real screening and planning."""
+    if type(pairs) is not int or pairs < 1 or not 0 <= mean <= 1:
+        raise ValueError("Screening requires a mean in [0,1] and at least one pair")
+    radius = math.sqrt(math.log(80) / (2 * pairs))
+    return max(0, mean - radius), min(1, mean + radius)
+
+
+def classify_screening_interval(low: float, high: float, margin: float) -> str:
+    if .25 - margin <= low and high <= .25 + margin:
+        return "chance_equivalent"
+    if low > .25 + margin:
+        return "positive_baseline"
+    if high < .25 - margin:
+        return "below_chance"
+    return "uncertain"
+
+
+def initial_analysis_group(labels: list[str]) -> tuple[str, str]:
+    if len(labels) == 2 and all(label == "chance_equivalent" for label in labels):
+        return "primary", "both independent pretest intervals within preregistered chance band"
+    if any(label == "positive_baseline" for label in labels):
+        return "positive_baseline_extension", "at least one direction above preregistered chance band"
+    return "uncertain", "pretest precision insufficient or outside inclusion band"
+
+
 def evaluate(agents: list, dataset: Dataset, captions: dict[str, list[str]], exchange: int, seed: int) -> list[dict]:
     states = [agent.state_digest() for agent in agents]
     points = []
@@ -52,7 +81,7 @@ def evaluate(agents: list, dataset: Dataset, captions: dict[str, list[str]], exc
         for probe, trial in zip(dataset.probes, trials):
             clusters.setdefault(probe.scene.group, []).append(int(trial["correct"]))
         cluster_mean = sum(sum(v) / len(v) for v in clusters.values()) / len(clusters)
-        radius = math.sqrt(math.log(80) / (2 * len(clusters)))
+        screening_low, screening_high = screening_interval(cluster_mean, len(clusters))
         points.append({"exchange": exchange, "source": source.config.name,
                        "listener": listener.config.name, "source_language": source.config.language,
                        "listener_language": listener.config.language, "listener_exposures": listener.exposures,
@@ -63,8 +92,8 @@ def evaluate(agents: list, dataset: Dataset, captions: dict[str, list[str]], exc
                        "correction_version": "chance-correction-v1", "choice_count": 4,
                        "corrected_wilson_low": corrected_accuracy(low),
                        "corrected_wilson_high": corrected_accuracy(high), "hits": hits, "n": n,
-                       "screening_low": max(0, cluster_mean - radius),
-                       "screening_high": min(1, cluster_mean + radius), "screening_clusters": len(clusters),
+                       "screening_low": screening_low,
+                       "screening_high": screening_high, "screening_clusters": len(clusters),
                        "screening_interval_method": "pair-mean Hoeffding; two-direction family coverage >=95%",
                        "invalid_answers": sum(not trial["valid"] for trial in trials),
                        "wilson_low": low, "wilson_high": high, "trials": trials})
@@ -152,9 +181,7 @@ def classify_initial(pretest: list[dict], native_eligibility: list[bool], margin
     checks = []
     for point in pretest:
         low, high = point["screening_low"], point["screening_high"]
-        label = ("chance_equivalent" if .25 - margin <= low and high <= .25 + margin else
-                 "positive_baseline" if low > .25 + margin else
-                 "below_chance" if high < .25 - margin else "uncertain")
+        label = classify_screening_interval(low, high, margin)
         checks.append({"learner_native_language": point["listener_language"],
                        "target_language": point["source_language"], "raw_accuracy": point["accuracy"],
                        "corrected_accuracy": point["corrected_accuracy"],
@@ -162,12 +189,8 @@ def classify_initial(pretest: list[dict], native_eligibility: list[bool], margin
                        "screening_interval": [low, high], "classification": label})
     if not verified_foreign_exposure or len(native_eligibility) != 2 or not all(native_eligibility):
         group, reason = "ineligible", "L1 qualification or foreign-training provenance requirement unmet"
-    elif len(checks) == 2 and all(p["classification"] == "chance_equivalent" for p in checks):
-        group, reason = "primary", "both independent pretest intervals within preregistered chance band"
-    elif any(p["classification"] == "positive_baseline" for p in checks):
-        group, reason = "positive_baseline_extension", "at least one direction above preregistered chance band"
     else:
-        group, reason = "uncertain", "pretest precision insufficient or outside inclusion band"
+        group, reason = initial_analysis_group([p["classification"] for p in checks])
     return {"analysis_group": group, "reason": reason, "raw_chance_band": [.25 - margin, .25 + margin],
             "interval_method": "pair-mean Hoeffding; two-direction family coverage >=95%; small pilots have low power",
             "foreign_training_exposure_verified_zero": verified_foreign_exposure, "directions": checks}

@@ -61,6 +61,26 @@ python -m mutual_lab serve
 
 또는 `association="shuffled"`, `reset_l1_understanding=true`를 사용합니다. 기본값인 `aligned`, L1 가중치 유지, 노출당 1회 업데이트와 구분해 기록합니다. 원어 가중치를 초기화해 초기 점수를 억지로 0에 맞추지 않습니다.
 
+## 본실험 전 개발 진단
+
+큰 세계·모델을 선택하기 전에 작은 자료에서 학습이 되는지, 사전검사 표본 수가 어떤 가정 아래에서 충분한지 확인할 수 있습니다.
+
+```bash
+# 기존 설정의 모델/학습 규칙으로 작은 train/dev 자료 진단 (optional neural 설치 필요)
+python -m mutual_lab diagnose-native configs/neural.example.json --language es --steps 600
+
+# PyTorch 없이 가능한 쌍 단위 표본 설계 시뮬레이션
+python -m mutual_lab plan-screening configs/screening-plan.example.json
+```
+
+둘 다 `runs/diagnostics/`에 개발용 `report.json`과 CSV를 저장하며 `excluded_from_research=true`로 표시합니다. 본실험 `summary.json`이나 적격 L1 체크포인트를 만들지 않습니다.
+
+- 학습 진단은 기존 **학습 분할 안에서만** 별도 train/dev 물체 쌍을 뽑고 개발 전용 시드를 사용합니다. 모국어 적격성·사전검사·곡선·최종 평가 자료로 튜닝하지 않습니다.
+- 이해/생성 손실, train/dev 이해 정확도, teacher forcing 토큰 정확도와 자유 생성 정확도를 나누고 원본 출력·EOS·인코딩 오류·알아볼 수 있는 의미 오류를 남깁니다. dev에만 있는 색·모양도 표시합니다.
+- 표본 설계는 현재 판정식을 그대로 사용하며 문항 상관·두 방향 상관 가정을 바꿉니다. 실제 언어 성능이나 충분한 표본 수를 확정하지 않습니다. 현재 세계/설정 상한을 넘는 후보도 시뮬레이션할 수 있지만 실제 실행 가능 여부를 별도로 표시합니다.
+
+옵션·가정·출력 해석은 [개발 진단 안내](docs/development-diagnostics.md)를 참고하세요. 세계 크기, 허용 폭, 모델 크기, 본실험 평가 발화 정책은 이 명령으로 자동 변경되지 않습니다.
+
 ## 독립 모델 × 경험 반복 × 모든 언어 쌍
 
 ```bash

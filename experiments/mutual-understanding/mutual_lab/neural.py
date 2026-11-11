@@ -160,16 +160,34 @@ class NativeModel(nn.Module):
 
     @torch.no_grad()
     def generate(self, png: bytes) -> str:
+        return self.generate_with_trace(png)["text"]
+
+    @torch.no_grad()
+    def generate_with_trace(self, png: bytes) -> dict:
+        """Same greedy decoder, with diagnostic flags before invalid bytes are dropped."""
         visual = self.visual([png])
         current, hidden, output = torch.tensor([[1]]), None, []
+        terminated = False
         for _ in range(self.tokenizer.maximum - 2):
             logits, hidden = self.producer(current, visual, hidden)
             token = int(logits[0, -1].argmax())
             if token == 2:
+                terminated = True
                 break
             output.append(token)
             current = torch.tensor([[token]])
-        return self.tokenizer.decode(output)
+        text = self.tokenizer.decode(output)
+        invalid_encoding = False
+        if self.tokenizer.kind == "utf8":
+            try:
+                bytes(token - 3 for token in output if token >= 3).decode("utf-8", errors="strict")
+            except UnicodeDecodeError:
+                invalid_encoding = True
+        else:
+            invalid_encoding = any(0xD800 <= token - 3 <= 0xDFFF for token in output)
+        return {"text": text, "token_ids": output, "terminated": terminated,
+                "invalid_encoding": invalid_encoding, "special_tokens_in_body": sum(t < 3 for t in output),
+                "output_units": len(output), "unit_limit": self.tokenizer.maximum - 2}
 
     @torch.no_grad()
     def predict(self, text: str, pngs: list[bytes]) -> int:
@@ -181,6 +199,19 @@ class NativeModel(nn.Module):
 def native_split_digest(dataset) -> str:
     return digest({"train": sorted(s.key for s in dataset.train),
                    "qualification": sorted(p.scene.key for p in dataset.native_test)})
+
+
+def native_examples(model: NativeModel, scenes, language: str) -> list[dict]:
+    """One language only; shared by full L1 training and development diagnostics."""
+    examples = []
+    for scene in scenes:
+        alternatives = variants(scene.group)
+        choices = [scene_png(s) for s in alternatives]
+        for caption in native_captions(scene, language):
+            model.tokenizer.encode(caption)
+            examples.append({"text": caption, "image": scene_png(scene), "choices": choices,
+                             "answer": alternatives.index(scene)})
+    return examples
 
 
 def checkpoint_provenance(payload: dict) -> dict:
@@ -246,13 +277,7 @@ def train_native(config: ExperimentConfig, language: str, path: str | Path, *, i
     model = NativeModel(config.model_profile, initialization_seed)
     initial = copy.deepcopy(model.understanding.state_dict())
     rng = random.Random(native_training_seed)
-    examples = []
-    for scene in data.train:
-        choices = [scene_png(s) for s in variants(scene.group)]
-        for caption in native_captions(scene, language):
-            model.tokenizer.encode(caption)  # Validate the whole corpus before training.
-            examples.append({"text": caption, "image": scene_png(scene), "choices": choices,
-                             "answer": variants(scene.group).index(scene)})
+    examples = native_examples(model, data.train, language)
     profile = config.native_training_profile
     optimizer = torch.optim.Adam(model.parameters(), lr=profile.learning_rate)
     loss_value = None

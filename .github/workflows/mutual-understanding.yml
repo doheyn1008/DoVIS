@@ -54,7 +54,18 @@ jobs:
           python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -e '.[neural]'
       - name: Check native transfer, persistent updates, controls, restart and nested grid
-        run: python -m unittest discover -s tests -p test_research.py -v
+        run: |
+          python -m unittest discover -s tests -p test_research.py -v
+          python -m unittest discover -s tests -p test_diagnostics.py -v
+      - name: Exercise development-only diagnostic commands
+        run: |
+          python -m mutual_lab diagnose-native configs/neural.example.json --language es --steps 2 --eval-every 1 --train-pairs 1 --dev-pairs 1 --quiet
+          python -m mutual_lab plan-screening configs/screening-plan.example.json --quiet
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutual-lab-development-diagnostics
+          path: experiments/mutual-understanding/runs/diagnostics/
 
   browser:
     runs-on: ubuntu-latest

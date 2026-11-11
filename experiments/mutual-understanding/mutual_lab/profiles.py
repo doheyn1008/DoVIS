@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 import math
 
+RESEARCH_EVALUATION_MAX_ITEMS = 96
+
 
 def bounded(value, name, low, high, *, integer=False):
     if (type(value) not in ({int} if integer else {int, float})
@@ -94,7 +96,7 @@ class EvaluationProfile:
         if self.threshold_scale not in {"raw", "corrected"} or self.id != "four-choice-v2":
             raise ValueError("Unsupported evaluation profile or threshold scale")
         for key in ("pretest_items", "final_items", "native_items"):
-            bounded(getattr(self, key), key, 4, 96, integer=True)
+            bounded(getattr(self, key), key, 4, RESEARCH_EVALUATION_MAX_ITEMS, integer=True)
             if getattr(self, key) % 4:
                 raise ValueError(f"{key} must be divisible by four")
         bounded(self.chance_margin, "chance equivalence margin (raw accuracy)", .001, .24)

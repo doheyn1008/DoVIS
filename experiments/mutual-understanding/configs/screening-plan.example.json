@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "candidate_pairs": [98, 200, 320],
+  "chance_margin": 0.15,
+  "replicates": 2000,
+  "seed": 19001,
+  "max_pair_draws": 50000000,
+  "scenarios": [
+    {"id": "chance-independent", "means": [0.25, 0.25], "within_pair_correlation": 0, "direction_shared_probability": 0},
+    {"id": "chance-within-pair-shared", "means": [0.25, 0.25], "within_pair_correlation": 1, "direction_shared_probability": 0},
+    {"id": "chance-both-directions-shared", "means": [0.25, 0.25], "within_pair_correlation": 1, "direction_shared_probability": 1},
+    {"id": "weak-transfer", "means": [0.30, 0.25], "within_pair_correlation": 1, "direction_shared_probability": 0},
+    {"id": "above-band", "means": [0.45, 0.25], "within_pair_correlation": 1, "direction_shared_probability": 0},
+    {"id": "exactly-one-hit-per-pair", "cluster_model": "custom_hits", "hits_a": [0, 1, 0, 0, 0], "hits_b": [0, 1, 0, 0, 0], "direction_shared_probability": 0}
+  ]
+}

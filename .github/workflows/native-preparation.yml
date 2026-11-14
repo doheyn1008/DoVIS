@@ -76,8 +76,18 @@ jobs:
       - name: Select a common budget only if every language meets both targets
         shell: bash
         run: |
-          mapfile -t reports < <(rg --files runs/native-preparation-downloads -g report.json | sort)
-          python -m mutual_lab.native_preparation --aggregate "${reports[@]}" --output runs/native-preparation-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from mutual_lab.diagnostics import safe_json
+          from mutual_lab.native_preparation import classify_all_languages
+          reports = sorted(Path('runs/native-preparation-downloads').rglob('report.json'))
+          if not reports:
+              raise RuntimeError('No preparation reports were found in the downloaded artifacts')
+          result = classify_all_languages([json.loads(path.read_text()) for path in reports])
+          safe_json(Path('runs/native-preparation-summary.json'), result)
+          print(json.dumps(result), flush=True)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:

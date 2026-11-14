@@ -36,6 +36,7 @@ class RecordingFactory:
     """Capture the actual trial initialization, without constructing audit models."""
 
     def __init__(self, decoder_condition, prior_condition):
+        self.__module__ = 'mutual_lab.decoder_study'
         if decoder_condition not in CONDITIONS or prior_condition not in ("B0", "B1"):
             raise ValueError("Unknown decoder or fixed-prior condition")
         self.decoder_condition, self.prior_condition = decoder_condition, prior_condition

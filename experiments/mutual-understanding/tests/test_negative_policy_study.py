@@ -132,6 +132,46 @@ class NegativePolicyNeuralTests(unittest.TestCase):
             suites.append(suite)
         return suites
 
+    def test_real_module_cli_factory_has_canonical_identity_and_unchanged_model_outputs(self):
+        import argparse
+        import inspect
+        import runpy
+        import warnings
+        from mutual_lab import development_world as world
+        from mutual_lab.neural import digest, torch
+
+        class StopBeforeTraining(Exception):
+            pass
+
+        def intercept(_parser, *args, **kwargs):
+            stopped = StopBeforeTraining()
+            stopped.module_globals = inspect.currentframe().f_back.f_globals
+            raise stopped
+
+        with warnings.catch_warnings(), patch.object(argparse.ArgumentParser, "parse_args", new=intercept):
+            warnings.simplefilter("ignore", RuntimeWarning)
+            with self.assertRaises(StopBeforeTraining) as stopped:
+                runpy.run_module("mutual_lab.negative_policy_study", run_name="__main__")
+        cli_factory_type = stopped.exception.module_globals["FixedLanguageFactory"]
+        self.assertEqual(cli_factory_type.__module__, "__main__")
+        scene = world.development_splits(self.config, self.plan.data_seed)["train"][0]
+        pngs, texts = [world.render_scene(scene)], [world.captions(scene, "en")[0]]
+        for model_name in ("standard", "attentive"):
+            imported, cli = FixedLanguageFactory(model_name, "B1"), cli_factory_type(model_name, "B1")
+            a = imported(self.plan.model_profile, 59007, self.bundle, condition="B1")
+            b = cli(self.plan.model_profile, 59007, self.bundle, condition="B1")
+            with self.subTest(model=model_name), torch.no_grad():
+                self.assertEqual(cli.__module__ + "." + cli.__qualname__,
+                                 "mutual_lab.negative_policy_study.FixedLanguageFactory." + model_name)
+                self.assertEqual(imported.initial_state, cli.initial_state)
+                self.assertEqual(digest(a.state_dict()), digest(b.state_dict()))
+                ids, _ = a.tokenizer.batch(texts)
+                def logits(model):
+                    if hasattr(model, "teacher_forced_logits"):
+                        return model.teacher_forced_logits(ids[:, :-1], pngs)
+                    return model.producer(ids[:, :-1], model.visual(pngs))[0]
+                self.assertTrue(torch.equal(logits(a), logits(b)))
+
     def test_real_policy_pairs_preserve_full_initial_state_final_producer_and_prior(self):
         for model, suite in self.suites.items():
             with self.subTest(model=model):

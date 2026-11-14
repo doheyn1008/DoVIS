@@ -24,6 +24,16 @@ FACTORIES = {
     "mutual_lab.negative_policy_study.FixedLanguageFactory.standard": "standard",
     "mutual_lab.negative_policy_study.FixedLanguageFactory.attentive": "attentive",
 }
+# Running the original D/E study entrypoints with ``python -m`` recorded their
+# wrapper class under __main__. These are exact historical CLI spellings, not
+# import targets; retain the recorded name and verify the usual tensor/core
+# implementation provenance before using the corresponding known factory.
+LEGACY_CLI_FACTORIES = {
+    "__main__.RecordingFactory.D0": "mutual_lab.decoder_study.RecordingFactory.D0",
+    "__main__.RecordingFactory.D1": "mutual_lab.decoder_study.RecordingFactory.D1",
+    "__main__.FixedLanguageFactory.standard": "mutual_lab.negative_policy_study.FixedLanguageFactory.standard",
+    "__main__.FixedLanguageFactory.attentive": "mutual_lab.negative_policy_study.FixedLanguageFactory.attentive",
+}
 ATTENTION_KEYS = {"producer.query.weight", "producer.key.weight", "producer.value.weight",
                   "producer.attention_output.weight", "spatial_coordinates"}
 
@@ -79,7 +89,11 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
     # layout plus exact implementation hashes identifies the standard model.
     # Later C/custom checkpoints must declare their factory explicitly.
     legacy_factory = "model_factory" not in payload and phase in ("A", "B")
-    factory = "default" if legacy_factory else payload.get("model_factory")
+    recorded_factory = payload.get("model_factory")
+    legacy_cli = recorded_factory in LEGACY_CLI_FACTORIES
+    if legacy_cli and phase != "C":
+        raise ValueError("Historical D/E CLI factories require the C engine phase")
+    factory = "default" if legacy_factory else LEGACY_CLI_FACTORIES.get(recorded_factory, recorded_factory)
     if factory not in FACTORIES:
         raise ValueError("Unsupported or missing development model factory")
     plan = payload.get("plan")
@@ -170,7 +184,11 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         "excluded_from_research": True, "eligible_for_fresh_experiment": False,
         "language": language, "phase": phase, "condition": condition, "step": payload["step"],
         "model_factory": factory, "checkpoint_sha256": manifest["sha256"],
-        "factory_provenance": "legacy_v1_standard_layout" if legacy_factory else "explicit_saved_factory",
+        "recorded_model_factory": recorded_factory,
+        "factory_provenance": ("legacy_cli_alias_verified" if legacy_cli else
+                               "legacy_v1_standard_layout" if legacy_factory else "explicit_saved_factory"),
+        "factory_compatibility_note": ("Exact historical D/E __main__ CLI alias; C phase, tensor layout and core source hashes verified"
+                                       if legacy_cli else None),
         "prior_sha256": prior_metadata.get("prior_sha256"), "verified_source_sha256": sources,
         "restored_model_sha256": digest(model.state_dict()), "training_revision": payload.get("revision"),
         "training_torch_version": payload.get("environment", {}).get("torch"),
@@ -226,7 +244,9 @@ def main(argv=None):
     model = load_development_model(args.checkpoint, args.prior_bundle)
     result = infer_development(model, args.image.read_bytes() if args.image else None,
                                text=args.text, choices_png=[p.read_bytes() for p in args.choices] if args.choices else None)
-    print(json.dumps(result, ensure_ascii=False, allow_nan=False), flush=True)
+    # Keep invalid generated Unicode in the trace while making stdout valid
+    # JSON even when a Unicode-BMP model emits an unpaired surrogate.
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False), flush=True)
     return 0
 
 

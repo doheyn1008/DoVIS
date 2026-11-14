@@ -35,6 +35,7 @@ class FixedLanguageFactory:
     """Construct one trial and immediately capture its complete initialization."""
 
     def __init__(self, model, prior_condition):
+        self.__module__ = 'mutual_lab.negative_policy_study'
         if model not in ("standard", "attentive") or prior_condition not in ("B0", "B1"):
             raise ValueError("Unknown fixed model or prior")
         self.model, self.prior_condition, self.initial_state = model, prior_condition, None

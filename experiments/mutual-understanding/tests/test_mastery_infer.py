@@ -4,16 +4,17 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
 import types
 import unittest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from mutual_lab.mastery_infer import FORMAT, infer_development, load_development_model
+from mutual_lab.mastery_infer import FORMAT, LEGACY_CLI_FACTORIES, infer_development, load_development_model
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -162,6 +163,32 @@ class InferenceModelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported"):
             load_development_model(self.save("missing-c", c_payload), self.prior_path)
 
+    def test_exact_historical_de_cli_aliases_keep_original_provenance_and_strict_layout_source_guards(self):
+        for index, (recorded, canonical) in enumerate(LEGACY_CLI_FACTORIES.items()):
+            with self.subTest(recorded=recorded):
+                path, payload, _ = self.fixture("legacy-cli-" + str(index), factory=recorded)
+                model = load_development_model(path, self.prior_path)
+                metadata = model.mastery_inference_metadata
+                self.assertEqual(metadata["model_factory"], canonical)
+                self.assertEqual(metadata["recorded_model_factory"], recorded)
+                self.assertEqual(metadata["factory_provenance"], "legacy_cli_alias_verified")
+                self.assertIn("core source hashes verified", metadata["factory_compatibility_note"])
+                changed = {**payload, "phase": "B", "condition": "B1"}
+                with self.assertRaisesRegex(ValueError, "C engine phase"):
+                    load_development_model(self.save("legacy-cli-wrong-phase-" + str(index), changed), self.prior_path)
+                source = "attentive_spatial.py" if recorded.endswith((".D1", ".attentive")) else "spatial_prior.py"
+                changed = {**payload, "source_sha256": {**payload["source_sha256"], source: "wrong"}}
+                with self.assertRaisesRegex(ValueError, "source mismatch"):
+                    load_development_model(self.save("legacy-cli-wrong-source-" + str(index), changed), self.prior_path)
+        _, standard, _ = self.fixture("legacy-cli-standard-layout", factory="__main__.RecordingFactory.D0")
+        standard["model_factory"] = "__main__.RecordingFactory.D1"
+        with self.assertRaisesRegex(ValueError, "Ambiguous"):
+            load_development_model(self.save("legacy-cli-wrong-layout", standard), self.prior_path)
+        for unknown in ("__main__.RecordingFactory.D2", "__main__.UnknownFactory.attentive",
+                        "__main__.mutual_lab.decoder_study.RecordingFactory.D0"):
+            with self.subTest(unknown=unknown), self.assertRaisesRegex(ValueError, "Unsupported"):
+                load_development_model(self.save("unknown-cli-alias", {**standard, "model_factory": unknown}), self.prior_path)
+
     def test_relevant_sources_and_factory_consistency_are_checked_but_unrelated_files_are_ignored(self):
         path, payload, _ = self.fixture("metadata")
         for name, changed, message in (
@@ -220,6 +247,38 @@ class InferenceModelTests(unittest.TestCase):
             next(model.producer.parameters()).add_(.1)
         with self.assertRaisesRegex(ValueError, "no longer matches"):
             infer_development(model, self.pngs[0])
+
+    def test_cli_preserves_real_unicode_bmp_surrogate_trace_with_strict_utf8_stdout(self):
+        from mutual_lab.neural import torch
+        from mutual_lab.spatial_prior import build_spatial_model
+        _, payload, _ = self.fixture("surrogate-header-source")
+        profile = replace(self.profile, tokenizer="unicode-bmp")
+        model = build_spatial_model(profile, 39007, self.bundle, "B1")
+        surrogate_token = 0xD800 + 3
+        # Exercise the actual greedy decoder/tokenizer with a repeatable invalid
+        # BMP output, rather than replacing the trace or stdout serializer.
+        with torch.no_grad():
+            model.producer.output.weight.zero_()
+            model.producer.output.bias.zero_()
+            model.producer.output.bias[surrogate_token] = 1000
+        payload["plan"]["model_profile"] = asdict(profile)
+        payload["model"] = model.state_dict()
+        path = self.save("surrogate-checkpoint", payload)
+        png = self.directory / "surrogate-input.png"
+        png.write_bytes(self.pngs[0])
+        process = subprocess.run([sys.executable, "-m", "mutual_lab.mastery_infer", "--checkpoint", str(path),
+                                  "--prior-bundle", str(self.prior_path), "--image", str(png)],
+            cwd=ROOT, env={**os.environ, "PYTHONIOENCODING": "utf-8:strict"}, capture_output=True, timeout=30)
+        self.assertEqual(process.returncode, 0, process.stderr.decode("utf-8", errors="strict"))
+        output = json.loads(process.stdout.decode("utf-8", errors="strict"))
+        trace = output["generation"]
+        self.assertTrue(trace["invalid_encoding"])
+        self.assertFalse(trace["terminated"])
+        self.assertEqual(trace["text"], "\ud800" * (profile.max_sequence_length - 2))
+        self.assertEqual(trace["token_ids"], [surrogate_token] * (profile.max_sequence_length - 2))
+        self.assertIn(b"\\ud800", process.stdout)
+        self.assertTrue(all(value < 128 for value in process.stdout))
+        self.assertTrue(output["read_only_state_verified"])
 
 
 if __name__ == "__main__":

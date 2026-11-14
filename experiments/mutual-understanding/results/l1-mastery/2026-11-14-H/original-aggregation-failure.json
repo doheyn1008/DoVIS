@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "source_nn_run_id": 43652561578,
+  "source_revision": "736097e5298fb71037a420ec8bd635c73a0154dd",
+  "run_attempt": 1,
+  "original_overall_status": "completed",
+  "original_overall_conclusion": "failure",
+  "failed_job_id": 132631927039,
+  "failed_job_name": "aggregate_h",
+  "error": "ValueError: Matched H replica provenance/initialization differs across languages",
+  "traceback": "2026-11-14T23:49:41.5986754Z Traceback (most recent call last):\n2026-11-14T23:49:41.5993492Z   File \"/home/runner/work/DoVIS/DoVIS/experiments/mutual-understanding/mutual_lab/producer_context_study.py\", line 427, in <module>\n2026-11-14T23:49:41.5994622Z   File \"/home/runner/work/DoVIS/DoVIS/experiments/mutual-understanding/mutual_lab/producer_context_study.py\", line 413, in main\n2026-11-14T23:49:41.6002201Z     result = aggregate_context_studies(suites, plan); output = args.output or Path(\"runs/producer-context-H-summary.json\")\n2026-11-14T23:49:41.6003328Z   File \"/home/runner/work/DoVIS/DoVIS/experiments/mutual-understanding/mutual_lab/producer_context_study.py\", line 361, in aggregate_context_studies\n2026-11-14T23:49:41.6004239Z ValueError: Matched H replica provenance/initialization differs across languages\n2026-11-14T23:49:42.2309723Z ##[error]No files were found with the provided path: experiments/mutual-understanding/runs/producer-context-H-summary.json. No artifacts will be uploaded.",
+  "native_model_jobs": 12,
+  "native_model_jobs_completed_successfully": 12,
+  "native_trials": 24,
+  "native_training_rerun": false,
+  "raw_audit_path": "independent-raw-audit.json"
+}

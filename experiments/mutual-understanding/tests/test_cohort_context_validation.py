@@ -80,7 +80,8 @@ def suite_fixture(language, replica, plan, request):
         understanding_specification={'understanding': 'objects', 'producer_memory': 'objects'},
         context_specification={'context': spec['producer_context'], 'nn_parameters_changed': False},
         memory_preflight={'status': 'completed', 'input_pngs': 332, 'unique_pngs': 332,
-                          'successful_pngs': 332, 'invalid_pngs': 0, 'fallback_count': 0})
+                          'successful_pngs': 332, 'fallback_count': 0, 'fallback_policy': 'raise; no fallback',
+                          'model_state_unchanged': True, 'rng_unchanged': True})
     raw.update(seed_pair=list(pair), plan=asdict(replace(plan, b_seed_pair=pair)),
         model_factory=factory, negative_sampling_seed=pair[1]+plan.negative_seed_offset,
         source_sha256=content['candidate_source_sha256'],
@@ -90,6 +91,7 @@ def suite_fixture(language, replica, plan, request):
     table = {'policy': cohort.FROZEN_FEATURE_POLICY, 'caches': {'visual_cache': {'entries': 332}}, 'sha256': '8'*64}
     raw['frozen_feature_policy'] = cohort.FROZEN_FEATURE_POLICY
     raw['frozen_feature_tables'] = {'step_0': table, 'final': copy.deepcopy(table)}
+    initial['memory_preflight']['feature_tables'] = copy.deepcopy(table)
     raw['benchmark']['image_caches_cleared'] = {'visual_cache': 332}
     for point in raw['curves']:
         point['frozen_feature_table_sha256'] = table['sha256']
@@ -204,6 +206,66 @@ class HConfirmationTests(unittest.TestCase):
             else: request['content']['confirmation_implementation_sha256'] = '0'*64
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 cohort._validate_request(request, self.plan)
+
+    def test_h_preflight_authoritative_fields_reject_malformed_failed_and_mutated_evidence(self):
+        variants = [('status', 'failed'), ('status', None), ('input_pngs', 331), ('input_pngs', 332.0),
+                    ('unique_pngs', 331), ('successful_pngs', 331), ('fallback_count', 1),
+                    ('fallback_count', False), ('fallback_count', '0'), ('fallback_policy', 'silent fallback'),
+                    ('model_state_unchanged', False), ('model_state_unchanged', 'true'),
+                    ('rng_unchanged', False), ('rng_unchanged', 1), ('feature_tables', {}),
+                    ('feature_tables', {'sha256': 'different'}), ('invalid_pngs', 1),
+                    ('invalid_pngs', -1), ('invalid_pngs', False), ('invalid_pngs', None), ('invalid_pngs', '0')]
+        baseline = self.suites()
+        self.assertNotIn('invalid_pngs', baseline[0]['initial_state']['memory_preflight'])
+        outcome = cohort.aggregate_cohort_validations(baseline, self.plan, candidate_request=self.request)
+        self.assertTrue(outcome['robust_development_candidate'])
+        baseline[0]['initial_state']['memory_preflight']['invalid_pngs'] = 0
+        self.assertTrue(cohort.aggregate_cohort_validations(baseline, self.plan,
+            candidate_request=self.request)['robust_development_candidate'])
+        for field, value in variants:
+            suites = self.suites()
+            suites[0]['initial_state']['memory_preflight'][field] = value
+            with self.subTest(field=field, value=value):
+                outcome = cohort.aggregate_cohort_validations(suites, self.plan, candidate_request=self.request)
+                self.assertFalse(outcome['robust_development_candidate'])
+                self.assertFalse(outcome['trial_checks'][0]['checks']['memory_preflight'])
+        for field in ('status','input_pngs','unique_pngs','successful_pngs','fallback_count','fallback_policy',
+                      'model_state_unchanged','rng_unchanged','feature_tables'):
+            suites = self.suites()
+            suites[0]['initial_state']['memory_preflight'].pop(field)
+            with self.subTest(missing=field):
+                outcome = cohort.aggregate_cohort_validations(suites, self.plan, candidate_request=self.request)
+                self.assertFalse(outcome['trial_checks'][0]['checks']['memory_preflight'])
+
+    @unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
+                         "requires optional CPU torch, NumPy and Pillow")
+    def test_actual_h_factory_preflight_schema_qualifies_without_invented_invalid_field(self):
+        from mutual_lab import development_world as world
+        from mutual_lab.config import ExperimentConfig
+        from mutual_lab.producer_context_study import RecordingFactory
+        from mutual_lab.neural import torch
+        config = ExperimentConfig.load(PACKAGE/'configs/neural.example.json')
+        splits = world.development_splits(config, self.plan.data_seed)
+        pngs = tuple(world.render_scene(scene) for values in splits.values() for scene in values)
+        factory = RecordingFactory('H0', pngs)
+        with patch.object(torch, 'load') as deserialize:
+            model = factory(self.plan.model_profile, cohort.SEED_PAIRS[0][0], self.actual_image_prior(), condition='B1')
+            deserialize.assert_not_called()
+        preflight = copy.deepcopy(factory.initial_state['memory_preflight'])
+        self.assertNotIn('invalid_pngs', preflight)
+        self.assertEqual(preflight['input_pngs'], 332)
+        self.assertTrue(preflight['model_state_unchanged']); self.assertTrue(preflight['rng_unchanged'])
+        suites = self.suites()
+        for suite in suites:
+            suite['initial_state']['memory_preflight'] = copy.deepcopy(preflight)
+            tables = preflight['feature_tables']
+            suite['engine_report']['frozen_feature_tables'] = {'step_0': copy.deepcopy(tables), 'final': copy.deepcopy(tables)}
+            for point in suite['engine_report']['curves']:
+                point['frozen_feature_table_sha256'] = tables['sha256']
+        outcome = cohort.aggregate_cohort_validations(suites, self.plan, candidate_request=self.request)
+        self.assertTrue(outcome['robust_development_candidate'], outcome['failed_trials'])
+        self.assertTrue(all(row['checks']['memory_preflight'] for row in outcome['trial_checks']))
+        del model
 
     @unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
                          "requires optional CPU torch, NumPy and Pillow")

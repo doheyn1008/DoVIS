@@ -405,7 +405,14 @@ def aggregate_cohort_validations(suites,plan,*,candidate_request):
             memory=initial.get('memory_specification',initial.get('producer_memory_specification',{}))
             preflight=initial.get('memory_preflight',{})
             checks['fixed_memory']=memory.get('memory_source')==spec['producer_memory'] and memory.get('memory_normalization')=='l2_first32_raw_yx_v1'
-            checks['memory_preflight']=preflight.get('status')=='completed' and preflight.get('input_pngs')==332 and preflight.get('unique_pngs')==332 and preflight.get('successful_pngs')==332 and preflight.get('invalid_pngs')==0 and preflight.get('fallback_count')==0
+            checks['memory_preflight']=(isinstance(preflight,Mapping) and preflight.get('status')=='completed'
+                and all(type(preflight.get(key)) is int and preflight[key]==332 for key in ('input_pngs','unique_pngs','successful_pngs'))
+                and type(preflight.get('fallback_count')) is int and preflight['fallback_count']==0
+                and preflight.get('fallback_policy')=='raise; no fallback'
+                and preflight.get('model_state_unchanged') is True and preflight.get('rng_unchanged') is True
+                and isinstance(preflight.get('feature_tables'),Mapping) and bool(preflight['feature_tables'])
+                and preflight['feature_tables']==tables.get('step_0')
+                and ('invalid_pngs' not in preflight or (type(preflight['invalid_pngs']) is int and preflight['invalid_pngs']==0)))
         if spec['candidate_kind']=='producer_context':
             u=initial.get('understanding_specification',{})
             checks['fixed_understanding']=u.get('understanding')=='objects' and u.get('producer_memory')=='objects'

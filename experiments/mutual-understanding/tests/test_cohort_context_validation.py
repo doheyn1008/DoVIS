@@ -205,6 +205,8 @@ class HConfirmationTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 cohort._validate_request(request, self.plan)
 
+    @unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
+                         "requires optional CPU torch, NumPy and Pillow")
     def test_real_cli_request_and_prior_loaders_aggregate_and_training_dispatch(self):
         from mutual_lab.spatial_prior import save_prior_bundle
         def save(path, value): path.write_text(json.dumps(value))
@@ -250,6 +252,8 @@ class HConfirmationTests(unittest.TestCase):
             cohort.load_candidate_request(request_path, self.plan, plan_path=plan_path,
                 prior_path=prior_path, source_summary_path=summary_path, source_plan_path=source_path)
 
+    @unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
+                         "requires optional CPU torch, NumPy and Pillow")
     def test_actual_h128_factories_start_two_fresh_990xx_models_and_adam_without_l1_load(self):
         from mutual_lab import development_world as world
         from mutual_lab.neural import digest, torch

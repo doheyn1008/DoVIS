@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 from mutual_lab import producer_context as module
 
 
+@unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
+                     "requires optional CPU torch, NumPy and Pillow")
 class ProducerContextTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

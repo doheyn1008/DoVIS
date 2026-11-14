@@ -1,0 +1,97 @@
+name: Native understanding and production preparation
+
+on:
+  push:
+    branches: [codex/native-preparation]
+    paths:
+      - '.github/workflows/native-preparation.yml'
+      - 'experiments/mutual-understanding/mutual_lab/native_preparation.py'
+      - 'experiments/mutual-understanding/tests/test_native_preparation.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-preparation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  train:
+    name: Joint L1 preparation (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+    defaults:
+      run:
+        working-directory: experiments/mutual-understanding
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training dependencies
+        run: |
+          python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[neural]'
+      - name: Verify data coverage, learning state and common budget rules
+        run: python -m unittest discover -s tests -p test_native_preparation.py -v
+      - name: Train comprehension and native production at fixed budgets
+        run: timeout --signal=INT --kill-after=30s 17m python -m mutual_lab.native_preparation --language '${{ matrix.language }}'
+      - name: Save reports and development checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-preparation-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/native-preparation/
+          if-no-files-found: error
+          retention-days: 90
+
+  aggregate:
+    name: Compare fixed development budgets
+    if: always()
+    needs: train
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: experiments/mutual-understanding
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-preparation-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/native-preparation-downloads/
+          merge-multiple: true
+      - name: Select a common budget only if every language meets both targets
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from mutual_lab.diagnostics import safe_json
+          from mutual_lab.native_preparation import classify_all_languages
+          reports = sorted(Path('runs/native-preparation-downloads').rglob('report.json'))
+          if not reports:
+              raise RuntimeError('No preparation reports were found in the downloaded artifacts')
+          result = classify_all_languages([json.loads(path.read_text()) for path in reports])
+          safe_json(Path('runs/native-preparation-summary.json'), result)
+          print(json.dumps(result), flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-preparation-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/native-preparation-summary.json
+          if-no-files-found: error
+          retention-days: 90

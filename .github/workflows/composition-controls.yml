@@ -4,12 +4,8 @@ on:
   push:
     branches: [codex/composition-controls]
     paths:
-      - '.github/workflows/composition-controls.yml'
-      - 'experiments/mutual-understanding/mutual_lab/composition_*.py'
-      - 'experiments/mutual-understanding/mutual_lab/development_models.py'
-      - 'experiments/mutual-understanding/tests/test_composition_*.py'
-      - 'experiments/mutual-understanding/tests/test_development_models.py'
-      - 'experiments/mutual-understanding/configs/composition-cpu-requirements.txt'
+      # Full training is explicitly requested; routine fixes run regular PR CI.
+      - 'experiments/mutual-understanding/configs/composition-run.request.json'
   workflow_dispatch:
 
 permissions:
@@ -52,6 +48,7 @@ jobs:
           python -m unittest discover -s tests -p test_composition_diagnostics.py -v
           python -m unittest discover -s tests -p test_development_models.py -v
           python -m unittest discover -s tests -p test_composition_suite.py -v
+          python -m unittest discover -s tests -p test_composition_failure_paths.py -v
       - name: Save dependency lock observed on this runner
         run: |
           mkdir -p runs/composition-suite

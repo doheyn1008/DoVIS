@@ -43,6 +43,17 @@ ARM_DEFINITIONS = {
 }
 
 
+class ArmCancelled(KeyboardInterrupt):
+    """Carry the persisted arm report through suite-level cancellation."""
+    def __init__(self, report_path):
+        super().__init__("Composition arm cancelled")
+        self.report_path = Path(report_path)
+
+
+class _ArmTimeLimit(Exception):
+    pass
+
+
 def arm_spec(name):
     if name not in ARM_DEFINITIONS:
         raise ValueError(f"Unknown development arm: {name}")
@@ -100,7 +111,11 @@ def environment_metadata(torch):
 def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-suite",
             progress=print, *, remaining_seconds=None):
     """Train one declared arm; the understanding stream always retains four forms."""
+    begun = time.monotonic()
     plan.validate(config)
+    allowance = min(plan.max_seconds_per_arm, remaining_seconds if remaining_seconds is not None
+                    else plan.max_seconds_per_arm)
+    deadline = begun + allowance
     if language not in LANGUAGES_ORDER:
         raise ValueError("Unknown suite language")
     spec = arm_spec(arm)
@@ -149,6 +164,8 @@ def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-su
         "initial_producer_sha256": digest(model.producer.state_dict()),
         "initial_visual_sha256": digest(model.visual_projection),
         "training_steps_completed": 0, "curves": [], "checkpoints": [],
+        "runtime_allowance_seconds": allowance,
+        "timing_scope": "Arm entry, including setup, training, evaluation and checkpoint snapshots",
         "interpretation": [
             "Development-only comparisons; no native qualification or foreign acquisition.",
             "All arms use separate branch clipping, so the original split arm is a new baseline, not a numerical replay of old global clipping.",
@@ -160,9 +177,9 @@ def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-su
     meaning_stream, caption_stream = hashlib.sha256(), hashlib.sha256()
     generations, predictions, step = [], [], 0
     index = semantic_index(language)
-    begun = time.monotonic()
-    allowance = min(plan.max_seconds_per_arm, remaining_seconds if remaining_seconds is not None
-                    else plan.max_seconds_per_arm)
+    def check_deadline():
+        if time.monotonic() >= deadline:
+            raise _ArmTimeLimit()
 
     def state_hash():
         return digest({"weights": model.state_dict(), "optimizer": optimizer.state_dict(),
@@ -199,6 +216,7 @@ def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-su
         report["checkpoints"] = [c for c in report["checkpoints"] if c["path"] != path.name] + [manifest]
 
     def evaluate():
+        check_deadline()
         before = state_hash()
         row = {"step": step}
         for name, scenes in splits.items():
@@ -222,18 +240,17 @@ def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-su
         report["curves"].append(row)
         save_checkpoint()
         snapshot()
+        check_deadline()
         if progress:
             progress(f"{language} {arm} step={step} understand={row['dev']['comprehension_accuracy']:.1%} "
                      f"generate={row['dev']['valid_generation_accuracy']:.1%}", flush=True)
 
-    snapshot()
     try:
+        snapshot()
+        check_deadline()
         evaluate()
         for next_step in range(1, plan.budgets[-1] + 1):
-            if time.monotonic() - begun >= allowance:
-                report["status"] = "time_limit"
-                save_checkpoint(); snapshot()
-                return directory
+            check_deadline()
             batch = rng.choices(examples["train"], k=config.native_training_profile.batch_size)
             meaning_stream.update(json.dumps([e["_scene_key"] for e in batch]).encode() + b"\n")
             caption_stream.update(json.dumps([e["text"] for e in batch], ensure_ascii=False).encode() + b"\n")
@@ -253,15 +270,21 @@ def run_arm(config, language, arm, plan=SuitePlan(), output="runs/composition-su
             report["training_steps_completed"] = step
             if step in plan.budgets:
                 evaluate()
+        check_deadline()
         report["status"] = "completed"
         snapshot()
+        check_deadline()
+        return directory
+    except _ArmTimeLimit:
+        report["status"] = "time_limit"
+        save_checkpoint(); snapshot()
         return directory
     except (Exception, KeyboardInterrupt) as exc:
         report["status"] = "cancelled" if isinstance(exc, KeyboardInterrupt) else "failed"
         report["error"] = f"{type(exc).__name__}: {exc}"
         save_checkpoint(); snapshot()
         if isinstance(exc, KeyboardInterrupt):
-            raise
+            raise ArmCancelled(directory / "report.json") from exc
         return directory
 
 
@@ -289,8 +312,14 @@ def run_suite(config, language, plan=SuitePlan(), output="runs/composition-suite
             except Exception as exc:
                 suite["reports"].append({"arm": arm_spec(arm), "status": "failed",
                     "language": language, "curves": [], "error": f"{type(exc).__name__}: {exc}"})
-            except KeyboardInterrupt:
+            except KeyboardInterrupt as exc:
+                if isinstance(exc, ArmCancelled):
+                    suite["reports"].append(json.loads(exc.report_path.read_text()))
+                else:
+                    suite["reports"].append({"arm": arm_spec(arm), "status": "cancelled",
+                        "language": language, "curves": [], "error": f"{type(exc).__name__}: {exc}"})
                 suite["status"] = "cancelled"
+                suite["elapsed_seconds"] = time.monotonic() - begun
                 safe_json(directory / "suite.json", suite)
                 raise
         suite["elapsed_seconds"] = time.monotonic() - begun

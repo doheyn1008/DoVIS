@@ -1,0 +1,5 @@
+# Versions observed in the preceding CPU experiment; freeze the main numerical dependencies.
+# Install the CPU torch wheel from the official CPU index before this file.
+torch==2.15.0+cpu
+numpy==2.5.4
+Pillow==12.3.0

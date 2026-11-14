@@ -148,6 +148,47 @@ class CorpusLoaderTests(unittest.TestCase):
             self.assertEqual(result["splits"]["test"], ())
             self.assertEqual(result["split_counts"], {"train": 1, "dev": 1, "test": 0})
 
+    def test_deadline_during_late_record_validation_propagates_without_exposure(self):
+        class Deadline(RuntimeError):
+            pass
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = write_corpus(Path(temporary), fixture_documents())
+            validated = []
+            original = NativeDocument.validate
+            deadline = Deadline("late-row cooperative deadline")
+
+            def validate(document, language):
+                result = original(document, language)
+                validated.append(document.document_id)
+                return result
+
+            def check():
+                if len(validated) >= 2:
+                    raise deadline
+
+            with patch.object(NativeDocument, "validate", validate), patch("corpus_loader.document_split") as split, \
+                    patch.object(ByteTokenizer, "encode") as encoder, patch("native_lm.build_model") as model:
+                with self.assertRaises(Deadline) as caught:
+                    load_corpus(path, "en", check_deadline=check)
+                self.assertIs(caught.exception, deadline)
+                self.assertEqual(len(validated), 2)
+                split.assert_not_called(); encoder.assert_not_called(); model.assert_not_called()
+
+    def test_callback_default_compatibility_and_deadline_before_manifest_read(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = write_corpus(Path(temporary), fixture_documents())
+            calls = []
+            baseline = load_corpus(path, "en")
+            observed = load_corpus(path, "en", check_deadline=lambda: calls.append(True))
+            self.assertEqual(baseline, observed)
+            self.assertGreater(len(calls), len(fixture_documents()) * 4)
+            deadline = TimeoutError("before manifest I/O")
+            with patch.object(Path, "read_bytes") as read, self.assertRaises(TimeoutError) as caught:
+                load_corpus(path, "en", check_deadline=lambda: (_ for _ in ()).throw(deadline))
+            self.assertIs(caught.exception, deadline)
+            read.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

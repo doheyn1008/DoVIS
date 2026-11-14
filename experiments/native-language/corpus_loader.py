@@ -38,12 +38,18 @@ def _json(raw, label):
         raise ValueError(f"Invalid UTF-8 JSON in {label}: {error}") from error
 
 
-def _identity_hash(values):
-    raw = json.dumps(sorted(values), ensure_ascii=False, separators=(",", ":")).encode("utf-8", errors="strict")
-    return hashlib.sha256(raw).hexdigest()
+def _identity_hash(values, check):
+    check()
+    ordered = sorted(values)
+    check()
+    raw = json.dumps(ordered, ensure_ascii=False, separators=(",", ":")).encode("utf-8", errors="strict")
+    check()
+    digest = hashlib.sha256(raw).hexdigest()
+    check()
+    return digest
 
 
-def load_corpus(manifest_path, native_language):
+def load_corpus(manifest_path, native_language, *, check_deadline=None):
     """Return validated NativeDocument tuples and split hashes; never encode text.
 
     The manifest has exactly MANIFEST_FIELDS and references a plain local JSONL
@@ -52,12 +58,21 @@ def load_corpus(manifest_path, native_language):
     ``documents_sha256`` is the hash of the original JSONL bytes, not a fitted or
     tokenized representation. Empty train/dev splits are rejected; test may be
     empty and is returned separately for a caller to keep outside its trainer.
+    An optional zero-argument deadline callback runs between bounded operations;
+    its exceptions propagate unchanged and no partial split is returned.
     """
+    if check_deadline is not None and not callable(check_deadline):
+        raise TypeError("check_deadline must be callable or None")
+    check = check_deadline if check_deadline is not None else lambda: None
+    check()
     if native_language not in LANGUAGES:
         raise ValueError("Choose exactly one supported native language")
     manifest_path = Path(manifest_path).resolve()
+    check()
     raw_manifest = manifest_path.read_bytes()
+    check()
     manifest = _json(raw_manifest, str(manifest_path))
+    check()
     if not isinstance(manifest, dict) or set(manifest) != MANIFEST_FIELDS:
         raise ValueError("Corpus manifest must contain exactly the schema-v1 fields")
     if (type(manifest["schema_version"]) is not int or manifest["schema_version"] != 1
@@ -80,11 +95,15 @@ def load_corpus(manifest_path, native_language):
 
     documents, identifiers, text_groups = [], set(), {}
     digest = hashlib.sha256()
+    check()
     with source.open("rb") as stream:
         for number, raw_line in enumerate(stream, 1):
+            check()
             digest.update(raw_line)
+            check()
             label = f"{source.name} line {number}"
             record = _json(raw_line, label)
+            check()
             if not isinstance(record, dict) or set(record) != DOCUMENT_FIELDS:
                 raise ValueError(f"{label}: expected exactly the NativeDocument fields")
             if any(not isinstance(value, str) for value in record.values()):
@@ -95,6 +114,7 @@ def load_corpus(manifest_path, native_language):
                 document = NativeDocument(**record).validate(native_language)
             except (UnicodeError, ValueError) as error:
                 raise ValueError(f"{label}: {error}") from error
+            check()
             if document.document_id in identifiers:
                 raise ValueError(f"{label}: duplicate document_id {document.document_id!r}")
             identifiers.add(document.document_id)
@@ -102,7 +122,10 @@ def load_corpus(manifest_path, native_language):
             if previous != document.near_duplicate_group:
                 raise ValueError(f"{label}: identical text has contradictory near_duplicate_group attestations")
             documents.append(document)
+            check()
+    check()
     actual = digest.hexdigest()
+    check()
     if actual != expected:
         raise ValueError("Corpus document file SHA256 mismatch")
     if not documents:
@@ -110,14 +133,19 @@ def load_corpus(manifest_path, native_language):
 
     # No split is exposed until every input record and the whole-file hash pass.
     splits = {name: [] for name in SPLITS}
+    groups = {name: set() for name in SPLITS}
+    texts = {name: set() for name in SPLITS}
+    ids = {name: set() for name in SPLITS}
     for document in documents:
+        check()
         name = document_split(document, seed)
         if name not in splits:
             raise ValueError("Document splitter returned an unknown split")
         splits[name].append(document)
-    groups = {name: {doc.near_duplicate_group for doc in values} for name, values in splits.items()}
-    texts = {name: {doc.text_sha256 for doc in values} for name, values in splits.items()}
-    ids = {name: {doc.document_id for doc in values} for name, values in splits.items()}
+        groups[name].add(document.near_duplicate_group)
+        texts[name].add(document.text_sha256)
+        ids[name].add(document.document_id)
+        check()
     intersections = {}
     for index, left in enumerate(SPLITS):
         for right in SPLITS[index + 1:]:
@@ -128,14 +156,15 @@ def load_corpus(manifest_path, native_language):
             if any(intersections[key].values()):
                 raise ValueError("Corpus split leakage: document IDs, groups, or exact texts overlap")
     counts = {name: len(values) for name, values in splits.items()}
+    check()
     if not counts["train"] or not counts["dev"]:
         raise ValueError("Corpus must provide nonempty train and dev splits without moving groups")
     audit = {"document_count": len(documents), "exact_text_count": len(text_groups),
              "near_duplicate_group_count": len(set.union(*groups.values())),
              "split_group_counts": {name: len(values) for name, values in groups.items()},
-             "split_document_ids_sha256": {name: _identity_hash(values) for name, values in ids.items()},
-             "split_groups_sha256": {name: _identity_hash(values) for name, values in groups.items()},
-             "split_text_hashes_sha256": {name: _identity_hash(values) for name, values in texts.items()},
+             "split_document_ids_sha256": {name: _identity_hash(values, check) for name, values in ids.items()},
+             "split_groups_sha256": {name: _identity_hash(values, check) for name, values in groups.items()},
+             "split_text_hashes_sha256": {name: _identity_hash(values, check) for name, values in texts.items()},
              "split_intersections": intersections,
              "split_policy": "sha256-seed-reviewed-near-duplicate-group-90-5-5-v1",
              "split_hash_policy": "sha256-utf8-json-sorted-unique-values-compact-v1",
@@ -146,6 +175,8 @@ def load_corpus(manifest_path, native_language):
              "near_duplicate_detection_performed": False,
              "rights_review_values": sorted({doc.rights_review for doc in documents}),
              "foreign_passage_audit_values": sorted({doc.foreign_passage_audit for doc in documents})}
-    return {"language": native_language, "manifest_sha256": hashlib.sha256(raw_manifest).hexdigest(),
-            "documents_sha256": actual, "split_seed": seed, "split_counts": counts,
-            "splits": {name: tuple(values) for name, values in splits.items()}, "audit": audit}
+    result = {"language": native_language, "manifest_sha256": hashlib.sha256(raw_manifest).hexdigest(),
+              "documents_sha256": actual, "split_seed": seed, "split_counts": counts,
+              "splits": {name: tuple(values) for name, values in splits.items()}, "audit": audit}
+    check()
+    return result

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import random
 import time
@@ -71,25 +72,35 @@ def _optimizer(model):
         betas=tuple(OPTIMIZER["betas"]), eps=OPTIMIZER["eps"], weight_decay=OPTIMIZER["weight_decay"])
 
 
-def _windows(documents, language, length):
+def _windows(documents, language, length, *, check_deadline=None):
     """Encode only the explicitly supplied train/dev tuple, never test."""
+    check = check_deadline or (lambda: None)
+    check()
     result = []
     for document in documents:
+        check()
         document.validate(language)
+        check()
         tokens = ByteTokenizer.encode(document.text)
+        check()
         for index, start in enumerate(range(0, len(tokens) - 1, length)):
+            check()
             values = tokens[start:start + length + 1]
             targets = values[1:]
             result.append({"document_id": document.document_id, "window": index,
                 "target_units": len(targets), "target_bytes": sum(value >= 3 for value in targets),
                 "sha256": _digest(values), "tokens": values + [PAD] * (length + 1 - len(values))})
+            check()
     if not result:
         raise ValueError("Each train/dev split needs at least one next-token window")
     return result
 
 
-def evaluate_dev(model, optimizer, rng, windows, batch_size, device):
+def evaluate_dev(model, optimizer, rng, windows, batch_size, device, *, check_deadline=None):
+    check = check_deadline or (lambda: None)
+    check()
     before = _digest({"model": model.state_dict(), "optimizer": optimizer.state_dict(), "sampler": rng.getstate()})
+    check()
     cpu_rng = torch.random.get_rng_state().clone()
     cuda_rng = torch.cuda.get_rng_state(device).clone() if device.type == "cuda" else None
     training = model.training
@@ -98,6 +109,7 @@ def evaluate_dev(model, optimizer, rng, windows, batch_size, device):
         model.eval()
         with torch.no_grad():
             for start in range(0, len(windows), batch_size):
+                check()
                 rows = windows[start:start + batch_size]
                 tokens = torch.tensor([row["tokens"] for row in rows], dtype=torch.long, device=device)
                 logits, targets = model(tokens[:, :-1]), tokens[:, 1:]
@@ -107,6 +119,7 @@ def evaluate_dev(model, optimizer, rng, windows, batch_size, device):
                 units += sum(row["target_units"] for row in rows)
                 byte_count += sum(row["target_bytes"] for row in rows)
                 eos_count += int((targets == 2).sum()); pad_count += int((targets == PAD).sum())
+                check()
     finally:
         model.train(training)
     after = _digest({"model": model.state_dict(), "optimizer": optimizer.state_dict(), "sampler": rng.getstate()})
@@ -115,6 +128,7 @@ def evaluate_dev(model, optimizer, rng, windows, batch_size, device):
         unchanged &= bool(torch.equal(cuda_rng, torch.cuda.get_rng_state(device)))
     if not unchanged:
         raise RuntimeError("Dev evaluation changed model/optimizer or RNG")
+    check()
     return {"loss_per_target_unit": total_nll / units, "bits_per_prediction_unit": total_nll / (units * math.log(2)),
         "bits_per_byte": byte_nll / (byte_count * math.log(2)), "byte_negative_log_likelihood_sum": byte_nll,
         "negative_log_likelihood_sum": total_nll, "target_units": units, "utf8_bytes": byte_count,
@@ -171,19 +185,59 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
               (initialization_seed, 0, 2**32 - 1), (data_seed, 0, 2**32 - 1))
     if language not in LANGUAGES or any(type(value) is not int or not low <= value <= high for value, low, high in bounds):
         raise ValueError("Invalid language or bounded training controls")
-    # Validate every manifest/record before constructing any model or windows.
-    corpus = load_corpus(manifest_path, language)
-    device = _device(device)
-    torch.set_num_threads(threads); torch.use_deterministic_algorithms(True)
-    windows = {name: _windows(corpus["splits"][name], language, profile.sequence_length) for name in ("train", "dev")}
+    deadline = began + max_seconds
+
+    def check_deadline():
+        if time.monotonic() >= deadline:
+            raise _Deadline()
+
     plan = {"steps": steps, "batch_size": batch_size, "initialization_seed": initialization_seed,
         "data_seed": data_seed, "eval_every": eval_every, "threads": threads, "device": str(device)}
-    restored = load_checkpoint(resume, corpus, device=device) if resume else None
-    if restored and (restored["payload"]["plan"] != plan or restored["payload"]["model_profile"] != asdict(profile)):
-        raise ValueError("Resume must retain the original fixed training plan and profile")
-    model = restored["model"] if restored else build_model(profile, initialization_seed).to(device)
-    optimizer = restored["optimizer"] if restored else _optimizer(model)
-    rng = restored["rng"] if restored else random.Random(data_seed)
+    corpus, restored = None, None
+
+    def setup_outcome(status, error=None):
+        path = Path(output).resolve() / f"native-{language}-{uuid.uuid4().hex[:8]}"
+        path.mkdir(parents=True)
+        value = {"schema_version": 1, "kind": "native-scratch-development-run-v1", "status": status,
+            "stage": "setup", "language": language, "model_profile": asdict(profile), "plan": plan,
+            "max_seconds": max_seconds, "elapsed_seconds": time.monotonic() - began,
+            "step": restored["payload"]["step"] if restored else 0, "sampling_trace": [], "dev_history": [],
+            "checkpoints": [], "checkpoint_created": False, "test_encoded": False,
+            "corpus_validation_completed": corpus is not None, "source_sha256": _sources(),
+            "excluded_from_research": True, "eligible_for_l2": False, "eligible_for_fresh_experiment": False,
+            "trained_general_l1": False, "new_training_steps": 0}
+        if error is not None:
+            value["error"] = f"{type(error).__name__}: {error}"
+        _json(path / "report.json", value)
+        return path
+
+    try:
+        # Every row is validated before any model/window exposure. Cooperative
+        # checks surround I/O, encoding and batches; individual operations are
+        # not preemptible and persistence is attempted outside the deadline.
+        check_deadline()
+        corpus = load_corpus(manifest_path, language, check_deadline=check_deadline)
+        check_deadline()
+        device = _device(device); plan["device"] = str(device)
+        torch.set_num_threads(threads); torch.use_deterministic_algorithms(True)
+        windows = {name: _windows(corpus["splits"][name], language, profile.sequence_length,
+            check_deadline=check_deadline) for name in ("train", "dev")}
+        check_deadline()
+        restored = load_checkpoint(resume, corpus, device=device) if resume else None
+        if restored and (restored["payload"]["plan"] != plan or restored["payload"]["model_profile"] != asdict(profile)):
+            raise ValueError("Resume must retain the original fixed training plan and profile")
+        model = restored["model"] if restored else build_model(profile, initialization_seed).to(device)
+        check_deadline()
+        optimizer = restored["optimizer"] if restored else _optimizer(model)
+        rng = restored["rng"] if restored else random.Random(data_seed)
+        check_deadline()
+    except _Deadline as error:
+        return setup_outcome("time_limit", error)
+    except KeyboardInterrupt as error:
+        try:
+            setup_outcome("cancelled", error)
+        finally:
+            raise error
     directory = Path(output).resolve() / f"native-{language}-{uuid.uuid4().hex[:8]}"
     directory.mkdir(parents=True)
     step = restored["payload"]["step"] if restored else 0
@@ -202,13 +256,8 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
         "excluded_from_research": True, "eligible_for_fresh_experiment": False, "eligible_for_l2": False,
         "trained_general_l1": False, "dev_history": history, "checkpoints": [],
         "selection": "Fixed final budget only; no best-dev checkpoint selection or automatic qualification"}
-    deadline = began + max_seconds
     in_update = False
     cuda_indices = [device.index if device.index is not None else torch.cuda.current_device()] if device.type == "cuda" else []
-
-    def check_deadline():
-        if time.monotonic() >= deadline:
-            raise _Deadline()
 
     def snapshot():
         counts = Counter((item["document_id"], item["window"]) for row in trace for item in row["windows"])
@@ -222,7 +271,8 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
         _json(directory / "report.json", report)
 
     def checkpoint():
-        path = directory / (f"incomplete-after-{step:06d}.pt" if in_update else f"step-{step:06d}.pt")
+        prefix = "incomplete-after" if in_update else "step"
+        path = directory / f"{prefix}-{step:06d}-{report['status']}-{uuid.uuid4().hex}.pt"
         payload = {"format": FORMAT, "kind": "development_only", "excluded_from_research": True,
             "eligible_for_fresh_experiment": False, "eligible_for_l2": False, "language": language,
             "step": step, "model_profile": asdict(profile), "plan": plan, "model": model.state_dict(),
@@ -234,11 +284,18 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
             "sampling_trace": trace, "dev_history": history, "resume_safe": not in_update,
             "status_at_save": report["status"]}
         temporary = path.with_suffix(".pt.tmp")
-        torch.save(payload, temporary); temporary.replace(path)
+        try:
+            with temporary.open("xb") as stream:
+                torch.save(payload, stream)
+            # Publish a new inode/name, never replace a previous checkpoint.
+            os.link(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
         sidecar = {"format": FORMAT, "kind": "development_only", "excluded_from_research": True,
             "eligible_for_fresh_experiment": False, "eligible_for_l2": False, "language": language,
             "step": step, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "model_profile": asdict(profile),
             "resume_safe": not in_update, "path": path.name,
+            "status_at_save": report["status"],
             "source_sha256": sources, "corpus_manifest_sha256": corpus["manifest_sha256"],
             "corpus_documents_sha256": corpus["documents_sha256"], "split_seed": corpus["split_seed"]}
         _json(path.with_suffix(".json"), sidecar)
@@ -254,6 +311,15 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
                 report.setdefault("persistence_errors", []).append(
                     {"operation": operation, "error": f"{type(error).__name__}: {error}"})
 
+    def evaluate_current_if_due():
+        scheduled = step == 0 or step % eval_every == 0 or step == steps
+        if scheduled and not any(point["step"] == step for point in history):
+            check_deadline()
+            metrics = evaluate_dev(model, optimizer, rng, windows["dev"], batch_size, device,
+                check_deadline=check_deadline)
+            history.append({"step": step, **metrics})
+            checkpoint(); snapshot(); check_deadline()
+
     with torch.random.fork_rng(devices=cuda_indices):
         torch.random.set_rng_state(restored["payload"]["torch_cpu_rng_state"] if restored else
             torch.Generator(device="cpu").manual_seed(data_seed).get_state())
@@ -262,9 +328,9 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
             torch.cuda.set_rng_state(state, device)
         try:
             snapshot(); check_deadline()
-            if not history:
-                history.append({"step": 0, **evaluate_dev(model, optimizer, rng, windows["dev"], batch_size, device)})
-                checkpoint(); snapshot(); check_deadline()
+            # A safe resumed checkpoint can precede its scheduled evaluation,
+            # including the final update. Fill that point exactly once first.
+            evaluate_current_if_due()
             for next_step in range(step + 1, steps + 1):
                 check_deadline()
                 in_update = True
@@ -280,10 +346,7 @@ def run_training(manifest_path, language, *, output="runs/native-scratch", profi
                     ("document_id", "window", "target_units", "target_bytes", "sha256")} for row in chosen],
                     "target_units": sum(row["target_units"] for row in chosen), "target_bytes": sum(row["target_bytes"] for row in chosen)})
                 in_update = False
-                if step % eval_every == 0 or step == steps:
-                    check_deadline()
-                    history.append({"step": step, **evaluate_dev(model, optimizer, rng, windows["dev"], batch_size, device)})
-                    checkpoint(); snapshot(); check_deadline()
+                evaluate_current_if_due()
                 if progress:
                     progress(step)
             check_deadline(); report["status"] = "completed"; checkpoint(); snapshot(); check_deadline()

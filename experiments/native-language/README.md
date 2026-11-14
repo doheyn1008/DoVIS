@@ -116,13 +116,17 @@ python train_native.py --manifest reviewed/ko/manifest.json --language ko \
   --output runs/native-scratch
 ```
 
-모델은 새 무작위 가중치와 새 AdamW에서 시작합니다. train window의 모든 선택, 문서/window별 횟수, 선택 스트림 해시, 바이트·EOS·PAD·전체 예측 unit 수를 기록합니다. `max-seconds`는 준비 시간을 포함하며 초과·실패·중단을 완료로 표시하지 않습니다. 개발 평가는 시작점과 고정 간격·고정 최종 step에서만 수행하고 가장 좋은 dev checkpoint를 고르지 않습니다. dev 평가 전후 모델·optimizer·표집 RNG·Torch RNG가 같은지 검사합니다.
+모델은 새 무작위 가중치와 새 AdamW에서 시작합니다. train window의 모든 선택, 문서/window별 횟수, 선택 스트림 해시, 바이트·EOS·PAD·전체 예측 unit 수를 기록합니다. `max-seconds`는 준비 시간을 포함하며 초과·실패·중단을 완료로 표시하지 않습니다. manifest 로딩의 행 처리·검증, 문서 인코딩 전후와 각 window, dev의 각 배치 전후에도 같은 deadline을 확인합니다. 이는 **협력적 시간 제한**이므로 진행 중인 단일 파일 I/O·인코딩·Torch 연산을 중간에 강제 종료하지 못합니다. 해당 연산 뒤 다음 경계에서 중단하며, 최소 실패 기록·체크포인트 저장은 마감 뒤에도 시도할 수 있습니다. 검증이 끝나기 전에 준비 시간이 초과하면 학습 없이 setup 단계의 time_limit 보고서만 남깁니다.
+
+개발 평가는 시작점과 고정 간격·고정 최종 step에서만 수행하고 가장 좋은 dev checkpoint를 고르지 않습니다. dev 평가 전후 모델·optimizer·표집 RNG·Torch RNG가 같은지 검사합니다. 마지막 업데이트 직후 평가 전에 중단된 안전한 상태를 재개하면, 빠진 그 최종 평가를 먼저 정확히 한 번 수행한 뒤 완료를 표시합니다. 현재 step이 사전 계획한 평가 시점이 아니면 재개를 이유로 새 평가점을 추가하지 않습니다.
 
 `loss_per_target_unit`과 `bits_per_prediction_unit`은 byte와 EOS 예측을 포함하고 PAD를 제외합니다. `bits_per_byte`는 **target ID≥3인 실제 바이트의 NLL만** 합산하고 바이트 수로 나누며 EOS/BOS/PAD를 제외합니다. 두 지표를 동의어로 쓰지 않고 EOS·PAD 수를 별도로 남깁니다. 어느 값도 L1 적격성·일반 유창성·언어 간 난이도 판정을 자동으로 만들지 않습니다.
 
-체크포인트에는 전체 모델·AdamW·로컬 표집 RNG·Torch RNG·기존 선택 스트림·dev 이력을 저장하며, sidecar에 SHA256·모델·소스·코퍼스·분할 정보를 남깁니다. 모든 파일은 `development_only`, `excluded_from_research=true`, `eligible_for_l2=false`, `eligible_for_fresh_experiment=false`입니다. 복원은 `weights_only=True`와 정확한 소스·코퍼스·프로파일·계획 검사를 사용합니다. 새 실행 디렉터리에서 같은 계획으로만 `--resume <step-XXXXXX.pt>`를 지정합니다.
+체크포인트에는 전체 모델·AdamW·로컬 표집 RNG·Torch RNG·기존 선택 스트림·dev 이력을 저장하며, sidecar에 SHA256·모델·소스·코퍼스·분할 정보를 남깁니다. 저장할 때마다 `step-XXXXXX-STATUS-UUID.pt`라는 새 파일 이름을 사용하며, 같은 step의 running/completed/failed 상태도 이전 tensor·sidecar 쌍을 덮어쓰지 않습니다. tensor 공개 뒤 새 sidecar 저장이 실패해도 이전의 유효한 쌍은 그대로 남습니다. 보고서의 `checkpoints[].path`가 성공적으로 저장된 쌍을 가리킵니다.
 
-완료된 step 사이의 중단은 정확히 재개할 수 있도록 검사했습니다. 업데이트 도중 중단된 live state는 `incomplete-after-*.pt`, `resume_safe=false`로 별도 보존하며, 마지막 안전한 `step-*.pt`를 덮어쓰지 않고 그 불완전 상태의 재개를 거부합니다. 이 도구와 작은 fixture의 성공은 일반 모국어 모델을 학습했다는 결과가 아닙니다.
+모든 파일은 `development_only`, `excluded_from_research=true`, `eligible_for_l2=false`, `eligible_for_fresh_experiment=false`입니다. 복원은 `weights_only=True`와 정확한 소스·코퍼스·프로파일·계획 검사를 사용합니다. 새 실행 디렉터리에서 같은 계획으로만 `--resume <step-XXXXXX-STATUS-UUID.pt>`를 지정합니다.
+
+완료된 step 사이의 중단은 정확히 재개할 수 있도록 검사했습니다. 업데이트 도중 중단된 live state는 `incomplete-after-XXXXXX-STATUS-UUID.pt`, `resume_safe=false`로 별도 보존하며, 마지막 안전한 `step-*.pt`를 덮어쓰지 않고 그 불완전 상태의 재개를 거부합니다. 이 도구와 작은 fixture의 성공은 일반 모국어 모델을 학습했다는 결과가 아닙니다.
 
 ## 확인한 1차 자료
 

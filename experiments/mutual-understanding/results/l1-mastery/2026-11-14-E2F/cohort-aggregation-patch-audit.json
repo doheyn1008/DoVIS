@@ -1,0 +1,14 @@
+{
+  "scope": "cohort_aggregation_safety_patch_only",
+  "source_revision": "04bd6e1ea88b95b281a69230d854aefc0257f7c6",
+  "source_cohort_wrapper_sha256": "830c3a81d3e6aac87d2ab8bd38583a3b8ae1a7b2fc330bcc1006cc1e11989d53",
+  "patched_cohort_wrapper_sha256": "3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19",
+  "changed_top_level_ast_nodes": [
+    "aggregate_cohort_validations"
+  ],
+  "all_other_top_level_ast_nodes_identical": true,
+  "training_entrypoint_ast_identical": true,
+  "reason": "Guard missing/null/scalar/list benchmark metadata and preserve incomplete outcome; no training/model/data or budget change",
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false
+}

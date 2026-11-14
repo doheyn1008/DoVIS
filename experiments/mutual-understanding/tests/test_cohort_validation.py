@@ -102,6 +102,24 @@ class CohortProtocolTests(unittest.TestCase):
             with self.assertRaises(ValueError):cohort._validate_request(request,self.plan)
         request=copy.deepcopy(self.request);request['content']['candidate_spec']['producer_memory']='os.system'
         with self.assertRaises(ValueError):cohort._validate_request(request,self.plan)
+    def test_unavailable_or_malformed_benchmark_cannot_qualify_and_retains_failure_context(self):
+        for status in ('completed','failed','cancelled','time_limit'):
+            for variant in ('missing',None,False,7,'unavailable',[]):
+                with self.subTest(status=status,benchmark=variant):
+                    suites=self.suites();suite=suites[0];raw=suite['engine_report']
+                    suite['status']=raw['status']=status
+                    suite['error']='benchmark did not complete'
+                    if variant=='missing':raw.pop('benchmark')
+                    else:raw['benchmark']=variant
+                    result=cohort.aggregate_cohort_validations(suites,self.plan,candidate_request=self.request)
+                    self.assertEqual(result['status'],'incomplete')
+                    self.assertFalse(result['robust_development_candidate']);self.assertFalse(result['provenance_valid'])
+                    self.assertFalse(result['trial_checks'][0]['checks']['benchmark_reset'])
+                    failure=result['failed_trials'][0]
+                    self.assertEqual((failure['language'],failure['replica'],failure['status']),
+                                     (suite['language'],suite['replica'],status))
+                    self.assertEqual(failure['error'],'benchmark did not complete')
+                    self.assertIn('benchmark_reset',failure['failed_checks'])
     def test_grounding_catalog_preserves_four_distinct_original_factory_ids(self):
         names=set()
         for condition in ('G0','G1'):
@@ -199,6 +217,7 @@ class CohortNeuralTests(unittest.TestCase):
         reference=replace(cohort._reference_plan(),budgets=(1,2),model_profile=tiny,benchmark_steps=0)
         full=world.development_splits(config,59003);fixture={'train':full['train'][:4]+full['train'][100:104]+full['train'][-4:],'dev':full['dev'][:4]}
         prior=save_prior_bundle(pretrain_prior([world.render_scene(s) for s in fixture['train']],dim=16,steps=1,batch_size=4,eval_every=1),Path(cls.temporary.name)/'prior.pt');bundle=load_prior_bundle(prior)
+        cls.prior_path,cls.bundle,cls.fixture,cls.reference_plan=prior,bundle,fixture,reference
         cls.request=request_record(cls.plan,actual_sources=True,prior_sha=bundle['_bundle_sha256'],prior_state=bundle['report']['trained_prior_sha256'])
         cls.suites={};cls.paths={}
         with patch.object(cohort,'_reference_plan',return_value=reference),patch.object(world,'development_splits',return_value=fixture),patch.object(world,'development_manifest',return_value={'fixture':'tiny-cohort'}):
@@ -231,5 +250,70 @@ class CohortNeuralTests(unittest.TestCase):
             self.assertTrue(state['optimizer']['state']);self.assertEqual(state['model_factory'],'mutual_lab.memory_study.RecordingFactory.F1')
             self.assertEqual(state['seed_pair'],list(cohort.SEED_PAIRS[key[0]]));self.assertEqual(state['frozen_feature_policy'],FROZEN_FEATURE_POLICY)
             self.assertEqual(state['negative_exposure_offset'],8)
+
+    def test_actual_g1_cohort_trains_fresh_seed_blocks_and_restores_token_conditioned_inference(self):
+        from mutual_lab import development_world as world
+        from mutual_lab.mastery_infer import infer_development,load_development_model
+        from mutual_lab.neural import torch
+        request=request_record(self.plan,'G1',actual_sources=True,
+            prior_sha=self.bundle['_bundle_sha256'],prior_state=self.bundle['report']['trained_prior_sha256'])
+        suites,paths={},{}
+        with tempfile.TemporaryDirectory() as temporary, patch.object(
+                cohort,'_reference_plan',return_value=self.reference_plan),patch.object(
+                world,'development_splits',return_value=self.fixture),patch.object(
+                world,'development_manifest',return_value={'fixture':'tiny-fresh-G1-cohort'}):
+            # The only loads during fresh training inspect each NEW step-zero
+            # checkpoint. The already loaded image-only prior is shared.
+            with patch('mutual_lab.neural.torch.load',wraps=torch.load) as deserialize:
+                for replica in (0,1):
+                    for language in ('en','ko'):
+                        path=cohort.run_cohort_validation(self.config,language,replica,self.plan,
+                            temporary,progress=None,prior_bundle=self.bundle,candidate_request=request)
+                        paths[(replica,language)]=path
+                        suites[(replica,language)]=json.loads((path/'cohort-validation.json').read_text())
+            self.assertEqual(deserialize.call_count,4)
+            for call in deserialize.call_args_list:
+                loaded_path=Path(call.args[0]).resolve()
+                self.assertTrue(loaded_path.is_relative_to(Path(temporary).resolve()))
+                self.assertEqual(loaded_path.name,'step-000000.pt')
+                self.assertIs(call.kwargs['weights_only'],True)
+            base_u,producer=[],[]
+            for replica in (0,1):
+                en,ko=(suites[(replica,language)] for language in ('en','ko'))
+                self.assertEqual(en['initial_state'],ko['initial_state'])
+                for key in ('base_understanding_sha256','producer_sha256','prior_sha256'):
+                    self.assertEqual(en['initial_state'][key],ko['initial_state'][key])
+                base_u.append(en['initial_state']['base_understanding_sha256'])
+                producer.append(en['initial_state']['producer_sha256'])
+                self.assertEqual(en['engine_report']['meaning_stream_sha256'],ko['engine_report']['meaning_stream_sha256'])
+                self.assertNotEqual(en['engine_report']['comprehension_caption_stream_sha256'],ko['engine_report']['comprehension_caption_stream_sha256'])
+                for language in ('en','ko'):
+                    suite=suites[(replica,language)];raw=suite['engine_report']
+                    self.assertEqual(suite['status'],'completed',suite.get('error'))
+                    self.assertTrue(suite['fresh_initialization']);self.assertFalse(suite['resumed'])
+                    self.assertEqual(raw['model_factory'],'mutual_lab.grounding_study.RecordingFactory.G1_objects')
+                    self.assertEqual(raw['seed_pair'],list(cohort.SEED_PAIRS[replica]))
+                    self.assertEqual(raw['plan']['b_seed_pair'],list(cohort.SEED_PAIRS[replica]))
+                    self.assertTrue(all(value for key,value in suite['initial_checkpoint_evidence'].items() if key!='sha256'))
+                    self.assertEqual(raw['frozen_feature_tables']['step_0'],raw['frozen_feature_tables']['final'])
+                    trial=(paths[(replica,language)]/suite['raw_report_path']).parent
+                    checkpoint=trial/'step-000002.pt'
+                    payload=torch.load(checkpoint,map_location='cpu',weights_only=True)
+                    self.assertTrue(payload['optimizer']['state'])
+                    self.assertGreater(float(payload['model']['understanding.residual_output.weight'].abs().sum()),0)
+                    model=load_development_model(checkpoint,self.prior_path)
+                    self.assertTrue(model.understanding.object_context)
+                    self.assertEqual(model.object_memory_source,'objects')
+                    example=world.make_examples(model,self.fixture['dev'][:1],language)[0]
+                    with patch.object(model,'understanding_objects',wraps=model.understanding_objects) as tokens:
+                        actual=infer_development(model,example['image'],text=example['text'],choices_png=example['choices'])
+                    tokens.assert_called()
+                    self.assertEqual(tuple(model.understanding_objects([example['image']]).shape),(1,2,34))
+                    generated=next(row for row in json.loads((trial/'generations.json').read_text()) if row['step']==2 and row['split']=='dev')
+                    predicted=next(row for row in json.loads((trial/'comprehension_predictions.json').read_text()) if row['step']==2 and row['split']=='dev')
+                    self.assertEqual(actual['generation'],{key:generated[key] for key in actual['generation']})
+                    self.assertEqual(actual['comprehension']['prediction'],predicted['prediction'])
+                    self.assertTrue(actual['read_only_state_verified'])
+            self.assertEqual(len(set(base_u)),2);self.assertEqual(len(set(producer)),2)
 
 if __name__=='__main__':unittest.main()

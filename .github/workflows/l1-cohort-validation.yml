@@ -14,7 +14,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: l1-cohort-validation-${{ github.ref }}
+  group: l1-cohort-validation
   cancel-in-progress: false
 
 env:
@@ -79,7 +79,7 @@ jobs:
           if not isinstance(request.get('source_revision'), str) or not re.fullmatch('[0-9a-f]{40}', request['source_revision']):
               raise ValueError('Pin the immutable source code revision')
           for key in ('source_summary_sha256', 'source_plan_sha256', 'prior_manifest_sha256',
-                      'prior_checkpoint_sha256', 'validation_plan_sha256'):
+                      'prior_checkpoint_sha256', 'validation_plan_sha256', 'cohort_implementation_sha256'):
               if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{64}', request[key]):
                   raise ValueError('Invalid pinned cohort hash: ' + key)
           expected = {'fixed_prior_condition': 'B1', 'fixed_final_step': 9600,
@@ -97,6 +97,9 @@ jobs:
                   or not isinstance(value, str) or not re.fullmatch('[0-9a-f]{64}', value)
                   for name, value in hashes.items()) or _implementation_hashes(request) != hashes):
               raise ValueError('The known candidate architecture or training implementation differs from its exact pins')
+          if (request['cohort_implementation_sha256'] != '3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19'
+                  or hashlib.sha256(Path('mutual_lab/cohort_validation.py').read_bytes()).hexdigest() != request['cohort_implementation_sha256']):
+              raise ValueError('Use the explicitly reviewed aggregate-only cohort wrapper correction')
           compatibility = request.get('inference_compatibility_sha256')
           if compatibility is not None and (not isinstance(compatibility, str) or not re.fullmatch('[0-9a-f]{64}', compatibility)):
               raise ValueError('An optional nontraining inference compatibility pin must be an explicit SHA256')
@@ -142,6 +145,198 @@ jobs:
               output.write('source_run_id=' + str(request['source_run_id']) + '\n')
               output.write('source_input_artifact=l1-' + prefix + '-input-' + str(request['source_run_id']) + '\n')
               output.write('source_summary_artifact=l1-' + prefix + '-summary-' + str(request['source_run_id']) + '\n')
+          PY
+      - name: Reject a previously admitted identical cohort request across both branches
+        id: admission
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64
+          import datetime
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          
+          WORKFLOW_PATH = '.github/workflows/l1-cohort-validation.yml'
+          REQUEST_PATH = 'experiments/mutual-understanding/configs/mastery-cohort-run.request.json'
+          BRANCHES = ('codex/l1-mastery', 'codex/l1-memory')
+          request_sha = hashlib.sha256(Path('configs/mastery-cohort-run.request.json').read_bytes()).hexdigest()
+          evidence_path = Path('runs/cohort-input/provenance/admission.json')
+          evidence_path.parent.mkdir(parents=True, exist_ok=True)
+          audit = {'schema_version': 1, 'status': 'checking', 'request_sha256': request_sha,
+              'workflow_path': WORKFLOW_PATH, 'branches': list(BRANCHES),
+              'admission_boundary': 'The first workflow attempt verify job completed with success',
+              'history_pages': 0, 'prior_runs_checked': 0, 'requests_missing_before_activation': 0,
+              'matching_prior_requests': []}
+          
+          def save():
+              evidence_path.write_text(json.dumps(audit, indent=2) + '\n')
+          
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          def timestamp(value):
+              if not isinstance(value, str):
+                  raise ValueError('A workflow creation timestamp is missing')
+              result = datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
+              if result.tzinfo is None:
+                  raise ValueError('Workflow creation timestamps must include a timezone')
+              return result
+          
+          try:
+              if os.environ['GITHUB_RUN_ATTEMPT'] != '1':
+                  raise ValueError('Only the original cohort workflow attempt may be admitted')
+              raw_id = os.environ['GITHUB_RUN_ID']
+              if not re.fullmatch('[1-9][0-9]*', raw_id):
+                  raise ValueError('The current workflow run ID is invalid')
+              current_id = int(raw_id)
+              repository = os.environ['GITHUB_REPOSITORY']
+              if not re.fullmatch('[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository):
+                  raise ValueError('The repository identity is invalid')
+              opener = urllib.request.build_opener(NoRedirect())
+              base = 'https://api.github.com/repos/' + repository
+          
+              def github(path):
+                  query = urllib.request.Request(base + path, headers={
+                      'Authorization': 'Bearer ' + os.environ['SOURCE_GITHUB_TOKEN'],
+                      'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                  with opener.open(query, timeout=30) as response:
+                      result = json.load(response)
+                  if not isinstance(result, dict):
+                      raise ValueError('GitHub returned an invalid API object')
+                  return result
+          
+              current = github('/actions/runs/' + str(current_id))
+              if (current.get('id') != current_id or current.get('path') != WORKFLOW_PATH
+                      or current.get('head_branch') not in BRANCHES
+                      or current.get('repository', {}).get('full_name') != repository):
+                  raise ValueError('The current cohort workflow identity is uncertain')
+              timestamp(current.get('created_at'))
+              audit['current_run'] = {'id': current_id, 'html_url': current.get('html_url'),
+                  'head_branch': current['head_branch'], 'created_at': current['created_at']}
+              seen_pages, seen_runs = set(), {}
+          
+              # Scan repository-wide history, across both branches and workflow IDs.
+              # No branch/date filter, time cutoff, or page-count cap may hide admission.
+              page = 1
+              while True:
+                  payload = github('/actions/runs?' + urllib.parse.urlencode({'per_page': 100, 'page': page}))
+                  runs = payload.get('workflow_runs')
+                  if not isinstance(runs, list):
+                      raise ValueError('GitHub workflow history is incomplete or invalid')
+                  audit['history_pages'] += 1
+                  if not runs:
+                      break
+                  ids = tuple(run.get('id') if isinstance(run, dict) else None for run in runs)
+                  if any(type(run_id) is not int or run_id <= 0 for run_id in ids) or ids in seen_pages:
+                      raise ValueError('GitHub workflow pagination stalled or contains invalid run IDs')
+                  seen_pages.add(ids)
+                  for run in runs:
+                      run_id = run['id']
+                      if run_id == current_id:
+                          continue
+                      path = run.get('path')
+                      if not isinstance(path, str):
+                          raise ValueError('A historical workflow path is missing')
+                      if path != WORKFLOW_PATH:
+                          continue
+                      branch = run.get('head_branch')
+                      if not isinstance(branch, str):
+                          raise ValueError('A historical cohort branch is missing')
+                      if branch not in BRANCHES:
+                          continue
+                      if run.get('repository', {}).get('full_name') != repository:
+                          raise ValueError('A historical cohort repository is uncertain')
+                      revision = run.get('head_sha')
+                      if not isinstance(revision, str) or not re.fullmatch('[0-9a-f]{40}', revision):
+                          raise ValueError('A historical cohort code revision is missing')
+                      if run_id in seen_runs:
+                          if seen_runs[run_id] != revision:
+                              raise ValueError('A historical run changed revision during pagination')
+                          continue
+                      seen_runs[run_id] = revision
+                      # Global serialization does not promise creation-order execution.
+                      # Inspect every other run's original verification, even when its
+                      # creation timestamp is later than the current run's.
+                      timestamp(run.get('created_at'))
+                      audit['prior_runs_checked'] += 1
+                      try:
+                          item = github('/contents/' + REQUEST_PATH + '?' + urllib.parse.urlencode({'ref': revision}))
+                      except urllib.error.HTTPError as error:
+                          if error.code != 404:
+                              raise
+                          commit = github('/commits/' + revision)
+                          if commit.get('sha') != revision:
+                              raise ValueError('A missing request cannot be distinguished from an unavailable historical revision')
+                          audit['requests_missing_before_activation'] += 1
+                          audit.setdefault('verified_absent_request_revisions', []).append(revision)
+                          continue
+                      if item.get('type') != 'file' or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str):
+                          raise ValueError('A historical request file cannot be verified')
+                      contents = base64.b64decode(''.join(item['content'].split()), validate=True)
+                      if hashlib.sha256(contents).hexdigest() != request_sha:
+                          continue
+                      prior = {key: run.get(key) for key in ('id', 'html_url', 'head_sha', 'head_branch',
+                          'created_at', 'status', 'conclusion', 'run_attempt')}
+                      audit['matching_prior_requests'].append(prior)
+                      jobs, job_pages, job_page = [], set(), 1
+                      while True:
+                          # A later failed rerun cannot hide successful original verify.
+                          response = github('/actions/runs/' + str(run_id) + '/attempts/1/jobs?'
+                              + urllib.parse.urlencode({'per_page': 100, 'page': job_page}))
+                          batch = response.get('jobs')
+                          if not isinstance(batch, list):
+                              raise ValueError('The first-attempt job history is invalid')
+                          if not batch:
+                              break
+                          job_ids = tuple(job.get('id') if isinstance(job, dict) else None for job in batch)
+                          if any(type(job_id) is not int or job_id <= 0 for job_id in job_ids) or job_ids in job_pages:
+                              raise ValueError('First-attempt job pagination stalled or is invalid')
+                          job_pages.add(job_ids)
+                          jobs.extend(batch)
+                          job_page += 1
+                      verify = [job for job in jobs if job.get('name') == 'verify']
+                      if (not jobs and type(run.get('run_attempt')) is int and run['run_attempt'] == 1
+                              and run.get('status') in ('queued', 'waiting', 'pending', 'requested')):
+                          # This first attempt has not started any job and cannot pass
+                          # verify while this workflow owns the shared global lock.
+                          prior['admission'] = 'first_attempt_not_started'
+                          continue
+                      if len(verify) != 1:
+                          raise ValueError('The original verification outcome cannot be established for run ' + str(run_id))
+                      verification = verify[0]
+                      prior['first_attempt_verify'] = {key: verification.get(key) for key in ('id', 'status', 'conclusion')}
+                      if verification.get('status') != 'completed':
+                          raise ValueError('An earlier identical request has unresolved first verification: ' + str(run_id))
+                      conclusion = verification.get('conclusion')
+                      if conclusion == 'success':
+                          audit['status'] = 'previously_admitted'
+                          audit['blocking_run'] = prior
+                          raise RuntimeError('This exact cohort request was already admitted by first-attempt verify SUCCESS in run '
+                              + str(run_id) + ' (' + str(run.get('html_url')) + '), latest status='
+                              + str(run.get('status')) + '/' + str(run.get('conclusion'))
+                              + '. Preserve that run and all failed seed cells; a new run ID cannot replace it.')
+                      if conclusion not in ('failure', 'cancelled', 'timed_out', 'skipped', 'neutral',
+                                            'action_required', 'stale', 'startup_failure'):
+                          raise ValueError('The original verification conclusion is uncertain')
+                      prior['admission'] = 'not_admitted_verify_did_not_succeed'
+                  page += 1
+              audit['status'] = 'no_prior_admission'
+              save()
+              print('No earlier first-attempt verify success for pinned request SHA256 ' + request_sha)
+          except Exception as error:
+              if audit['status'] != 'previously_admitted':
+                  audit['status'] = 'blocked_uncertain'
+              audit['error'] = type(error).__name__ + ': ' + str(error)
+              save()
+              raise
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -321,13 +516,22 @@ jobs:
               local_path = Path('mutual_lab') / name
               current_sha = hashlib.sha256(local_path.read_bytes()).hexdigest()
               if current_sha != sha:
-                  if name != 'mastery_infer.py' or request.get('inference_compatibility_sha256') != current_sha:
+                  if (name == 'cohort_validation.py'
+                          and sha == '830c3a81d3e6aac87d2ab8bd38583a3b8ae1a7b2fc330bcc1006cc1e11989d53'
+                          and current_sha == '3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19'
+                          and request.get('cohort_implementation_sha256') == current_sha):
+                      scope = 'Exact reviewed aggregate-only benchmark Mapping guard; every other top-level AST node including run_cohort_validation is unchanged; NN/data/training/candidate source pins remain exact'
+                  elif name == 'mastery_infer.py' and request.get('inference_compatibility_sha256') == current_sha:
+                      scope = 'Explicitly pinned read-only inference compatibility utility; no training/model/data change'
+                  else:
                       raise ValueError('An existing candidate, neural, training or data source changed: ' + name)
-                  compatibility[name] = {'source_sha256': sha, 'cohort_sha256': current_sha,
-                      'scope': 'Explicitly pinned read-only inference compatibility utility; no training/model/data change'}
+                  compatibility[name] = {'source_sha256': sha, 'cohort_sha256': current_sha, 'scope': scope}
           extras = {p.name for p in Path('mutual_lab').glob('*.py')} - recorded.keys()
           if extras - {'cohort_validation.py'}:
               raise ValueError('Only the new cohort wrapper may be added to the pinned candidate package: ' + str(sorted(extras)))
+          if (request['cohort_implementation_sha256'] != '3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19'
+                  or hashlib.sha256(Path('mutual_lab/cohort_validation.py').read_bytes()).hexdigest() != request['cohort_implementation_sha256']):
+              raise ValueError('The exact aggregate-only wrapper correction pin changed')
           if (any(recorded.get(name) != sha for name, sha in request['candidate_source_sha256'].items())
                   or _implementation_hashes(request) != request['candidate_source_sha256']):
               raise ValueError('The selected architecture, memory/readout, feature helper or training source drifted')
@@ -398,6 +602,10 @@ jobs:
           record = load_candidate_request(request_path, plan, plan_path='configs/mastery-cohort-plan.json',
               prior_path=canonical / 'prior.pt', source_summary_path=directory / 'source-summary.json',
               source_plan_path='configs/mastery-C-plan.json')
+          admission = json.loads((directory / 'provenance/admission.json').read_text())
+          if (admission.get('status') != 'no_prior_admission' or admission.get('request_sha256') != record['sha256']
+                  or str(admission.get('current_run', {}).get('id')) != os.environ['GITHUB_RUN_ID']):
+              raise ValueError('The first-attempt, cross-branch admission record differs from this request/run')
           provenance = {'code_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'repository': os.environ['GITHUB_REPOSITORY'],
               'request': request, 'request_sha256': record['sha256'], 'candidate_spec': spec,
@@ -406,7 +614,8 @@ jobs:
               'source_summary_sha256': request['source_summary_sha256'], 'qualified_final_source_rows': selected,
               'preregistered_source_selection': source_selection,
               'source_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('mutual_lab').glob('*.py'))},
-              'unchanged_candidate_source_sha256': recorded, 'inference_compatibility': compatibility,
+              'unchanged_candidate_source_sha256': recorded, 'explicit_nontraining_compatibility': compatibility,
+              'cohort_implementation_sha256': request['cohort_implementation_sha256'], 'admission': admission,
               'unchanged_configuration_sha256': config_hashes, 'canonical_prior': record['prior_evidence'],
               'fresh_seed_pairs': [[69007, 69009], [69017, 69019], [69027, 69029]],
               'frozen_feature_policy': 'per_png_singleton_v1', 'all_source_conditions_retained': True,

@@ -3,10 +3,12 @@
 import hashlib
 import importlib.util
 import json
+import os
 import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/package_l1_states.py"
 spec = importlib.util.spec_from_file_location("package_l1_states", SCRIPT)
@@ -72,6 +74,24 @@ def read_index(path):
 
 
 class L1StatePackagingTests(unittest.TestCase):
+    def test_concurrent_publication_preserves_the_winning_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            trial(root / "A")
+            output = root / "all.zip"
+            winner = b"another verified archive won publication"
+            real_link = os.link
+
+            def publish_after_competitor(source, destination):
+                Path(destination).write_bytes(winner)
+                return real_link(source, destination)
+
+            with patch("os.link", side_effect=publish_after_competitor):
+                with self.assertRaises(FileExistsError):
+                    packaging.package_states({"A": root / "A"}, {}, output)
+            self.assertEqual(output.read_bytes(), winner)
+            self.assertFalse(list(root.glob("all.zip.*.tmp")))
+
     def test_latest_opaque_bytes_all_statuses_and_exact_step_candidate(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

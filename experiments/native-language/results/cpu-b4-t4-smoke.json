@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "scope": "SMOKE_NOT_LANGUAGE_LEARNING",
+  "created_at": "2026-11-14T21:58:11.601895+00:00",
+  "kind": "native-language-cpu-resource-smoke-v1",
+  "language": null,
+  "corpus": null,
+  "input": "Uniform synthetic byte IDs plus BOS/EOS; no natural-language documents",
+  "pretrained_weights": false,
+  "trained_tokenizer": false,
+  "model": {
+    "id": "scratch-byte-384x8-v1",
+    "vocab_size": 259,
+    "hidden_dim": 384,
+    "layers": 8,
+    "heads": 6,
+    "feedforward_dim": 1536,
+    "sequence_length": 256
+  },
+  "parameter_count": 14394240,
+  "trainable_parameter_count": 14394240,
+  "dtype": "float32",
+  "device": "cpu",
+  "batch_size": 4,
+  "sequence_length": 256,
+  "initialization_seed": 79007,
+  "synthetic_data_seed": 79009,
+  "optimizer": {
+    "name": "AdamW",
+    "learning_rate": 0.0003,
+    "betas": [
+      0.9,
+      0.95
+    ],
+    "eps": 1e-08,
+    "weight_decay": 0.1,
+    "gradient_clip_norm": 1.0
+  },
+  "warmup_steps": 2,
+  "warmup_seconds": 1.531748362001963,
+  "warmup_losses": [
+    5.621166229248047,
+    5.661698818206787
+  ],
+  "measured_steps": 20,
+  "measured_seconds": 11.552243786998588,
+  "predicted_tokens": 20480,
+  "tokens_per_second": 1772.8157730751068,
+  "seconds_per_step": 0.5776121893499294,
+  "measured_losses": [
+    5.700659275054932,
+    5.6354546546936035,
+    5.620436668395996,
+    5.596385955810547,
+    5.588269233703613,
+    5.58782434463501,
+    5.569849014282227,
+    5.582876682281494,
+    5.582266330718994,
+    5.578373432159424,
+    5.5851545333862305,
+    5.5694804191589355,
+    5.569514274597168,
+    5.569540023803711,
+    5.5722336769104,
+    5.561055660247803,
+    5.573041915893555,
+    5.570608615875244,
+    5.580366134643555,
+    5.568894863128662
+  ],
+  "total_benchmark_seconds": 13.321450909003033,
+  "total_time_scope": "Model/optimizer construction, synthetic batches, warmup and measured steps; excludes imports and thread setup",
+  "parameter_tensor_bytes": 57576960,
+  "optimizer_state_tensor_bytes": 115154320,
+  "max_process_rss_kib": 744104,
+  "rss_scope": "Linux process high-water RSS includes interpreter, torch, activations, gradients and temporary allocations; not GPU VRAM",
+  "threads": 4,
+  "interop_threads": 9,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "torch": "2.15.0+cpu",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"
+  },
+  "source_sha256": {
+    "native_lm.py": "f540e919c2c6f965ce92c9b7e41873bbe65cd35fe7e548cdc5c14c524fd86ce3",
+    "benchmark_cpu.py": "30ecc4469c938e99c7274a021bc10564565023d1d7ee5793009a78794fd05783"
+  },
+  "checkpoint_saved": false,
+  "gpu_vram_measured": false,
+  "interpretation": "Throughput/memory feasibility only. Losses on random byte samples measure no native-language competence. No long training or corpus ingestion occurred."
+}

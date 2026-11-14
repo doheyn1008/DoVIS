@@ -1,0 +1,110 @@
+[
+  {
+    "language": "ko",
+    "fixed_dev_index": 0,
+    "checkpoint_sha256": "0087ed3b49d6cdc47f170fff8a2b498ce30a419fa96abac39b30f93e05e5e04f",
+    "target": "파란 원은 노란 원의 왼쪽에 있다.",
+    "generation": "파란 원은 노란 원의 왼쪽에 있다.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "ko",
+    "fixed_dev_index": 1,
+    "checkpoint_sha256": "0087ed3b49d6cdc47f170fff8a2b498ce30a419fa96abac39b30f93e05e5e04f",
+    "target": "파란 원은 노란 원의 위쪽에 있다.",
+    "generation": "파란 원은 노란 원의 위쪽에 있다.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "ko",
+    "fixed_dev_index": 2,
+    "checkpoint_sha256": "0087ed3b49d6cdc47f170fff8a2b498ce30a419fa96abac39b30f93e05e5e04f",
+    "target": "노란 원은 파란 원의 왼쪽에 있다.",
+    "generation": "노란 원은 파란 원의 왼쪽에 있다.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "ja",
+    "fixed_dev_index": 0,
+    "checkpoint_sha256": "ddc5ecc8d31804085c10240a1e314621d29866d2136c25d5874499c3a62aaeb0",
+    "target": "青い円は黄色い円の左にある。",
+    "generation": "青い円は黄色い円の左にある。",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "ja",
+    "fixed_dev_index": 1,
+    "checkpoint_sha256": "ddc5ecc8d31804085c10240a1e314621d29866d2136c25d5874499c3a62aaeb0",
+    "target": "青い円は黄色い円の上にある。",
+    "generation": "青い円は黄色い円の上にある。",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "ja",
+    "fixed_dev_index": 2,
+    "checkpoint_sha256": "ddc5ecc8d31804085c10240a1e314621d29866d2136c25d5874499c3a62aaeb0",
+    "target": "黄色い円は青い円の左にある。",
+    "generation": "黄色い円は青い円の左にある。",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "en",
+    "fixed_dev_index": 0,
+    "checkpoint_sha256": "0cb62343ac216aeb8f4b3ea33d9f7e4f30ecb0528f0f179faef065bd84bee602",
+    "target": "The blue circle is to the left of the yellow circle.",
+    "generation": "The blue circle is to the left of the yellow circle.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "en",
+    "fixed_dev_index": 1,
+    "checkpoint_sha256": "0cb62343ac216aeb8f4b3ea33d9f7e4f30ecb0528f0f179faef065bd84bee602",
+    "target": "The blue circle is above the yellow circle.",
+    "generation": "The blue circle is above the yellow circle.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "en",
+    "fixed_dev_index": 2,
+    "checkpoint_sha256": "0cb62343ac216aeb8f4b3ea33d9f7e4f30ecb0528f0f179faef065bd84bee602",
+    "target": "The yellow circle is to the left of the blue circle.",
+    "generation": "The yellow circle is to the left of the blue circle.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "es",
+    "fixed_dev_index": 0,
+    "checkpoint_sha256": "a72bcbc3742044bb0fdac3af9e214103d867e0167adb91bbe16732e87213b473",
+    "target": "El círculo azul está a la izquierda del círculo amarillo.",
+    "generation": "El círculo azul está a la izquierda del círculo amarillo.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "es",
+    "fixed_dev_index": 1,
+    "checkpoint_sha256": "a72bcbc3742044bb0fdac3af9e214103d867e0167adb91bbe16732e87213b473",
+    "target": "El círculo azul está encima del círculo amarillo.",
+    "generation": "El círculo azul está encima del círculo amarillo.",
+    "exact": true,
+    "read_only_state_verified": true
+  },
+  {
+    "language": "es",
+    "fixed_dev_index": 2,
+    "checkpoint_sha256": "a72bcbc3742044bb0fdac3af9e214103d867e0167adb91bbe16732e87213b473",
+    "target": "El círculo amarillo está a la izquierda del círculo azul.",
+    "generation": "El círculo amarillo está a la izquierda del círculo azul.",
+    "exact": true,
+    "read_only_state_verified": true
+  }
+]

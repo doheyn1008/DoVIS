@@ -321,7 +321,7 @@ def aggregate_cohort_validations(suites,plan,*,candidate_request):
         if _canonical(suite.get("plan"))!=_canonical(asdict(plan)):raise ValueError("Cohort plans differ")
         raw=suite.get("engine_report",{});initial=suite.get("initial_state",{});pair=SEED_PAIRS[replica]
         points=raw.get("curves",[]);steps=[0,*plan.budgets];tables=raw.get("frozen_feature_tables",{})
-        evidence=suite.get("initial_checkpoint_evidence",{})
+        evidence=suite.get("initial_checkpoint_evidence",{});benchmark=raw.get("benchmark")
         checks={
             "fixed_candidate":suite.get("candidate_spec")==spec and suite.get("source_condition")==content["source_condition"]
                 and suite.get("fixed_prior_condition")=="B1" and suite.get("policy")==content["policy"]
@@ -354,9 +354,9 @@ def aggregate_cohort_validations(suites,plan,*,candidate_request):
                 and tables.get("step_0")==tables.get("final") and tables.get("final",{}).get("policy")==FROZEN_FEATURE_POLICY
                 and bool(tables.get("final",{}).get("caches"))
                 and all(point.get("frozen_feature_table_sha256")==tables.get("final",{}).get("sha256") for point in points),
-            "benchmark_reset":plan.benchmark_steps==0 or(raw.get("benchmark",{}).get("steps")==plan.benchmark_steps
-                and raw.get("benchmark",{}).get("initial_weights_restored") is True
-                and bool(raw.get("benchmark",{}).get("image_caches_cleared"))),
+            "benchmark_reset":plan.benchmark_steps==0 or(isinstance(benchmark,Mapping) and benchmark.get("steps")==plan.benchmark_steps
+                and benchmark.get("initial_weights_restored") is True
+                and bool(benchmark.get("image_caches_cleared"))),
             "native_only_input":raw.get("training_languages")==[language] and raw.get("foreign_training_languages")==[] and raw.get("protected_splits_used")==[],
             "development_only":all(suite.get(key) is value and raw.get(key) is value for key,value in (("excluded_from_research",True),("eligible_for_fresh_experiment",False))),
             "execution_identity":suite.get("execution",{}).get("workflow_run_attempt") in (None,"1")

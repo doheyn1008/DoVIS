@@ -314,7 +314,10 @@ def _write_archive(output, index, payload):
                     raise ValueError(f"ZIP member integrity mismatch or changing source: {name}")
             if archive.read("index.json") != index_bytes:
                 raise ValueError("ZIP index integrity mismatch")
-        temporary.replace(output)
+        # Both paths share a directory/filesystem. A hard-link publication is
+        # atomic and refuses an existing destination, including a competing
+        # writer that won after the initial existence checks.
+        os.link(temporary, output)
     finally:
         temporary.unlink(missing_ok=True)
     return {"path": str(output), "sha256": _sha(output), "bytes": output.stat().st_size,

@@ -63,6 +63,10 @@ jobs:
           python -m unittest discover -s tests -p test_development_models.py -v
           python -m unittest discover -s tests -p test_composition_suite.py -v
           python -m unittest discover -s tests -p test_composition_failure_paths.py -v
+          python -m unittest discover -s tests -p test_fit_distractors.py -v
+          python -m unittest discover -s tests -p test_spatial_prior.py -v
+          python -m unittest discover -s tests -p test_mastery_lab.py -v
+          python -m unittest discover -s tests -p test_development_world.py -v
       - name: Exercise development-only diagnostic commands
         run: |
           python -m mutual_lab diagnose-native configs/neural.example.json --language es --steps 2 --eval-every 1 --train-pairs 1 --dev-pairs 1 --quiet

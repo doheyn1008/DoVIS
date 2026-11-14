@@ -1,0 +1,17 @@
+{
+  "source": "287a9886ea74d302932f70e10e4599e30c112b77",
+  "runs": {
+    "E2": 43639705193,
+    "F": 43639705288,
+    "CI": 43639712526
+  },
+  "language_training_started": false,
+  "failed_test": "test_registered_state_flags_global_vision_and_initial_logits_equal_old_attentive",
+  "cause": "Fixture mixed legacy request-grouped feature caches with canonical singleton semantics on a different CPU.",
+  "fix": "Both comparison fixtures now explicitly use the same singleton feature policy; exact assertions retained.",
+  "production_changes": false,
+  "targeted_actual_torch_tests": {
+    "passed": 9,
+    "seconds": 9.301
+  }
+}

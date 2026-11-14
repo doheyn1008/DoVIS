@@ -147,14 +147,19 @@ class ObjectMemoryTests(unittest.TestCase):
 
     def test_registered_state_flags_global_vision_and_initial_logits_equal_old_attentive(self):
         from mutual_lab.attentive_spatial import build_attentive_spatial_model
+        from mutual_lab.frozen_features import enforce_singleton_features
         from mutual_lab.neural import digest, torch
         original = build_attentive_spatial_model(self.profile, 79007, self.bundle)
+        # Compare both readouts under the same canonical feature policy. The
+        # legacy batched cache can otherwise retain different first-use groups.
+        enforce_singleton_features(original)
         ids, _ = original.tokenizer.batch(["two objects", "another geometry"])
         before = digest(original.state_dict())
         with torch.no_grad():
             expected = original.teacher_forced_logits(ids[:, :-1], self.pngs[:2])
         for source in ("cnn", "objects"):
             model = self.model(source)
+            enforce_singleton_features(model)
             self.assertEqual(digest(model.state_dict()), before)
             self.assertEqual([(n, p.requires_grad) for n, p in original.named_parameters()],
                              [(n, p.requires_grad) for n, p in model.named_parameters()])

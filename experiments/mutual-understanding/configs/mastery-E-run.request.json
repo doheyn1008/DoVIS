@@ -15,5 +15,8 @@
   },
   "execution_id": "E2-singleton-frozen-features",
   "correction_of_run_id": 43634532997,
-  "frozen_feature_policy": "per_png_singleton_v1"
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "verification_attempt": 2,
+  "verification_retry_of_run_id": 43639705193,
+  "verification_retry_reason": "The old test compared a grouped-cache legacy baseline with a different cache population history. Apply the canonical singleton feature policy to BOTH fixture models, retaining exact equality assertions. No production/model/budget/seed/criterion change; prior attempt stopped at verification before L1 training."
 }

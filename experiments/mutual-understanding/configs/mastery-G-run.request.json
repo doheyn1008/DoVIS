@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "source_f_run_id": 43640297162,
+  "source_f_revision": "12f4453d0e77e8e1c5cebc68cd54b9d3082194f6",
+  "source_f_summary_sha256": "c5b0823f72d43bbd64b05a9dcd2c707156b37352721658fc9cb24af9fe29ca4a",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "prior_checkpoint_sha256": "862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d",
+  "plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "understanding_implementation_sha256": "7a68b5b8498f2563efad2cacee0d2b8b3177e47be8752616f98a624a04e47bcb",
+  "study_implementation_sha256": "04218ce20cc8ab28199a1081d92927f35788fc0e9ce28261da0e1355e81bf63d",
+  "inference_compatibility_sha256": "dfd4c6534cbbd9310cfe221f2e9a94abe850668422043c05c44028282f44745e",
+  "producer_memory": "objects",
+  "model": "attentive",
+  "fixed_prior_condition": "B1",
+  "policy": "mixed_blocks",
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "memory_normalization": "l2_first32_raw_yx_v1",
+  "fixed_final_step": 9600,
+  "data_version": "five-colors-three-shapes-v1",
+  "selection_rule": "all_languages_minimum_six_final_scores_tie_g0_v1",
+  "producer_selection_rule": "all_languages_p_then_minimum_p_tie_cnn_v1",
+  "rationale": "Completed valid F has F1 final P111/112 in ko/ja and112/112 in en/es; F0 fails all-language P>=.9. The ORIGINAL F selection rule therefore chooses ONE objects producer for all languages. F has only enF1 full-six candidate; remaining ko/ja/es color U is386/376/400of448. Compare G0 global U with G1 byte-state access to2 unordered PNG continuous component tokens+additional readout parameters, while fixing F1 P architecture, initialP/globalCNN, native streams, Cplan/seeds/budgets/criteria. FinalP and P-relevant frozenfeatures must remain bit-identical. G1 is an engineered visual-information+capacity+readout bundle, NOT isolated attention causality, word alignment or preserved roles after learning. Only ALL4 actual final9600 checkpoints in one arm passing ALL6 scores+coverage qualify; maximize minimum over24scores, exacttiesG0, otherwise noqualifiedcandidate. No peaks, cross-arm splicing, seed retries or relaxed criteria. Fresh690xx cohort activation is separate and conditional; no research promotion."
+}

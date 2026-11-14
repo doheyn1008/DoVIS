@@ -303,12 +303,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.aggregate_dir is not None:
         paths = sorted(args.aggregate_dir.rglob("negative-policy-study.json"))
-        if not paths:
-            raise ValueError("No negative-policy-study.json manifests found")
         result = aggregate_negative_policy_studies([json.loads(path.read_text()) for path in paths])
         destination = args.output or Path("runs/negative-policy-comparison.json")
         destination.parent.mkdir(parents=True, exist_ok=True); safe_json(destination, result)
-        print(json.dumps(result), flush=True); return 0
+        print(json.dumps(result), flush=True)
+        return 0 if result["status"] == "completed" else 1
     if args.language is None or args.prior_bundle is None:
         parser.error("--language and --prior-bundle are required for explicit E execution")
     from .config import ExperimentConfig

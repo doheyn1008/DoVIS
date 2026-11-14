@@ -224,6 +224,7 @@ def aggregate_candidate_validations(suites, plan=None, *, candidate_request=None
         expected_trial_plan = asdict(replace(plan, b_seed_pair=pair))
         expected_steps = [0, *plan.budgets]
         points = raw.get("curves", [])
+        benchmark = raw.get("benchmark")
         checks = {"fixed_model": suite.get("model") == "attentive" and suite.get("fixed_prior_condition") == "B1"
             and suite.get("policy") == "mixed_blocks" and suite.get("negative_policy_specification") == negative_policy_manifest("mixed_blocks")
             and raw.get("model_factory") == FACTORY and raw.get("policy") == "mixed_blocks",
@@ -259,8 +260,9 @@ def aggregate_candidate_validations(suites, plan=None, *, candidate_request=None
                 and raw.get("initial_prior_sha256") == raw.get("final_prior_sha256")
                 and raw.get("prior_metadata", {}).get("condition") == "B1"
                 and raw.get("prior_metadata", {}).get("prior_sha256") == raw.get("initial_prior_sha256"),
-            "benchmark_reset": plan.benchmark_steps == 0 or (raw.get("benchmark", {}).get("steps") == plan.benchmark_steps
-                and raw.get("benchmark", {}).get("initial_weights_restored") is True),
+            "benchmark_reset": plan.benchmark_steps == 0 or (isinstance(benchmark, Mapping)
+                and benchmark.get("steps") == plan.benchmark_steps
+                and benchmark.get("initial_weights_restored") is True),
             "native_only_input": raw.get("training_languages") == [language]
                 and raw.get("foreign_training_languages") == [] and raw.get("protected_splits_used") == [],
             "development_only": suite.get("excluded_from_research") is True and suite.get("eligible_for_fresh_experiment") is False

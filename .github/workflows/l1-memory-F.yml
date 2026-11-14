@@ -371,7 +371,7 @@ jobs:
       - name: Aggregate F manifests with every failed or missing language retained
         run: |
           mkdir -p runs/memory-F-downloads
-          python -m mutual_lab.memory_study --aggregate-dir runs/memory-F-downloads --plan configs/mastery-C-plan.json --policy '${{ needs.verify.outputs.policy }}' --study-request configs/mastery-F-run.request.json --output runs/memory-F-summary.json
+          python -m mutual_lab.memory_study --aggregate-dir runs/memory-F-downloads --plan configs/mastery-C-plan.json --study-request configs/mastery-F-run.request.json --output runs/memory-F-summary.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

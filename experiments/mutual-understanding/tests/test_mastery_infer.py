@@ -14,7 +14,8 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from mutual_lab.mastery_infer import FORMAT, LEGACY_CLI_FACTORIES, infer_development, load_development_model
+from mutual_lab.mastery_infer import (FORMAT, GROUNDING_FACTORIES, LEGACY_CLI_FACTORIES,
+    infer_development, load_development_model)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -77,10 +78,16 @@ class InferenceModelTests(unittest.TestCase):
         from mutual_lab.spatial_prior import build_spatial_model
         memory_source = ("objects" if factory.endswith(".F1") else "cnn") if factory.startswith(
             "mutual_lab.memory_study.RecordingFactory.") else None
+        grounding = GROUNDING_FACTORIES.get(factory)
         attentive = factory.endswith(("build_attentive_spatial_model", ".D1", ".attentive"))
         if phase == "A":
             model = build_development_model(self.profile, 39007)
             prior_metadata = {"kind": "fixed_pixel_random_projection"}
+        elif grounding is not None:
+            from mutual_lab.understanding_memory import build_understanding_memory_model
+            model = build_understanding_memory_model(self.profile, 39007, self.bundle, "B1",
+                understanding=grounding[0], producer_memory=grounding[1])
+            prior_metadata = model.spatial_prior_metadata
         elif memory_source is not None:
             from mutual_lab.object_memory import build_object_memory_model
             model = build_object_memory_model(self.profile, 39007, self.bundle, "B1", memory=memory_source)
@@ -321,6 +328,44 @@ class InferenceModelTests(unittest.TestCase):
         self.assertIn(b"\\ud800", process.stdout)
         self.assertTrue(all(value < 128 for value in process.stdout))
         self.assertTrue(output["read_only_state_verified"])
+
+    def test_four_grounding_ids_restore_explicit_u_and_p_modes_with_strict_new_base_keys(self):
+        from mutual_lab.frozen_features import FROZEN_FEATURE_POLICY
+        from mutual_lab.neural import digest
+        from mutual_lab.world import native_captions
+        for index, (factory, modes) in enumerate(GROUNDING_FACTORIES.items()):
+            with self.subTest(factory=factory):
+                path, payload, original = self.fixture("grounding-" + str(index), factory=factory,
+                    feature_policy=FROZEN_FEATURE_POLICY)
+                restored = load_development_model(path, self.prior_path)
+                self.assertEqual(restored.object_memory_source, modes[1])
+                self.assertEqual(restored.understanding.object_context, modes[0] == "objects")
+                self.assertEqual(restored.mastery_inference_metadata["model_factory"], factory)
+                self.assertEqual(restored.mastery_inference_metadata["understanding_readout"]["producer_memory"], modes[1])
+                self.assertEqual(digest(original.state_dict()), digest(restored.state_dict()))
+                text = native_captions(self.scenes[0], "ko")[0]
+                output = infer_development(restored, self.pngs[0], text=text, choices_png=self.pngs)
+                self.assertEqual(output["generation"], original.generate_with_trace(self.pngs[0]))
+                self.assertEqual(output["comprehension"]["prediction"], original.predict(text, self.pngs))
+                changed = copy.deepcopy(payload)
+                del changed["model"]["understanding.base.embedding.weight"]
+                with self.assertRaisesRegex(ValueError, "understanding base keys"):
+                    load_development_model(self.save("grounding-missing-base", changed), self.prior_path)
+                for name in ("understanding_memory.py", "object_memory.py", "frozen_features.py"):
+                    changed = {**payload, "source_sha256": {**payload["source_sha256"], name: "wrong"}}
+                    with self.assertRaisesRegex(ValueError, name):
+                        load_development_model(self.save("grounding-bad-source", changed), self.prior_path)
+                changed = {key: value for key, value in payload.items() if key != "frozen_feature_policy"}
+                with self.assertRaisesRegex(ValueError, "explicit canonical"):
+                    load_development_model(self.save("grounding-missing-policy", changed), self.prior_path)
+                other = "G0" if modes[0] == "objects" else "G1"
+                changed = {**payload, "model_factory": "mutual_lab.grounding_study.RecordingFactory." + other + "_" + modes[1]}
+                with self.assertRaisesRegex(ValueError, "Ambiguous grounding"):
+                    load_development_model(self.save("grounding-wrong-u-mode", changed), self.prior_path)
+        for missing_provider in ("G0", "G1"):
+            with self.assertRaisesRegex(ValueError, "Unsupported"):
+                load_development_model(self.save("grounding-ambiguous-provider", {**payload,
+                    "model_factory": "mutual_lab.grounding_study.RecordingFactory." + missing_provider}), self.prior_path)
 
 
 if __name__ == "__main__":

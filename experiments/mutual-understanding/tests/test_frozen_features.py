@@ -1,6 +1,7 @@
 """Frozen CNN features must not depend on a negative policy's cache history."""
 
 import copy
+import hashlib
 import importlib.util
 import unittest
 from dataclasses import replace
@@ -34,14 +35,15 @@ class FrozenFeatureTests(unittest.TestCase):
         from mutual_lab.attentive_spatial import build_attentive_spatial_model
         return build_attentive_spatial_model(self.profile, 59007, self.bundle, condition="B1")
 
-    def test_batch_roundoff_reproducer_is_removed_for_vectors_grids_and_producer_updates(self):
+    def test_actual_cnn_canonical_vectors_grids_and_producer_updates_match_cache_histories(self):
         from mutual_lab.neural import digest, torch
         a, b = self.model(), self.model()
         pngs = self.pngs[:3]
         a.visual([pngs[0]]); a.visual(pngs[1:])
         a.visual_grid([pngs[0]]); a.visual_grid(pngs[1:])
-        old_a, old_b = a.visual(pngs), b.visual(pngs)
-        self.assertFalse(torch.equal(old_a, old_b), "Fixture must reproduce the original batched-cache defect")
+        # Real backends may or may not differ bitwise across batch sizes. The
+        # post-correction invariant must hold on either kind of backend.
+        a.visual(pngs); b.visual(pngs)
         b.visual_grid(pngs)
         enforce_singleton_features(a); enforce_singleton_features(b)
         a.visual([pngs[0]]); a.visual(pngs[1:])
@@ -58,6 +60,38 @@ class FrozenFeatureTests(unittest.TestCase):
             torch.nn.utils.clip_grad_norm_(model.producer.parameters(), 1, error_if_nonfinite=True)
             optimizer.step()
         self.assertEqual(digest(a.producer.state_dict()), digest(b.producer.state_dict()))
+
+    def test_singleton_policy_removes_a_deterministic_batch_sensitive_cache_fixture(self):
+        from mutual_lab.neural import torch
+
+        class BatchSensitiveCache:
+            def __init__(self):
+                self.visual_cache, self.spatial_grid_cache = {}, {}
+
+            def cached(self, pngs, cache, shape):
+                for png in pngs:
+                    key = hashlib.sha256(png).digest()
+                    if key not in cache:
+                        cache[key] = torch.full(shape, float(len(pngs)))
+                return torch.stack([cache[hashlib.sha256(png).digest()] for png in pngs])
+
+            def visual(self, pngs):
+                return self.cached(pngs, self.visual_cache, (2,))
+
+            def visual_grid(self, pngs):
+                return self.cached(pngs, self.spatial_grid_cache, (24, 34))
+
+        a, b = BatchSensitiveCache(), BatchSensitiveCache()
+        pngs = self.pngs[:3]
+        for name in ("visual", "visual_grid"):
+            getattr(a, name)(pngs[:1]); getattr(a, name)(pngs[1:])
+            self.assertFalse(torch.equal(getattr(a, name)(pngs), getattr(b, name)(pngs)))
+        enforce_singleton_features(a); enforce_singleton_features(b)
+        for name, expected in (("visual", torch.ones(3, 2)), ("visual_grid", torch.ones(3, 24, 34))):
+            getattr(a, name)(pngs[:1]); getattr(a, name)(pngs[1:])
+            self.assertTrue(torch.equal(getattr(a, name)(pngs), getattr(b, name)(pngs)))
+            self.assertTrue(torch.equal(getattr(a, name)(pngs), expected))
+        self.assertEqual(feature_cache_manifest(a), feature_cache_manifest(b))
 
     def test_wrapping_clears_preflight_caches_without_changing_state_flags_or_copy_independence(self):
         from mutual_lab.neural import digest, torch

@@ -166,6 +166,27 @@ class CandidateValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not discovery"):
             validation.aggregate_candidate_validations([{"kind": "negative-policy-study-v1"}], self.plan)
 
+    def test_absent_or_nonmapping_benchmark_is_retained_as_failed_validation(self):
+        for status in ("completed", "failed", "cancelled", "time_limit"):
+            for benchmark in (None, [], "not-a-benchmark"):
+                with self.subTest(status=status, benchmark=benchmark):
+                    suites = self.all_suites()
+                    suites[0]["status"] = status
+                    raw = suites[0]["engine_report"]
+                    raw["status"] = status
+                    raw["benchmark"] = benchmark
+                    if status != "completed":
+                        raw["curves"] = raw["curves"][:1]
+                    result = validation.aggregate_candidate_validations(suites, self.plan)
+                    self.assertEqual(result["status"], "incomplete")
+                    self.assertFalse(result["robust_development_candidate"])
+                    check = next(item for item in result["trial_checks"]
+                                 if item["language"] == suites[0]["language"] and item["replica"] == 0)
+                    self.assertFalse(check["checks"]["benchmark_reset"])
+                    failure = next(item for item in result["failed_trials"]
+                                   if item["language"] == suites[0]["language"] and item["replica"] == 0)
+                    self.assertIn("benchmark_reset", failure["failed_checks"])
+
     def test_protocol_changes_are_rejected_before_creating_training_outputs(self):
         variants = (replace(self.plan, budgets=(2400,)), replace(self.plan, production_min=.8),
             replace(self.plan, data_seed=29003), replace(self.plan, seed_pairs=((59007, 59009),)),

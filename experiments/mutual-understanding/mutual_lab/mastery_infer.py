@@ -25,7 +25,19 @@ FACTORIES = {
     "mutual_lab.negative_policy_study.FixedLanguageFactory.attentive": "attentive",
     "mutual_lab.memory_study.RecordingFactory.F0": "memory_cnn",
     "mutual_lab.memory_study.RecordingFactory.F1": "memory_objects",
+    "mutual_lab.grounding_study.RecordingFactory.G0_cnn": "grounding",
+    "mutual_lab.grounding_study.RecordingFactory.G0_objects": "grounding",
+    "mutual_lab.grounding_study.RecordingFactory.G1_cnn": "grounding",
+    "mutual_lab.grounding_study.RecordingFactory.G1_objects": "grounding",
 }
+GROUNDING_FACTORIES = {
+    "mutual_lab.grounding_study.RecordingFactory.G0_cnn": ("global", "cnn"),
+    "mutual_lab.grounding_study.RecordingFactory.G0_objects": ("global", "objects"),
+    "mutual_lab.grounding_study.RecordingFactory.G1_cnn": ("objects", "cnn"),
+    "mutual_lab.grounding_study.RecordingFactory.G1_objects": ("objects", "objects"),
+}
+UNDERSTANDING_RESIDUAL_KEYS = {"understanding.query.weight", "understanding.key.weight",
+    "understanding.value.weight", "understanding.residual_output.weight"}
 # Running the original D/E study entrypoints with ``python -m`` recorded their
 # wrapper class under __main__. These are exact historical CLI spellings, not
 # import targets; retain the recorded name and verify the usual tensor/core
@@ -116,13 +128,24 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
     if not isinstance(weights, dict):
         raise ValueError("Checkpoint has no tensor model state")
     architecture = FACTORIES[factory]
-    memory_provider = architecture.removeprefix("memory_") if architecture.startswith("memory_") else None
-    attentive = architecture in ("attentive", "memory_cnn", "memory_objects")
+    grounding = GROUNDING_FACTORIES.get(factory)
+    memory_provider = (grounding[1] if grounding is not None else
+                       architecture.removeprefix("memory_") if architecture.startswith("memory_") else None)
+    attentive = architecture in ("attentive", "memory_cnn", "memory_objects", "grounding")
     if memory_provider is not None and (phase != "C" or condition != "C1"):
         raise ValueError("Producer-memory checkpoints require the C1/B1 engine condition")
     feature_policy = payload.get("frozen_feature_policy")
     if "frozen_feature_policy" in payload and feature_policy != "per_png_singleton_v1":
         raise ValueError("Unsupported frozen feature policy")
+    if grounding is not None and feature_policy != "per_png_singleton_v1":
+        raise ValueError("Grounding checkpoints require the explicit canonical frozen feature policy")
+    if grounding is not None:
+        residual_keys = UNDERSTANDING_RESIDUAL_KEYS & set(weights)
+        if ((grounding[0] == "objects" and residual_keys != UNDERSTANDING_RESIDUAL_KEYS)
+                or (grounding[0] == "global" and residual_keys)
+                or not any(name.startswith("understanding.base.") for name in weights)
+                or any(name.startswith(("understanding.embedding.", "understanding.gru.", "understanding.head.")) for name in weights)):
+            raise ValueError("Ambiguous grounding factory and understanding base/residual state")
     if phase == "A" and feature_policy is not None:
         raise ValueError("Singleton CNN feature policy does not apply to A checkpoints")
     present_attention = ATTENTION_KEYS & set(weights)
@@ -137,6 +160,8 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         relevant.append("attentive_spatial.py")
     if memory_provider is not None:
         relevant.append("object_memory.py")
+    if grounding is not None:
+        relevant.append("understanding_memory.py")
     if feature_policy is not None:
         relevant.append("frozen_features.py")
     sources = _verify_sources(payload.get("source_sha256"), relevant)
@@ -169,6 +194,10 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         if phase == "A":
             from .development_models import build_development_model
             model = build_development_model(profile, seed_pair[0])
+        elif grounding is not None:
+            from .understanding_memory import build_understanding_memory_model
+            model = build_understanding_memory_model(profile, seed_pair[0], bundle, prior_metadata["condition"],
+                understanding=grounding[0], producer_memory=grounding[1])
         elif memory_provider is not None:
             from .object_memory import build_object_memory_model
             model = build_object_memory_model(profile, seed_pair[0], bundle, prior_metadata["condition"],
@@ -182,6 +211,10 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         if feature_policy is not None:
             from .frozen_features import enforce_singleton_features
             enforce_singleton_features(model)
+        if grounding is not None:
+            expected_understanding = {"understanding." + name for name in model.understanding.state_dict()}
+            if {name for name in weights if name.startswith("understanding.")} != expected_understanding:
+                raise ValueError("Grounding checkpoint has incomplete or unexpected understanding base keys")
         if attentive and not torch.equal(model.spatial_coordinates, weights["spatial_coordinates"]):
             raise ValueError("Checkpoint changed the fixed spatial coordinate grid")
         if (not isinstance(weights.get("visual_projection"), torch.Tensor)
@@ -214,6 +247,7 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         "prior_sha256": prior_metadata.get("prior_sha256"), "verified_source_sha256": sources,
         "frozen_feature_policy": getattr(model, "frozen_feature_policy", "legacy_unspecified"),
         "producer_memory": getattr(model, "object_memory_metadata", None),
+        "understanding_readout": getattr(model, "understanding_memory_metadata", None),
         "restored_model_sha256": digest(model.state_dict()), "training_revision": payload.get("revision"),
         "training_torch_version": payload.get("environment", {}).get("torch"),
         "inference_torch_version": str(torch.__version__),

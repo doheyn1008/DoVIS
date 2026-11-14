@@ -80,8 +80,15 @@ class NegativePolicyValidationTests(unittest.TestCase):
                                               prior_condition=prior, prior_bundle=bundle)
                 self.assertFalse(output.exists())
             (Path(temporary) / "decoder-study.json").write_text("{}")
-            with self.assertRaisesRegex(ValueError, "No negative-policy-study"):
-                main(["--aggregate-dir", temporary])
+            summary = Path(temporary) / "nested" / "summary.json"
+            status = main(["--aggregate-dir", temporary, "--output", str(summary)])
+            self.assertEqual(status, 1)
+            result = json.loads(summary.read_text())
+            self.assertEqual(result["status"], "incomplete")
+            self.assertEqual(result["missing_languages"], list(LANGUAGES_ORDER))
+            self.assertEqual(result["rows"], [])
+            self.assertEqual(result["paired_deltas"], [])
+            self.assertFalse(result["eligible_for_fresh_experiment"])
         for report in ({"kind": "mastery-lab-v1-suite", "phase": "C"},
                        {"kind": "decoder-study-v1", "phase": "D", "axis": "decoder"}):
             with self.assertRaisesRegex(ValueError, "not E studies"):

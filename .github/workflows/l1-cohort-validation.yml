@@ -1,0 +1,558 @@
+# Preparation is inert. A pinned request for one valid, qualified source condition
+# is required before any fresh native-language learner can start.
+name: Fixed-candidate fresh native-seed cohort
+
+on:
+  push:
+    branches: [codex/l1-mastery, codex/l1-memory]
+    paths:
+      - 'experiments/mutual-understanding/configs/mastery-cohort-run.request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: l1-cohort-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONUNBUFFERED: '1'
+
+defaults:
+  run:
+    working-directory: experiments/mutual-understanding
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      source_run_id: ${{ steps.request.outputs.source_run_id }}
+      source_input_artifact: ${{ steps.request.outputs.source_input_artifact }}
+      source_summary_artifact: ${{ steps.request.outputs.source_summary_artifact }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - name: Require one pinned candidate and exactly three fresh native seed blocks
+        id: request
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, shutil
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import VERSION, development_manifest
+          from mutual_lab.cohort_validation import _selection, _implementation_hashes
+          if os.environ['GITHUB_REF'] not in ('refs/heads/codex/l1-mastery', 'refs/heads/codex/l1-memory'):
+              raise ValueError('The cohort is restricted to the prepared development branches')
+          if os.environ['GITHUB_RUN_ATTEMPT'] != '1':
+              raise ValueError('Cohort reruns cannot replace failed seed evidence; retain the original attempt')
+          path = Path('configs/mastery-cohort-run.request.json')
+          if not path.is_file():
+              raise RuntimeError('Create a pinned cohort request after one actual source condition passes all four languages; preparation does not activate training')
+          request = json.loads(path.read_text())
+          if type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+              raise ValueError('Unsupported cohort request schema')
+          if type(request.get('validation_run_attempt')) is not int or request['validation_run_attempt'] != 1:
+              raise ValueError('The request must explicitly require the single first cohort attempt')
+          condition, spec, factory = _selection(request)
+          catalog = {
+              'negative-policy-study-v1-comparison': ('E', '.github/workflows/l1-negative-E.yml'),
+              'memory-study-v1-comparison': ('F', '.github/workflows/l1-memory-F.yml'),
+              'grounding-study-v1-comparison': ('G', '.github/workflows/l1-grounding-G.yml')}
+          if request.get('source_summary_kind') not in catalog:
+              raise ValueError('Only the known corrected E2, F or G comparisons may supply a candidate')
+          prefix, workflow = catalog[request['source_summary_kind']]
+          for key in ('source_run_id', 'source_run_attempt'):
+              if type(request.get(key)) is not int or request[key] <= 0:
+                  raise ValueError('Pin the positive source run and attempt: ' + key)
+          if request['source_run_id'] == 43634532997:
+              raise ValueError('Original E is an invalid comparison and cannot supply a cohort candidate')
+          if not isinstance(request.get('source_revision'), str) or not re.fullmatch('[0-9a-f]{40}', request['source_revision']):
+              raise ValueError('Pin the immutable source code revision')
+          for key in ('source_summary_sha256', 'source_plan_sha256', 'prior_manifest_sha256',
+                      'prior_checkpoint_sha256', 'validation_plan_sha256'):
+              if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{64}', request[key]):
+                  raise ValueError('Invalid pinned cohort hash: ' + key)
+          expected = {'fixed_prior_condition': 'B1', 'fixed_final_step': 9600,
+                      'data_version': VERSION, 'frozen_feature_policy': 'per_png_singleton_v1'}
+          if (any(request.get(key) != value for key, value in expected.items())
+                  or type(request.get('fixed_final_step')) is not int
+                  or request.get('policy') not in ('same_pair', 'attributes', 'mixed_blocks')
+                  or (condition == 'E1' and request['policy'] != 'mixed_blocks')):
+              raise ValueError('The fixed candidate/prior/feature policy/final budget changed')
+          if not isinstance(request.get('rationale'), str) or not request['rationale'].strip():
+              raise ValueError('Record the original selection rule and rationale for this single common condition')
+          hashes = request.get('candidate_source_sha256')
+          if (not isinstance(hashes, dict) or not hashes or any(
+                  not re.fullmatch('[A-Za-z_][A-Za-z0-9_]*[.]py', name)
+                  or not isinstance(value, str) or not re.fullmatch('[0-9a-f]{64}', value)
+                  for name, value in hashes.items()) or _implementation_hashes(request) != hashes):
+              raise ValueError('The known candidate architecture or training implementation differs from its exact pins')
+          compatibility = request.get('inference_compatibility_sha256')
+          if compatibility is not None and (not isinstance(compatibility, str) or not re.fullmatch('[0-9a-f]{64}', compatibility)):
+              raise ValueError('An optional nontraining inference compatibility pin must be an explicit SHA256')
+          if compatibility is not None and hashlib.sha256(Path('mutual_lab/mastery_infer.py').read_bytes()).hexdigest() != compatibility:
+              raise ValueError('The explicitly pinned nontraining inference utility differs from its requested bytes')
+          source_path = Path('configs/mastery-C-plan.json')
+          validation_path = Path('configs/mastery-cohort-plan.json')
+          if (request['validation_plan_sha256'] != '4b20f50af7674a82d9c37c0fc63ab4bd28d613ec3be5e59f7e34bb1699a446bf'
+                  or hashlib.sha256(validation_path.read_bytes()).hexdigest() != request['validation_plan_sha256']
+                  or hashlib.sha256(source_path.read_bytes()).hexdigest() != request['source_plan_sha256']):
+              raise ValueError('Use the predeclared cohort plan and unchanged source C plan')
+          source, validation = json.loads(source_path.read_text()), json.loads(validation_path.read_text())
+          changed = {'seed_pairs', 'b_seed_pair', 'metadata'}
+          if {k: v for k, v in source.items() if k not in changed} != {k: v for k, v in validation.items() if k not in changed}:
+              raise ValueError('Only fresh native seeds and descriptive metadata may differ from discovery')
+          fresh = [[69007, 69009], [69017, 69019], [69027, 69029]]
+          if validation.get('seed_pairs') != fresh or validation.get('b_seed_pair') != fresh[0]:
+              raise ValueError('Use exactly the three predeclared fresh seed pairs')
+          prior_seeds = {39007, 39009, 39017, 39019, 39027, 39029, 59007, 59009}
+          prior_seeds.update(seed for pair in source['seed_pairs'] for seed in pair)
+          prior_seeds.update(source['b_seed_pair'])
+          new_seeds = [seed for pair in fresh for seed in pair]
+          if len(set(new_seeds)) != 6 or set(new_seeds) & prior_seeds:
+              raise ValueError('Discovery and cohort language seeds must be disjoint')
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load(validation_path).validate(config)
+          if (plan.budgets != (2400, 4800, 9600) or plan.max_trial_seconds != 3600
+                  or (plan.comprehension_min, plan.production_min, plan.contrast_min) != (.9, .9, .9)
+                  or (plan.min_contrast_anchors, plan.min_contrast_pairs) != (8, 2)):
+              raise ValueError('Retain every original training budget, target and coverage requirement')
+          manifest = development_manifest(config, plan.data_seed)
+          if (manifest['scene_counts'] != {'train': 220, 'dev': 112} or manifest['protected_pairs_excluded'] != 22
+                  or plan.metadata.get('data_version') != VERSION
+                  or plan.metadata.get('data_pair_sha256') != manifest['pair_sha256']):
+              raise ValueError('The C development population or original protected-pair exclusion changed')
+          directory = Path('runs/cohort-input/provenance')
+          directory.mkdir(parents=True, exist_ok=True)
+          for original, name in ((path, 'request.json'), (source_path, 'source-plan.json'),
+                  (validation_path, 'validation-plan.json'), (Path('configs/neural.example.json'), 'config.json')):
+              shutil.copyfile(original, directory / name)
+          (directory / 'data-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('source_run_id=' + str(request['source_run_id']) + '\n')
+              output.write('source_input_artifact=l1-' + prefix + '-input-' + str(request['source_run_id']) + '\n')
+              output.write('source_summary_artifact=l1-' + prefix + '-summary-' + str(request['source_run_id']) + '\n')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.request.outputs.source_input_artifact }}
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/cohort-input/source-input/
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.request.outputs.source_summary_artifact }}
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/cohort-input/source-summary/
+      - name: Verify valid source comparison, all four final candidates, and the identical image-only prior
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, json, math, os, re, shutil, urllib.parse, urllib.request
+          from pathlib import Path
+          from mutual_lab.composition_diagnostics import CATEGORIES
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_manifest, development_splits, render_scene
+          from mutual_lab.spatial_prior import FORMAT, fit_pool_hash
+          from mutual_lab.cohort_validation import load_candidate_request, _selection, _implementation_hashes
+          from mutual_lab.candidate_validation import _point_checks
+          directory = Path('runs/cohort-input')
+          request_path = Path('configs/mastery-cohort-run.request.json')
+          request = json.loads(request_path.read_text())
+          condition, spec, factory = _selection(request)
+          catalog = {
+              'negative-policy-study-v1-comparison': ('E', '.github/workflows/l1-negative-E.yml', 'negative-E-summary.json', 'study_phase', 'negative_policy', ('E0', 'E1')),
+              'memory-study-v1-comparison': ('F', '.github/workflows/l1-memory-F.yml', 'memory-F-summary.json', 'phase', 'producer_perceptual_memory', ('F0', 'F1')),
+              'grounding-study-v1-comparison': ('G', '.github/workflows/l1-grounding-G.yml', 'grounding-G-summary.json', 'phase', 'understanding_readout', ('G0', 'G1'))}
+          prefix, workflow, summary_name, phase_key, axis, arms = catalog[request['source_summary_kind']]
+          summary_paths = list((directory / 'source-summary').rglob(summary_name))
+          if len(summary_paths) != 1:
+              raise ValueError('Expected exactly the known source summary file')
+          summary_path = summary_paths[0]
+          if hashlib.sha256(summary_path.read_bytes()).hexdigest() != request['source_summary_sha256']:
+              raise ValueError('The source evidence summary differs from its immutable pin')
+          summary = json.loads(summary_path.read_text())
+          if (summary.get('kind') != request['source_summary_kind'] or summary.get(phase_key) != prefix
+                  or summary.get('axis') != axis or summary.get('status') != 'completed'
+                  or summary.get('missing_languages') != [] or summary.get('failed_trials') != []
+                  or summary.get('fixed_prior_condition') != 'B1'
+                  or summary.get('excluded_from_research') is not True
+                  or summary.get('eligible_for_fresh_experiment') is not False):
+              raise ValueError('Only a complete, invariant-valid, development-only comparison may supply a candidate')
+          if prefix == 'E' and summary.get('model') != 'attentive':
+              raise ValueError('The E candidate must use the fixed attentive producer')
+          if prefix != 'E' and summary.get('policy') != request['policy']:
+              raise ValueError('The source comparison and frozen cohort policy differ')
+          if prefix == 'G' and summary.get('producer_memory') != spec['producer_memory']:
+              raise ValueError('The G source producer memory differs from the fixed candidate')
+          config = ExperimentConfig.load('configs/neural.example.json')
+          source_plan = MasteryPlan.load('configs/mastery-C-plan.json').validate(config)
+          plan = MasteryPlan.load('configs/mastery-cohort-plan.json').validate(config)
+          data = development_manifest(config, source_plan.data_seed)
+          languages = ('ko', 'ja', 'en', 'es')
+          rows = summary.get('rows', [])
+          keys = [(row.get('language'), row.get('condition'), row.get('step')) for row in rows]
+          expected = {(language, arm, step) for language in languages for arm in arms for step in (0, *source_plan.budgets)}
+          if (len(keys) != len(set(keys)) or set(keys) != expected
+                  or any(row.get('status') != 'completed' for row in rows)):
+              raise ValueError('Retain all unique source language/condition/budget rows, not only successful selections')
+          selected = [row for row in rows if row['condition'] == condition and row['step'] == 9600]
+          if len(selected) != 4 or {row['language'] for row in selected} != set(languages):
+              raise ValueError('One common source condition must qualify all four languages at the fixed final step')
+          def target(metrics, hit_key, item_key, accuracy_key, expected_items):
+              h, n, a = metrics.get(hit_key), metrics.get(item_key), metrics.get(accuracy_key)
+              return (type(h) is int and type(n) is int and n == expected_items and 0 <= h <= n
+                  and type(a) in (int, float) and math.isfinite(a) and a >= .9 and abs(a - h / n) < 1e-12)
+          for row in selected:
+              candidate = row.get('candidate', {})
+              if (candidate.get('status') != 'development_candidate' or candidate.get('score_targets_met') is not True
+                      or candidate.get('coverage_sufficient') is not True
+                      or candidate.get('excluded_from_research') is not True
+                      or candidate.get('eligible_for_fresh_experiment') is not False
+                      or not target(row['dev'], 'comprehension_hits', 'comprehension_items', 'comprehension_accuracy', 448)
+                      or not target(row['dev'], 'valid_generation_hits', 'generation_scenes', 'valid_generation_accuracy', 112)
+                      or set(row.get('contrasts', {})) != set(CATEGORIES)
+                      or set(candidate.get('categories', {})) != set(CATEGORIES)):
+                  raise ValueError('Every actual selected final checkpoint must meet all six original targets and coverage')
+              if prefix == 'E' and row.get('negative_policy') != request['policy']:
+                  raise ValueError('Selected E1 policy differs')
+              if prefix == 'F' and row.get('memory_source') != spec['producer_memory']:
+                  raise ValueError('Selected F memory source differs')
+              for category in CATEGORIES:
+                  metrics, gate = row['contrasts'][category], candidate['categories'][category]
+                  coverage = data['contrast_availability'][category]
+                  if (not target(metrics, 'hits', 'items', 'accuracy', 4 * coverage['anchors'])
+                          or gate.get('available_anchors') != coverage['anchors'] or coverage['anchors'] < 8
+                          or gate.get('available_pairs') != coverage['object_pairs'] or coverage['object_pairs'] < 2
+                          or gate.get('coverage_sufficient') is not True or gate.get('score_target_met') is not True
+                          or any(gate.get(key) != metrics.get(key) for key in ('hits', 'items', 'accuracy'))):
+                      raise ValueError('A final source diagnostic score or denominator fails: ' + category)
+          source_selection = None
+          if prefix in ('F', 'G'):
+              eligible, worst = [], {}
+              for arm in arms:
+                  final_rows = [row for row in rows if row['condition'] == arm and row['step'] == 9600]
+                  arm_passes, scores = [], []
+                  for row in final_rows:
+                      checks, passes = _point_checks({'dev': row.get('dev', {}), 'candidate': row.get('candidate', {}),
+                          'contrasts': {'categories': row.get('contrasts', {})}}, plan)
+                      if not all(checks.values()):
+                          raise ValueError('A final source score, count, candidate flag or coverage declaration is inconsistent')
+                      arm_passes.append(passes)
+                      scores.extend((row['dev']['comprehension_accuracy'], row['dev']['valid_generation_accuracy']))
+                      scores.extend(row['contrasts'][category]['accuracy'] for category in CATEGORIES)
+                  if len(arm_passes) == 4 and all(arm_passes):
+                      eligible.append(arm)
+                      worst[arm] = min(scores)
+              if not eligible:
+                  raise ValueError('No single source condition qualifies in all four languages')
+              if prefix == 'F':
+                  chosen = 'F0' if 'F0' in eligible else 'F1'
+                  rule = 'all_languages_all_six_final_targets_prefer_f0_v1'
+              else:
+                  chosen = ('G0' if 'G0' in eligible and ('G1' not in eligible or worst['G0'] >= worst['G1']) else 'G1')
+                  rule = 'all_languages_minimum_six_final_scores_tie_g0_v1'
+                  selection = summary.get('selection', {})
+                  if (not isinstance(selection, dict) or selection.get('status') != 'selected'
+                          or selection.get('rule') != rule or selection.get('fixed_final_step') != 9600
+                          or selection.get('tie_break') != 'G0' or selection.get('condition') != chosen):
+                      raise ValueError('The G summary differs from its preregistered all-language bottleneck rule')
+              if condition != chosen:
+                  raise ValueError('The requested source condition differs from its predeclared common-candidate selection rule')
+              source_selection = {'condition': chosen, 'eligible_conditions': eligible, 'worst_scores': worst,
+                  'rule': rule, 'recomputed_from_raw_counts': True}
+          source_input = directory / 'source-input'
+          context_path = source_input / 'provenance/run-context.json'
+          context = json.loads(context_path.read_text())
+          source_request_path = source_input / 'provenance/request.json'
+          source_request = json.loads(source_request_path.read_text())
+          if (context.get('code_revision') != request['source_revision']
+                  or str(context.get('run_id')) != str(request['source_run_id'])
+                  or str(context.get('run_attempt')) != str(request['source_run_attempt'])
+                  or context.get('repository') != os.environ['GITHUB_REPOSITORY']
+                  or context.get('request') != source_request
+                  or context.get('request_sha256') != hashlib.sha256(source_request_path.read_bytes()).hexdigest()
+                  or context.get('fixed_prior_condition') != 'B1'
+                  or source_request.get('fixed_prior_condition') != 'B1'
+                  or source_request.get('plan_sha256') != request['source_plan_sha256']
+                  or source_request.get('prior_manifest_sha256') != request['prior_manifest_sha256']
+                  or source_request.get('data_version') != request['data_version']
+                  or source_request.get('frozen_feature_policy') != 'per_png_singleton_v1'
+                  or context.get('frozen_feature_policy', source_request.get('frozen_feature_policy')) != 'per_png_singleton_v1'):
+              raise ValueError('The source input does not describe the pinned run, attempt, request and singleton-feature system')
+          if prefix != 'E' and context.get('policy') != request['policy']:
+              raise ValueError('The source F/G policy differs from the fixed candidate')
+          if prefix == 'E' and (context.get('model') != 'attentive' or source_request.get('model') != 'attentive'):
+              raise ValueError('The corrected E2 source is not the attentive candidate')
+          if prefix == 'G' and context.get('producer_memory') != spec['producer_memory']:
+              raise ValueError('The G source context fixes a different producer memory')
+          source_plan_path = source_input / 'provenance/plan.json'
+          if (hashlib.sha256(source_plan_path.read_bytes()).hexdigest() != request['source_plan_sha256']
+                  or json.loads((source_input / 'provenance/data-manifest.json').read_text()) != data):
+              raise ValueError('The source training plan or selected development population differs')
+          recorded = context.get('source_sha256')
+          if not isinstance(recorded, dict) or not recorded:
+              raise ValueError('The source input lacks complete recorded package hashes')
+          recorded = dict(recorded)
+          for field in ('implementation_source_sha256', 'prototype_source_sha256'):
+              for name, sha in context.get(field, {}).items():
+                  if name in recorded and recorded[name] != sha:
+                      raise ValueError('Conflicting source implementation hashes: ' + name)
+                  recorded[name] = sha
+          for name, sha in recorded.items():
+              if (not re.fullmatch('[A-Za-z_][A-Za-z0-9_]*[.]py', name)
+                      or not isinstance(sha, str) or not re.fullmatch('[0-9a-f]{64}', sha)):
+                  raise ValueError('Invalid recorded source hash')
+          compatibility = {}
+          for name, sha in recorded.items():
+              local_path = Path('mutual_lab') / name
+              current_sha = hashlib.sha256(local_path.read_bytes()).hexdigest()
+              if current_sha != sha:
+                  if name != 'mastery_infer.py' or request.get('inference_compatibility_sha256') != current_sha:
+                      raise ValueError('An existing candidate, neural, training or data source changed: ' + name)
+                  compatibility[name] = {'source_sha256': sha, 'cohort_sha256': current_sha,
+                      'scope': 'Explicitly pinned read-only inference compatibility utility; no training/model/data change'}
+          extras = {p.name for p in Path('mutual_lab').glob('*.py')} - recorded.keys()
+          if extras - {'cohort_validation.py'}:
+              raise ValueError('Only the new cohort wrapper may be added to the pinned candidate package: ' + str(sorted(extras)))
+          if (any(recorded.get(name) != sha for name, sha in request['candidate_source_sha256'].items())
+                  or _implementation_hashes(request) != request['candidate_source_sha256']):
+              raise ValueError('The selected architecture, memory/readout, feature helper or training source drifted')
+          prior_paths = list(source_input.rglob('prior.json'))
+          matches = [p for p in prior_paths if hashlib.sha256(p.read_bytes()).hexdigest() == request['prior_manifest_sha256']]
+          if not matches:
+              raise ValueError('The source input contains no exact pinned image-prior manifest')
+          if any(hashlib.sha256(p.read_bytes()).hexdigest() != request['prior_manifest_sha256'] for p in prior_paths):
+              raise ValueError('Ambiguous differing image priors in the source input')
+          for prior_path in matches:
+              if hashlib.sha256(prior_path.with_suffix('.pt').read_bytes()).hexdigest() != request['prior_checkpoint_sha256']:
+                  raise ValueError('The source prior checkpoint differs from its exact byte pin')
+          if any(p.name != 'prior.pt' or hashlib.sha256(p.read_bytes()).hexdigest() != request['prior_checkpoint_sha256']
+                  for p in source_input.rglob('*.pt')):
+              raise ValueError('The source input may contain only the shared image prior, never native-language weights')
+          manifest = json.loads(matches[0].read_text())
+          if (manifest.get('format') != FORMAT or manifest.get('kind') != 'development_only'
+                  or manifest.get('excluded_from_research') is not True
+                  or manifest.get('sha256') != request['prior_checkpoint_sha256']):
+              raise ValueError('The pinned prior is not an excluded development image asset')
+          pngs = [render_scene(scene) for scene in development_splits(config, source_plan.data_seed)['train']]
+          hashes = [hashlib.sha256(png).hexdigest() for png in pngs]
+          report, settings = manifest['report'], source_plan.metadata['b_prior']
+          expected_prior = {'status': 'completed', 'image_count': 220, 'seed': settings['seed'],
+              'steps': 1000, 'steps_completed': 1000, 'batch_size': settings['batch_size'],
+              'learning_rate': settings['learning_rate'], 'runtime_allowance_seconds': settings['max_seconds'],
+              'dimension': source_plan.model_profile.hidden_dim, 'fit_png_sha256': sorted(hashes),
+              'fit_png_order_sha256': hashes, 'fit_pool_sha256': fit_pool_hash(pngs)}
+          if settings['steps'] != 1000 or any(report.get(key) != value for key, value in expected_prior.items()):
+              raise ValueError('Reuse the exact completed image-only C prior on the same 220 fit PNGs')
+          for name in ('neural.py', 'spatial_prior.py'):
+              if report.get('source_sha256', {}).get(name) != request['candidate_source_sha256'][name]:
+                  raise ValueError('The inherited image-prior implementation differs from the fixed candidate')
+          canonical = directory / 'prior'
+          canonical.mkdir()
+          shutil.copyfile(matches[0], canonical / 'prior.json')
+          shutil.copyfile(matches[0].with_suffix('.pt'), canonical / 'prior.pt')
+          shutil.copyfile(summary_path, directory / 'source-summary.json')
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect())
+          base = 'https://api.github.com/repos/' + os.environ['GITHUB_REPOSITORY']
+          def github(path):
+              query = urllib.request.Request(base + path, headers={
+                  'Authorization': 'Bearer ' + os.environ['SOURCE_GITHUB_TOKEN'],
+                  'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with opener.open(query, timeout=30) as response:
+                  return json.load(response)
+          run = github('/actions/runs/' + str(request['source_run_id']))
+          if (run.get('id') != request['source_run_id'] or run.get('head_sha') != request['source_revision']
+                  or run.get('run_attempt') != request['source_run_attempt'] or run.get('path') != workflow
+                  or run.get('head_branch') not in ('codex/l1-mastery', 'codex/l1-memory')
+                  or run.get('event') not in ('push', 'workflow_dispatch') or run.get('status') != 'completed'
+                  or run.get('conclusion') != 'success'
+                  or run.get('repository', {}).get('full_name') != os.environ['GITHUB_REPOSITORY']):
+              raise ValueError('The source is not the successful pinned known workflow and attempt in this repository')
+          config_hashes = {}
+          for name in ('neural.example.json', 'composition-cpu-requirements.txt', 'mastery-C-plan.json'):
+              item = github('/contents/experiments/mutual-understanding/configs/' + name + '?'
+                            + urllib.parse.urlencode({'ref': request['source_revision']}))
+              if item.get('encoding') != 'base64' or item.get('type') != 'file':
+                  raise ValueError('Expected a pinned source configuration file')
+              raw = base64.b64decode(item['content'], validate=False)
+              if raw != (Path('configs') / name).read_bytes():
+                  raise ValueError('A fixed candidate configuration changed: ' + name)
+              config_hashes[name] = hashlib.sha256(raw).hexdigest()
+          record = load_candidate_request(request_path, plan, plan_path='configs/mastery-cohort-plan.json',
+              prior_path=canonical / 'prior.pt', source_summary_path=directory / 'source-summary.json',
+              source_plan_path='configs/mastery-C-plan.json')
+          provenance = {'code_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'repository': os.environ['GITHUB_REPOSITORY'],
+              'request': request, 'request_sha256': record['sha256'], 'candidate_spec': spec,
+              'source_condition': condition, 'original_factory': factory,
+              'source_run': {key: run.get(key) for key in ('id', 'head_sha', 'run_attempt', 'html_url', 'path', 'event', 'status', 'conclusion')},
+              'source_summary_sha256': request['source_summary_sha256'], 'qualified_final_source_rows': selected,
+              'preregistered_source_selection': source_selection,
+              'source_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('mutual_lab').glob('*.py'))},
+              'unchanged_candidate_source_sha256': recorded, 'inference_compatibility': compatibility,
+              'unchanged_configuration_sha256': config_hashes, 'canonical_prior': record['prior_evidence'],
+              'fresh_seed_pairs': [[69007, 69009], [69017, 69019], [69027, 69029]],
+              'frozen_feature_policy': 'per_png_singleton_v1', 'all_source_conditions_retained': True,
+              'source_language_checkpoints_downloaded_or_resumed': False,
+              'qualification_scope': 'All12 fixed-final native-seed cells must pass; selected development data and one shared prior, never research promotion or fresh-data/visual replication'}
+          (directory / 'provenance/run-context.json').write_text(json.dumps(provenance, indent=2) + '\n')
+          print('Verified one common fixed-final candidate, unchanged source and canonical image-only prior')
+          PY
+      - name: Install unchanged pinned numerical dependencies
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Verify prior tensors, original targets, and the complete regression suite
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_splits, render_scene
+          from mutual_lab.spatial_prior import fit_pool_hash, load_prior_bundle
+          from mutual_lab.cohort_validation import load_candidate_request
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-cohort-plan.json').validate(config)
+          pngs = [render_scene(scene) for scene in development_splits(config, plan.data_seed)['train']]
+          bundle = load_prior_bundle('runs/cohort-input/prior/prior.pt', expected_fit_pool_sha256=fit_pool_hash(pngs))
+          if bundle['report']['status'] != 'completed':
+              raise ValueError('The cohort may load only the identical completed C image-only prior')
+          load_candidate_request('configs/mastery-cohort-run.request.json', plan,
+              plan_path='configs/mastery-cohort-plan.json', prior_path='runs/cohort-input/prior/prior.pt',
+              source_summary_path='runs/cohort-input/source-summary.json', source_plan_path='configs/mastery-C-plan.json')
+          PY
+          python -m unittest discover -s tests -v
+          python -m pip freeze > runs/cohort-input/provenance/dependencies.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-cohort-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort-input/
+          if-no-files-found: error
+          retention-days: 30
+
+  validate_candidate:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+        replica: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-cohort-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort-input/
+      - name: Preserve the exact candidate, first attempt, code and runtime provenance
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, shutil
+          from pathlib import Path
+          source = Path('runs/cohort-input')
+          context = json.loads((source / 'provenance/run-context.json').read_text())
+          request_path = Path('configs/mastery-cohort-run.request.json')
+          request = json.loads(request_path.read_text())
+          if (os.environ['GITHUB_RUN_ATTEMPT'] != '1' or context.get('run_attempt') != '1'
+                  or context.get('code_revision') != os.environ['GITHUB_SHA']
+                  or str(context.get('run_id')) != os.environ['GITHUB_RUN_ID']
+                  or context.get('request') != request
+                  or context.get('request_sha256') != hashlib.sha256(request_path.read_bytes()).hexdigest()
+                  or hashlib.sha256(Path('configs/mastery-cohort-plan.json').read_bytes()).hexdigest() != request['validation_plan_sha256']):
+              raise ValueError('The single declared cohort attempt, request, plan or source changed')
+          hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('mutual_lab').glob('*.py')}
+          if hashes != context.get('source_sha256'):
+              raise ValueError('The verified candidate/cohort source differs in this language job')
+          target = Path('runs/cohort/provenance-${{ matrix.language }}-r${{ matrix.replica }}')
+          shutil.copytree(source / 'provenance', target)
+          PY
+          python -m pip freeze > runs/cohort/provenance-${{ matrix.language }}-r${{ matrix.replica }}/trial-dependencies.txt
+      - name: Train one fresh fixed-candidate native learner without resuming language weights
+        run: timeout --signal=INT --kill-after=30s 63m python -m mutual_lab.cohort_validation --config configs/neural.example.json --plan configs/mastery-cohort-plan.json --candidate-request configs/mastery-cohort-run.request.json --source-summary runs/cohort-input/source-summary.json --source-plan configs/mastery-C-plan.json --prior-bundle runs/cohort-input/prior/prior.pt --language '${{ matrix.language }}' --replica '${{ matrix.replica }}' --output runs/cohort
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-cohort-trial-${{ matrix.language }}-r${{ matrix.replica }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort/
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate_cohort:
+    if: always()
+    needs: [verify, validate_candidate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: l1-cohort-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort-input/
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: l1-cohort-trial-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort-downloads/
+          merge-multiple: true
+      - name: Retain all twelve fixed-final outcomes and separate execution, provenance and targets
+        if: needs.verify.result == 'success'
+        run: |
+          mkdir -p runs/cohort-downloads
+          python -m mutual_lab.cohort_validation --config configs/neural.example.json --plan configs/mastery-cohort-plan.json --candidate-request configs/mastery-cohort-run.request.json --source-summary runs/cohort-input/source-summary.json --source-plan configs/mastery-C-plan.json --prior-bundle runs/cohort-input/prior/prior.pt --aggregate-dir runs/cohort-downloads --output runs/cohort-summary.json
+      - name: Record blocked provenance and every unstarted cell when verification failed
+        if: needs.verify.result != 'success'
+        env:
+          VERIFY_RESULT: ${{ needs.verify.result }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          missing = [{'language': language, 'replica': replica} for replica in range(3) for language in ('ko', 'ja', 'en', 'es')]
+          result = {'schema_version': 1, 'kind': 'cohort-validation-v1-comparison', 'status': 'blocked',
+              'execution_completed': False, 'provenance_valid': False, 'robust_development_candidate': False,
+              'source_verification': os.environ['VERIFY_RESULT'], 'expected_jobs': 12, 'reported_jobs': 0,
+              'missing_trials': missing, 'failed_trials': [], 'excluded_from_research': True,
+              'eligible_for_fresh_experiment': False,
+              'interpretation': 'No cohort qualification: source/request verification did not succeed; every unstarted cell is retained'}
+          path = Path('runs/cohort-summary.json')
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(result, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-cohort-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/cohort-summary.json
+          if-no-files-found: error
+          retention-days: 30

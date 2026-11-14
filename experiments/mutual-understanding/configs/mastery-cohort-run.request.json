@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source_run_id": 43644996603,
+  "source_run_attempt": 1,
+  "source_revision": "04bd6e1ea88b95b281a69230d854aefc0257f7c6",
+  "source_summary_kind": "grounding-study-v1-comparison",
+  "source_condition": "G1",
+  "source_summary_sha256": "0e63760d3812bfdc9aded0208bf8c65a1774d500f3ddd8151d3dd1743f8be762",
+  "source_plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "prior_checkpoint_sha256": "862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d",
+  "validation_plan_sha256": "4b20f50af7674a82d9c37c0fc63ab4bd28d613ec3be5e59f7e34bb1699a446bf",
+  "cohort_implementation_sha256": "3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19",
+  "validation_run_attempt": 1,
+  "policy": "mixed_blocks",
+  "fixed_prior_condition": "B1",
+  "fixed_final_step": 9600,
+  "data_version": "five-colors-three-shapes-v1",
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "candidate_spec": {
+    "candidate_kind": "grounding",
+    "producer_memory": "objects",
+    "understanding": "attentive"
+  },
+  "rationale": "G full matched discovery43644996603 selected G1 by the rule fixed BEFORE G results: ALL4 languages at ONE actual final9600 checkpoint each pass original U/P/four diagnostic90%+coverage; G1 is sole eligible arm and minimum of24 scores is107/112=.9553571428571429. Freeze this ONE common G1_objects architecture and all C numeric/data/optimizer/criteria controls; validate the three690xx fresh seed blocks declared BEFORE D/E/F/G outcomes. Fresh U/P+Adam+RNG, shared image-only prior only, no L1 resume. All12 fixed-final cells must pass all6+coverage to count as seed-stable finite-world development candidate. Same selected development population and shared prior, not fresh data/visual replication, human/general native competence, language-distance evidence or automatic L2/research promotion. Preserve all missing/failed/time_limit cells; one admitted workflow run per exact pinned request across both branches, no replacement retry. Cohort wrapper3e5 patch is aggregate benchmark metadata safety only; AST audit proves ALL other nodes including run_cohort_validation unchanged from source830; all scientific candidate sources remain exact.",
+  "candidate_source_sha256": {
+    "neural.py": "6c118cc91304cb6212348637acc88f4c95387b332401917ce381821ab8bfae75",
+    "development_models.py": "84df083ef1c21fc15627295dab343362f7d880e73b641865dfa9ee373fd51fc9",
+    "spatial_prior.py": "d97e72364b24801f428764c59a4655ac7773d4713f2b9da40ffc6164a2371d1b",
+    "attentive_spatial.py": "fabaf3b480b230c32a7f71cbd8b5616a1b6f5b56dd8d461884cbcaadcc4b9c15",
+    "frozen_features.py": "3a6c1d99e9c5322e7ec6cf1ff74f28abe3fa866826d7dccff058235525f21d5b",
+    "fit_distractors.py": "c56e648f6d942b8f1ad1263cd12c299282fc6f566dae1365ff5fd15c8701bb9d",
+    "mastery_lab.py": "d2cdb759564aeed19d1ac43d302e8c7ec90e3ffc1d4600224f45aac09cbabe9f",
+    "development_world.py": "4ddb1f05af38970c14cc0f0801f4c550b33129a8e026e0538d52d2d064fa244a",
+    "candidate_validation.py": "d5c29ddafc2d3dd98aa241adc16c63b44cf863bfc0b479ac3a8f4f50f7913d8e",
+    "object_memory.py": "0003db8ce10cc07773372644435d868e1a7737138eac7d5af3651bed84bd4fc7",
+    "memory_study.py": "570e81a21901748b25dbd15cd2730df4d2f50868c2b32037405f105ac91da867",
+    "grounding_study.py": "04218ce20cc8ab28199a1081d92927f35788fc0e9ce28261da0e1355e81bf63d",
+    "understanding_memory.py": "7a68b5b8498f2563efad2cacee0d2b8b3177e47be8752616f98a624a04e47bcb"
+  }
+}

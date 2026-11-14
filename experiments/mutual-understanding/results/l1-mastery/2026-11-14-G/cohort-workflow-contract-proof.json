@@ -1,0 +1,120 @@
+{
+  "status": "pass",
+  "source_run_id": 43644996603,
+  "source_revision": "04bd6e1ea88b95b281a69230d854aefc0257f7c6",
+  "source_summary_sha256": "0e63760d3812bfdc9aded0208bf8c65a1774d500f3ddd8151d3dd1743f8be762",
+  "draft_request_sha256": "e26c4d613e0eb91513662a895034243bea9035cf68e41d33f095742bc65a3452",
+  "workflow_sha256": "d8f0dbde5d8da3d9babea5d9cad7e9236309d3404d2789f493c78b9604047b3b",
+  "blocks": [
+    {
+      "block": 1,
+      "name": "actual_request_schema_and_plan",
+      "status": "pass"
+    },
+    {
+      "block": 2,
+      "name": "actual_admission_history",
+      "status": "pass"
+    },
+    {
+      "block": 3,
+      "name": "actual_G_summary_source_prior_verification",
+      "status": "pass"
+    },
+    {
+      "block": 4,
+      "name": "actual_H128_prior_tensor_load",
+      "status": "pass"
+    },
+    {
+      "block": 5,
+      "name": "all12_actual_matrix_provenance_paths",
+      "status": "pass",
+      "cells": 12
+    },
+    {
+      "block": 6,
+      "name": "isolated_failed_verification_summary",
+      "status": "pass"
+    }
+  ],
+  "only_mock": "GitHub API transport",
+  "H128_fresh_G1_factory_preflight": {
+    "status": "pass",
+    "source_L1_checkpoint_loaded": false,
+    "initializations": [
+      {
+        "seed_pair": [
+          69007,
+          69009
+        ],
+        "understanding_sha256": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+        "producer_sha256": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+        "optimizer_empty": true,
+        "parameter_count": 477443
+      },
+      {
+        "seed_pair": [
+          69017,
+          69019
+        ],
+        "understanding_sha256": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+        "producer_sha256": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+        "optimizer_empty": true,
+        "parameter_count": 477443
+      }
+    ]
+  },
+  "admission": {
+    "schema_version": 1,
+    "status": "no_prior_admission",
+    "request_sha256": "e26c4d613e0eb91513662a895034243bea9035cf68e41d33f095742bc65a3452",
+    "workflow_path": ".github/workflows/l1-cohort-validation.yml",
+    "branches": [
+      "codex/l1-mastery",
+      "codex/l1-memory"
+    ],
+    "admission_boundary": "The first workflow attempt verify job completed with success",
+    "history_pages": 2,
+    "prior_runs_checked": 0,
+    "requests_missing_before_activation": 0,
+    "matching_prior_requests": [],
+    "current_run": {
+      "id": 99999999999,
+      "html_url": "https://github.com/doheyn1008/DoVIS/actions/runs/99999999999",
+      "head_branch": "codex/l1-mastery",
+      "created_at": "2026-11-14T23:50:00Z",
+      "simulated": true
+    }
+  },
+  "source_selection": {
+    "condition": "G1",
+    "eligible_conditions": [
+      "G1"
+    ],
+    "worst_scores": {
+      "G1": 0.9553571428571429
+    },
+    "rule": "all_languages_minimum_six_final_scores_tie_g0_v1",
+    "recomputed_from_raw_counts": true
+  },
+  "wrapper_compatibility": {
+    "source_sha256": "830c3a81d3e6aac87d2ab8bd38583a3b8ae1a7b2fc330bcc1006cc1e11989d53",
+    "cohort_sha256": "3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19",
+    "scope": "Exact reviewed aggregate-only benchmark Mapping guard; every other top-level AST node including run_cohort_validation is unchanged; NN/data/training/candidate source pins remain exact"
+  },
+  "prior_checkpoint_sha256": "862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d",
+  "api_calls": [
+    "https://api.github.com/repos/doheyn1008/DoVIS/actions/runs/99999999999",
+    "https://api.github.com/repos/doheyn1008/DoVIS/actions/runs?per_page=100&page=1",
+    "https://api.github.com/repos/doheyn1008/DoVIS/actions/runs?per_page=100&page=2",
+    "https://api.github.com/repos/doheyn1008/DoVIS/actions/runs/43644996603",
+    "https://api.github.com/repos/doheyn1008/DoVIS/contents/experiments/mutual-understanding/configs/neural.example.json?ref=04bd6e1ea88b95b281a69230d854aefc0257f7c6",
+    "https://api.github.com/repos/doheyn1008/DoVIS/contents/experiments/mutual-understanding/configs/composition-cpu-requirements.txt?ref=04bd6e1ea88b95b281a69230d854aefc0257f7c6",
+    "https://api.github.com/repos/doheyn1008/DoVIS/contents/experiments/mutual-understanding/configs/mastery-C-plan.json?ref=04bd6e1ea88b95b281a69230d854aefc0257f7c6"
+  ],
+  "full_test_suite_repeated": false,
+  "scope": "OFFLINE_CONTRACT_TEST_NOT_AN_ADMITTED_RUN",
+  "actual_cohort_training_started": false,
+  "interpretation": "The current workflow/API responses above are test fixtures; genuine source G artifacts and real fresh initialization tensors were used. This proof neither admits a live workflow nor reports trained cohort outcomes."
+}

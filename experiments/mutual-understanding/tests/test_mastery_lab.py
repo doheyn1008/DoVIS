@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from mutual_lab.composition_diagnostics import balanced_splits, build_contrast_probes
+from mutual_lab.composition_suite import ArmCancelled
 from mutual_lab.config import ExperimentConfig
 from mutual_lab.mastery_lab import MasteryPlan, aggregate_reports, candidate_assessment, pair_audit, phase_conditions, run_phase, run_trial
 from mutual_lab.native_preparation import PreparationPlan
@@ -57,6 +58,39 @@ def synthetic_suite(language, phase="A"):
 
 
 class MasteryProtocolTests(unittest.TestCase):
+    def test_cancellation_without_a_readable_trial_report_stops_the_suite_even_if_suite_write_fails(self):
+        from mutual_lab.mastery_lab import safe_json
+        config = experiment()
+        for read_failure, fail_suite_write in ((OSError, False), (OSError, True),
+                                               (KeyboardInterrupt, False), (KeyboardInterrupt, True)):
+            with self.subTest(read_failure=read_failure, fail_suite_write=fail_suite_write), \
+                 tempfile.TemporaryDirectory() as temporary:
+                interrupted = ArmCancelled(Path(temporary) / "missing-report.json")
+                written_cancelled_suites = []
+
+                def persist(path, value):
+                    if Path(path).name == "mastery-suite.json" and value["status"] == "cancelled":
+                        written_cancelled_suites.append(copy.deepcopy(value))
+                        if fail_suite_write:
+                            raise OSError("suite storage unavailable")
+                    return safe_json(path, value)
+
+                with patch("mutual_lab.mastery_lab.run_trial", side_effect=interrupted) as trial, \
+                     patch("mutual_lab.mastery_lab.safe_json", side_effect=persist), \
+                     patch.object(Path, "read_text", side_effect=read_failure("report storage unavailable")), \
+                     self.assertRaises(ArmCancelled) as caught:
+                    run_phase(config, "ko", "A", output=temporary, progress=None)
+                self.assertIs(caught.exception, interrupted)
+                self.assertEqual(trial.call_count, 1)
+                self.assertEqual(len(written_cancelled_suites), 1)
+                cancelled_suite = written_cancelled_suites[0]
+                self.assertEqual(cancelled_suite["status"], "cancelled")
+                self.assertEqual(len(cancelled_suite["reports"]), 1)
+                self.assertEqual(cancelled_suite["reports"][0]["status"], "cancelled")
+                if not fail_suite_write:
+                    paths = list(Path(temporary).rglob("mastery-suite.json"))
+                    self.assertEqual(json.loads(paths[0].read_text()), json.loads(json.dumps(cancelled_suite)))
+
     def test_plan_round_trip_and_invalid_inputs_fail_before_output(self):
         plan = MasteryPlan()
         self.assertEqual(MasteryPlan.from_dict(asdict(plan)), plan)
@@ -230,6 +264,63 @@ class MasteryNeuralTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     load_checkpoint(path, expected_kind=kind)
             deserialize.assert_not_called()
+
+    def test_actual_trial_interrupt_survives_independent_checkpoint_and_snapshot_failures(self):
+        from mutual_lab.mastery_lab import safe_json
+        from mutual_lab.neural import torch
+        real_save = torch.save
+        plan = replace(self.plan, budgets=(1,), benchmark_steps=0)
+        cases = ((True, False, False), (False, True, False),
+                 (True, True, False), (True, True, True))
+        for fail_checkpoint, fail_snapshot, fail_suite in cases:
+            with self.subTest(checkpoint=fail_checkpoint, snapshot=fail_snapshot, suite=fail_suite), \
+                 tempfile.TemporaryDirectory() as temporary:
+                original = KeyboardInterrupt("stop the experiment")
+                cancellation_writes = []
+
+                def persist(path, value):
+                    name = Path(path).name
+                    if isinstance(value, dict) and value.get("status") == "cancelled":
+                        cancellation_writes.append((name, copy.deepcopy(value)))
+                        if ((fail_snapshot and name == "report.json") or
+                                (fail_suite and name == "mastery-suite.json")):
+                            raise OSError("cancelled JSON storage unavailable")
+                    return safe_json(path, value)
+
+                def save(payload, path, *args, **kwargs):
+                    if fail_checkpoint:
+                        raise OSError("checkpoint storage unavailable")
+                    return real_save(payload, path, *args, **kwargs)
+
+                with patch("mutual_lab.mastery_lab.run_trial", wraps=run_trial) as trial, \
+                     patch("mutual_lab.mastery_lab.evaluate_diagnostic", side_effect=original), \
+                     patch("mutual_lab.mastery_lab.safe_json", side_effect=persist), \
+                     patch("mutual_lab.neural.torch.save", side_effect=save) as checkpoint, \
+                     self.assertRaises(ArmCancelled) as caught:
+                    run_phase(experiment(), "ko", "A", plan, output=temporary, progress=None)
+                self.assertIs(caught.exception.__cause__, original)
+                self.assertEqual(trial.call_count, 1, "Cancellation must not start the next arm")
+                self.assertEqual(checkpoint.call_count, 1, "Checkpoint persistence must still be attempted")
+                report = caught.exception.report
+                self.assertEqual(report["status"], "cancelled")
+                self.assertEqual((report["condition"], report["replica"]), ("A0", 0))
+                self.assertIn("stop the experiment", report["error"])
+                json.dumps(report)  # The interrupt payload is metadata, never tensors or optimizer state.
+                self.assertNotIn("model", report)
+                self.assertNotIn("optimizer", report)
+                self.assertEqual({item["operation"] for item in report["cancellation_persistence_errors"]},
+                                 ({"checkpoint"} if fail_checkpoint else set()) |
+                                 ({"snapshot"} if fail_snapshot else set()))
+                self.assertTrue(any(name == "report.json" for name, _ in cancellation_writes),
+                                "Snapshot persistence must be attempted even after checkpoint failure")
+                suites = [value for name, value in cancellation_writes if name == "mastery-suite.json"]
+                self.assertEqual(len(suites), 1)
+                self.assertEqual(suites[0]["status"], "cancelled")
+                self.assertEqual(suites[0]["reports"], [report],
+                                 "The suite must prefer the in-memory cancelled report to a stale disk report")
+                if not fail_suite:
+                    path = next(Path(temporary).rglob("mastery-suite.json"))
+                    self.assertEqual(json.loads(path.read_text()), json.loads(json.dumps(suites[0])))
 
 
 if __name__ == "__main__":

@@ -54,6 +54,25 @@ C 실행은 별도 요청 파일로만 활성화합니다. 요청에는 A 원본
 
 이 후보는 C의 실제 생성 오류가 해당 가설을 뒷받침할 때만 별도 실행 요청과 함께 활성화합니다. 새 자료와 생성기를 동시에 바꿔 단일 원인의 개선이라고 주장하지 않습니다. 생성 평가도 `teacher_forced_logits()`를 통해 실제 attention 경로를 사용하며 공간 grid를 빠뜨린 호출은 실패합니다.
 
+`decoder_study.py`는 D0/D1의 원본 C 실행 보고서를 보존하고 별도 `decoder-study.json`으로 생성기 비교를 선언합니다. 두 조건은 동일한 고정 prior를 쓰므로 원본 C0/C1 표시는 자료·prior adapter일 뿐 D 조건명이 아닙니다. 초기 기본 생성기·이해기·prior가 같고, 최종 이해기가 그대로 같은지 검사합니다. 전용 요청은 원본 C prior manifest·실행·소스·계획의 해시를 고정합니다. 공통 prior를 재사용하며 C 언어 모델을 이어 학습하지 않습니다.
+
+## 오류에 따른 오답 정책 후보
+
+A1의 속성 진단 개선과 기존 이해 하락은 새 가설의 근거입니다. `mixed_blocks`는 기존 A0 문제16노출과 A1 문제16노출을 교대로 사용합니다. A1의 유효 노출 인덱스를 따로 계산해 각16노출 블록에서 기존 생략 범주×정답 위치의 완전 교차를 유지합니다. 완전32노출 주기에서 비율은50:50이며 A0 구간은 오답 RNG를 소비하지 않습니다. 기존 A0/A1 경로의 출력·노출 감사·난수 동작은 유지합니다.
+
+`negative_policy_study.py`는 E0 `same_pair`와 E1 `mixed_blocks`를 비교하는 준비 도구입니다. C 자료·고정 시각 prior·고정 생성기 구조·seed·예산·정답/문장 스트림은 같고 오답 정책만 다릅니다. 초기 전체 가중치와 **최종 생성기 동일성**을 요구하고, 분기별 실제 노출과 모든 후보 기준을 기록합니다. 생성기를 고르는 D와 오답 정책을 고르는 E를 같은 원인의 변화로 합치지 않습니다. E도 별도 요청에 근거와 선택 모델/prior를 고정한 뒤 활성화하며 자동 승자 선택은 하지 않습니다.
+
+## 학습 결과 직접 확인
+
+`mastery_infer.py`는 개발 체크포인트와 그 원본 시각 prior를 불러와 PNG 설명 또는 선택지 이해를 시험하는 도구입니다. 체크포인트 sidecar의 해시·개발 전용 형식·관련 구현 소스·prior를 검사하며 `weights_only=True`로 읽습니다. 연구용 학습자 자격을 부여하지 않습니다. 결과와 함께 실제 언어·범위·종료/인코딩 상태를 출력하고, 추론이 가중치와 난수를 바꾸지 않았는지 확인합니다.
+
+```bash
+python -m mutual_lab.mastery_infer --checkpoint step-009600.pt --prior-bundle prior.pt --image scene.png
+python -m mutual_lab.mastery_infer --checkpoint step-009600.pt --prior-bundle prior.pt --text 'The red circle is above the blue square.' --choices a.png b.png c.png d.png
+```
+
+학습 실행의 원본 revision을 사용하고 checkpoint와 같은 이름의 `.json` sidecar 및 원본 prior 파일을 함께 보존해야 합니다. 일반 사진이나 자유 대화 능력은 이 학습으로 검증되지 않았습니다.
+
 ## 실행·보존
 
 ```bash

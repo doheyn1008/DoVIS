@@ -134,7 +134,7 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
     if language not in LANGUAGES_ORDER or phase not in ("A", "B", "C"):
         raise ValueError("Unknown mastery phase or language")
     expected = phase_conditions(phase)
-    if condition not in expected or policy not in ("same_pair", "attributes"):
+    if condition not in expected or policy not in ("same_pair", "attributes", "mixed_blocks"):
         raise ValueError("Unknown condition or distractor policy")
     if phase in ("B", "C") and prior_bundle is None:
         raise ValueError("Spatial-prior phases require the frozen common prior bundle")
@@ -348,12 +348,27 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         return directory
     except _Deadline:
         report["status"] = "time_limit"; checkpoint(); snapshot(); return directory
-    except (Exception, KeyboardInterrupt) as exc:
-        report["status"] = "cancelled" if isinstance(exc, KeyboardInterrupt) else "failed"
+    except KeyboardInterrupt as exc:
+        report["status"] = "cancelled"
+        report["error"] = f"{type(exc).__name__}: {exc}"
+        report["cancellation_persistence_errors"] = []
+        cancelled = ArmCancelled(directory / "report.json")
+        # A cancelled attempt must survive failed filesystem writes. This report
+        # contains JSON metadata only; checkpoint weights stay out of the signal.
+        cancelled.report = report
+        try:
+            for name, persist in (("checkpoint", checkpoint), ("snapshot", snapshot)):
+                try:
+                    persist()
+                except (Exception, KeyboardInterrupt) as error:
+                    report["cancellation_persistence_errors"].append(
+                        {"operation": name, "error": f"{type(error).__name__}: {error}"})
+        finally:
+            raise cancelled from exc
+    except Exception as exc:
+        report["status"] = "failed"
         report["error"] = f"{type(exc).__name__}: {exc}"
         checkpoint(); snapshot()
-        if isinstance(exc, KeyboardInterrupt):
-            raise ArmCancelled(directory / "report.json") from exc
         return directory
 
 
@@ -410,11 +425,31 @@ def run_phase(config, language, phase, plan=MasteryPlan(), output="runs/mastery-
                         remaining_seconds=remaining, model_factory=model_factory)
                     report = json.loads((path / "report.json").read_text())
                 except KeyboardInterrupt as exc:
-                    report = (json.loads(exc.report_path.read_text()) if isinstance(exc, ArmCancelled) else
-                              {"replica": replica, "condition": condition, "status": "cancelled", "curves": []})
+                    report = {"replica": replica, "condition": condition, "seed_pair": list(pair),
+                              "status": "cancelled", "curves": [], "error": f"{type(exc).__name__}: {exc}"}
                     suite["reports"].append(report); suite["status"] = "cancelled"
-                    suite["pair_audit"] = pair_audit(suite["reports"], phase)
-                    safe_json(directory / "mastery-suite.json", suite); raise
+                    try:
+                        captured = getattr(exc, "report", None)
+                        if not isinstance(captured, dict) and isinstance(exc, ArmCancelled):
+                            try:
+                                captured = json.loads(exc.report_path.read_text())
+                            except Exception:
+                                captured = None
+                        if isinstance(captured, dict):
+                            report.update(captured)
+                        report["status"] = "cancelled"
+                    finally:
+                        try:
+                            suite["elapsed_seconds"] = time.monotonic() - begun
+                            try:
+                                suite["pair_audit"] = pair_audit(suite["reports"], phase)
+                            except Exception:
+                                pass
+                            safe_json(directory / "mastery-suite.json", suite)
+                        finally:
+                            # Secondary read/write failures must never turn an
+                            # interrupted suite into another attempted arm.
+                            raise exc
                 except Exception as exc:
                     report = {"replica": replica, "condition": condition, "seed_pair": list(pair),
                               "status": "failed", "curves": [], "error": f"{type(exc).__name__}: {exc}"}

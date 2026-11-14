@@ -4,6 +4,10 @@
 
 이 결과는 네 가지 직접 작성한 문형과 제한된 그림 세계의 개발 결과입니다. 자연언어 전반의 모국어 능력이나 언어 간 습득 난이도 결과가 아닙니다. 언어 사이의 CPU host가 달라 실행 초를 언어별 학습 속도로 비교하면 안 됩니다.
 
+![Fixed-budget A/B results](../results/l1-mastery/2026-11-14-AB/paired-final.svg)
+
+그림은 원본 집계에서 `python scripts/plot_mastery_ab.py`로 재생성할 수 있습니다. 그림 생성에만 선택 의존성 `matplotlib`이 필요합니다.
+
 ## A: 속성 오답
 
 사전에 고정한 세 초기화/훈련 seed 쌍을 네 언어 모두 실행했습니다. 아래는 최종2,400-step의 세 seed 평균입니다.

@@ -19,6 +19,33 @@ from .world import Scene
 
 CATALOG_VERSION = "explicit-fit-negatives-v1"
 SAMPLING_RULE = "omit-category-per-four-exposures-rotate-position-per-exposure-v1"
+NEGATIVE_POLICIES = ("same_pair", "attributes", "mixed_blocks")
+MIXED_BLOCK_EXPOSURES = 16
+
+
+def negative_policy_manifest(policy):
+    """Describe an explicitly selected policy without changing any defaults.
+
+    Mixed blocks are a separate development hypothesis. Merely importing this
+    module or constructing a catalog does not activate them in any runner.
+    """
+    if policy not in NEGATIVE_POLICIES:
+        raise ValueError("Unknown fit-negative policy")
+    if policy == "mixed_blocks":
+        return {"version": "fit-negative-mixed-blocks-v1", "policy": policy,
+                "choice_count": 4, "chance_accuracy": .25,
+                "block_exposures": MIXED_BLOCK_EXPOSURES,
+                "cycle_exposures": 2 * MIXED_BLOCK_EXPOSURES,
+                "cycle_order": ["same_pair", "attributes"],
+                "expected_example_fractions_per_complete_cycle": {"same_pair": .5, "attributes": .5},
+                "attribute_rule": SAMPLING_RULE,
+                "attribute_exposure_index": "floor(global_exposure/32)*16 + global_exposure modulo16",
+                "rng_rule": "Only attribute blocks consume the explicitly supplied negative RNG"}
+    return {"version": "fit-negative-single-policy-v1", "policy": policy,
+            "choice_count": 4, "chance_accuracy": .25,
+            "expected_example_fractions_per_complete_cycle": {
+                "same_pair": int(policy == "same_pair"), "attributes": int(policy == "attributes")},
+            "attribute_rule": SAMPLING_RULE if policy == "attributes" else None}
 
 
 def _sha(value):
@@ -99,6 +126,38 @@ def _empty_audit():
     return result
 
 
+def _mixed_examples(batch, catalog, negative_rng, exposure_offset):
+    """Delegate complete or partial 16-exposure blocks to the unchanged policies."""
+    batch = list(batch)
+    output, audit = [], _empty_audit()
+    for branch in ("same_pair", "attributes"):
+        audit[f"branch_{branch}_examples"] = 0
+        audit.update({f"branch_{branch}:{key}": 0 for key in _empty_audit()})
+    consumed = 0
+    while consumed < len(batch):
+        global_exposure = exposure_offset + consumed
+        block_index, position = divmod(global_exposure, MIXED_BLOCK_EXPOSURES)
+        branch = "same_pair" if block_index % 2 == 0 else "attributes"
+        count = min(MIXED_BLOCK_EXPOSURES - position, len(batch) - consumed)
+        # Attribute exposure counts exclude the intervening baseline blocks.
+        # Every complete attribute block retains the original 16-point crossing
+        # of omitted category and correct position, with no batch resampling.
+        effective_offset = (global_exposure if branch == "same_pair" else
+                            (global_exposure // (2 * MIXED_BLOCK_EXPOSURES)) * MIXED_BLOCK_EXPOSURES
+                            + global_exposure % MIXED_BLOCK_EXPOSURES)
+        prepared, subaudit = make_training_examples(
+            batch[consumed:consumed + count], catalog, negative_rng,
+            exposure_offset=effective_offset, policy=branch)
+        output.extend(prepared)
+        audit[f"branch_{branch}_examples"] += count
+        for key, value in subaudit.items():
+            audit[key] = audit.get(key, 0) + value
+            field = f"branch_{branch}:{key}"
+            audit[field] = audit.get(field, 0) + value
+        consumed += count
+    return output, audit
+
+
 def make_training_examples(batch, catalog, negative_rng, exposure_offset=0, policy="attributes"):
     """Return a batch with the same positives/texts and exactly four fit PNGs.
 
@@ -109,16 +168,23 @@ def make_training_examples(batch, catalog, negative_rng, exposure_offset=0, poli
     types and positions over a 16-exposure cycle. Unavailable categories use
     unique fit-only fallback images; no meaning or caption is resampled.
 
+    ``mixed_blocks`` explicitly alternates 16 baseline exposures and 16
+    attribute exposures. Its attribute exposure counter excludes baseline
+    blocks, and only attribute blocks advance the negative RNG. Existing
+    single-policy outputs and audit schemas are unchanged.
+
     The flat numeric audit can be summed over batches without special handling.
     Category-attempt sources and actual contrast membership are separate.
     """
     if not isinstance(catalog, FitCatalog):
         raise ValueError("Use an explicit FitCatalog")
-    if policy not in {"same_pair", "attributes"}:
+    if policy not in NEGATIVE_POLICIES:
         raise ValueError("Unknown fit-negative policy")
     integer(exposure_offset, "negative exposure offset", 0, 2**63 - 1)
-    if policy == "attributes" and not isinstance(negative_rng, random.Random):
+    if policy in {"attributes", "mixed_blocks"} and not isinstance(negative_rng, random.Random):
         raise ValueError("Attribute negatives need their own random.Random instance")
+    if policy == "mixed_blocks":
+        return _mixed_examples(batch, catalog, negative_rng, exposure_offset)
     audit, output = _empty_audit(), []
     for row_index, example in enumerate(batch):
         key = example.get("_scene_key")

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "source_c_run_id": 43632332293,
+  "source_c_revision": "8288fb0d345c178d4b5e04139b86eacea0935d7b",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "policy": "same_pair",
+  "fixed_prior_condition": "B1",
+  "data_version": "five-colors-three-shapes-v1",
+  "model": "attentive",
+  "rationale": "Fixed-9600 C color/shape comprehension remains below90%. Compare same_pair versus predeclared16/16 mixed_blocks on a fixed attentive model, chosen BEFORE D outcomes. U/P branches and clipping are independent; require final producer equality inside E. This tests a separate negative-policy axis, not a D-winner selection.",
+  "parallel_design": {
+    "shared_condition": "D1 and E0 repeat the same configured system; not independent statistical replications. Cross-host final tensor equality is not assumed.",
+    "qualification": "Judge all targets at the fixed final budget in one actual E1 checkpoint; never splice E1 understanding with D1 production or select an intermediate peak."
+  }
+}

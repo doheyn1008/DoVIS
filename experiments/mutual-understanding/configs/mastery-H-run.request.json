@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "phase": "H",
+  "model": "attentive",
+  "fixed_prior_condition": "B1",
+  "policy": "mixed_blocks",
+  "producer_memory": "objects",
+  "understanding": "objects",
+  "hidden_dim": 128,
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "memory_normalization": "l2_first32_raw_yx_v1",
+  "fixed_final_step": 9600,
+  "data_version": "five-colors-three-shapes-v1",
+  "source_rule": "all_discovery_cells_minimum_final_production_tie_h0_v1",
+  "source_cohort_run_id": 43647997707,
+  "source_cohort_run_attempt": 1,
+  "source_cohort_revision": "c65ab2752c117ddf66c98c4e871f553cf9c8f95a",
+  "source_cohort_summary_sha256": "31154a7910a2653d7c9a6043af111f1eacaf050ae0fed8d21391f84ea89d48a5",
+  "source_plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "plan_sha256": "a2622ee9bada8ce5f79365fa790d90bf2902a806c8af4d4a389b5081009a962c",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "prior_checkpoint_sha256": "862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d",
+  "context_implementation_sha256": "19733707041fecc4a6e240e87531ed72affe1644d59ca498c4de561dd5154ad7",
+  "study_implementation_sha256": "1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f",
+  "inference_compatibility_sha256": "ea7b76728d1fe0f4807c098e94ec157fd949b2175aa0699a33f6e7a24c237bac",
+  "discovery_run_attempt": 1,
+  "discovery_seed_pairs": [
+    [
+      79007,
+      79009
+    ],
+    [
+      79017,
+      79019
+    ],
+    [
+      79027,
+      79029
+    ]
+  ],
+  "confirmation_seed_pairs": [
+    [
+      99007,
+      99009
+    ],
+    [
+      99017,
+      99019
+    ],
+    [
+      99027,
+      99029
+    ]
+  ],
+  "confirmation_plan_sha256": "88ffbc19a129d0191259ff43f69457c1d4185d51f6c9eb7a209788ebb8f8e9b3",
+  "capacity_matched": true,
+  "rationale": "Original G1 fresh690xxcohort completedALL12 but qualified10/12: JA-r1P99/112(colorerrors) andKO-r1P81/112(unrecognizedsurface,noEOS,invalidUTF8,shapeerrors); bothonlyproductionfail. Preservealloldoutcomes,NEVERretry/replacethatcohort. H is a NEW controlled WHOLE P-global-conditioning input comparison (initial GRUhidden AND repeated every-token concat): H0 frozenCNNglobal128 versus H1 frozenPNG2-object first32normalized+rawYX tokens; concatmean34,Yweightedmean34,Xweightedmean34=102,zero-pad26,L2unit128. Pobjectattention,G1U,ALLNNparameters/initialtensors, nativeimages/captions/data+22protectedexclusion,prior,optimizer/clipping,choicepolicy,budgets,andALL6score+coveragecriteria stayfixed. No Scene/palette/class/role/nativeIDs,fittedstats,foreignpretrain,extraimages,oranchorremoval. CorrectinformationalreadyexistsinPattention; hypothesisiscontextOOD/optimization/shortcut instability,NOTprovedcauseorprovenvisionfix. H0/H1Uactualtensors+UcachemustremainEXACT atEVERYbudget;Poutputsallowedchangeconditioning. UseTHREEnew790xxdiscoveryblocks(24trials), notone luckyseed. ONEconditioneligibleonlyALL12sourcefixed9600modelspassALL6.9+coverage;maximizeworstPover12cells,exacttieH0,none=>none. OnlythenfreezeonecommonconditionandrunTHREEseparatenew990xxblocks12freshU/P/Adammodels;all12fixedfinalneeded,sharedimageprioronly,NOTsourceL1resume. Sourceandconfirmationeachoneadmittedrunperpinnedrequestacrossbranches,failedcellsretainednotreplaced. No intermediatepeaks,per-languagewinners,criteriarelaxation,research/L2promotionorhuman/generalnativeclaims."
+}

@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "OFFLINE_CONTRACT_FIXTURE_NOT_EMPIRICAL_RESULTS": true,
+  "scope": "Actual four H confirmation verification blocks and all12 cell guards; synthetic all24 Hfinal score source, authentic Cprior/config/fullsource/context; only source API transport mocked. Literal12train CLIs preserve real parser/request/prior loader, replace only actual trainer; true empty aggregate retains12missing. No activation or native updates.",
+  "stage": "/tmp/dovis-H-confirm-WF-OFFLINE-ru6gvxc1",
+  "blocks": [
+    {
+      "block": 0,
+      "status": "passed"
+    },
+    {
+      "block": 1,
+      "status": "passed"
+    },
+    {
+      "block": 2,
+      "status": "passed"
+    },
+    {
+      "block": 3,
+      "status": "passed"
+    }
+  ],
+  "cell_guards": 12,
+  "literal_training_commands": [
+    [
+      "ko",
+      0
+    ],
+    [
+      "ko",
+      1
+    ],
+    [
+      "ko",
+      2
+    ],
+    [
+      "ja",
+      0
+    ],
+    [
+      "ja",
+      1
+    ],
+    [
+      "ja",
+      2
+    ],
+    [
+      "en",
+      0
+    ],
+    [
+      "en",
+      1
+    ],
+    [
+      "en",
+      2
+    ],
+    [
+      "es",
+      0
+    ],
+    [
+      "es",
+      1
+    ],
+    [
+      "es",
+      2
+    ]
+  ],
+  "empty_aggregate_missing_trials": 12,
+  "workflow_sha256": "9f9fef49ba3c60489a70ee2e27f05889b84f0d4685fc7a98b0f9aceef2f0c651",
+  "OFFLINE_CONTRACT_TEST_ONLY": true,
+  "empirical_H_training_results": false,
+  "interpretation": "Verifies code contracts using real prior/assets and mocked source API transport. Any qualified H summary in the confirmation fixture is synthetic, not evidence of H performance."
+}

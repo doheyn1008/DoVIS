@@ -29,6 +29,12 @@ FACTORIES = {
     "mutual_lab.grounding_study.RecordingFactory.G0_objects": "grounding",
     "mutual_lab.grounding_study.RecordingFactory.G1_cnn": "grounding",
     "mutual_lab.grounding_study.RecordingFactory.G1_objects": "grounding",
+    "mutual_lab.producer_context_study.RecordingFactory.H0": "producer_context",
+    "mutual_lab.producer_context_study.RecordingFactory.H1": "producer_context",
+}
+PRODUCER_CONTEXT_FACTORIES = {
+    "mutual_lab.producer_context_study.RecordingFactory.H0": "cnn",
+    "mutual_lab.producer_context_study.RecordingFactory.H1": "object_moments",
 }
 GROUNDING_FACTORIES = {
     "mutual_lab.grounding_study.RecordingFactory.G0_cnn": ("global", "cnn"),
@@ -128,10 +134,17 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
     if not isinstance(weights, dict):
         raise ValueError("Checkpoint has no tensor model state")
     architecture = FACTORIES[factory]
+    producer_context = PRODUCER_CONTEXT_FACTORIES.get(factory)
     grounding = GROUNDING_FACTORIES.get(factory)
+    if producer_context is not None:
+        # Both H treatments retain precisely G1 understanding and F1 producer
+        # memory. Their identical tensor layouts do not identify the context.
+        grounding = ("objects", "objects")
+        if profile.hidden_dim != 128:
+            raise ValueError("Producer-context checkpoints require the fixed H128 profile")
     memory_provider = (grounding[1] if grounding is not None else
                        architecture.removeprefix("memory_") if architecture.startswith("memory_") else None)
-    attentive = architecture in ("attentive", "memory_cnn", "memory_objects", "grounding")
+    attentive = architecture in ("attentive", "memory_cnn", "memory_objects", "grounding", "producer_context")
     if memory_provider is not None and (phase != "C" or condition != "C1"):
         raise ValueError("Producer-memory checkpoints require the C1/B1 engine condition")
     feature_policy = payload.get("frozen_feature_policy")
@@ -162,6 +175,8 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         relevant.append("object_memory.py")
     if grounding is not None:
         relevant.append("understanding_memory.py")
+    if producer_context is not None:
+        relevant.extend(("producer_context.py", "producer_context_study.py"))
     if feature_policy is not None:
         relevant.append("frozen_features.py")
     sources = _verify_sources(payload.get("source_sha256"), relevant)
@@ -194,6 +209,10 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         if phase == "A":
             from .development_models import build_development_model
             model = build_development_model(profile, seed_pair[0])
+        elif producer_context is not None:
+            from .producer_context import build_producer_context_model
+            model = build_producer_context_model(profile, seed_pair[0], bundle, prior_metadata["condition"],
+                context=producer_context)
         elif grounding is not None:
             from .understanding_memory import build_understanding_memory_model
             model = build_understanding_memory_model(profile, seed_pair[0], bundle, prior_metadata["condition"],
@@ -248,6 +267,7 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         "frozen_feature_policy": getattr(model, "frozen_feature_policy", "legacy_unspecified"),
         "producer_memory": getattr(model, "object_memory_metadata", None),
         "understanding_readout": getattr(model, "understanding_memory_metadata", None),
+        "producer_global_context": getattr(model, "producer_context_metadata", None),
         "restored_model_sha256": digest(model.state_dict()), "training_revision": payload.get("revision"),
         "training_torch_version": payload.get("environment", {}).get("torch"),
         "inference_torch_version": str(torch.__version__),

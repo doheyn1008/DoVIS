@@ -1,0 +1,4151 @@
+{
+  "status": "pass",
+  "audit_complete": true,
+  "run_id": 43647997707,
+  "run_attempt": 1,
+  "source_revision": "c65ab2752c117ddf66c98c4e871f553cf9c8f95a",
+  "request_sha256": "e26c4d613e0eb91513662a895034243bea9035cf68e41d33f095742bc65a3452",
+  "expected_jobs": 12,
+  "reported_jobs": 12,
+  "checkpoint_manifests_verified": 48,
+  "actual_checkpoint_tensors_verified": 48,
+  "generation_rows_regraded": 15936,
+  "native_prediction_rows_verified": 63744,
+  "binary_prediction_rows_verified": 75264,
+  "cells": [
+    {
+      "language": "ko",
+      "replica": 0,
+      "seed_pair": [
+        69007,
+        69009
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 225,
+              "items": 448,
+              "accuracy": 0.5022321428571429,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 249,
+              "items": 448,
+              "accuracy": 0.5558035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 244,
+              "items": 432,
+              "accuracy": 0.5648148148148148,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 120,
+              "items": 240,
+              "accuracy": 0.5,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 446,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9955357142857143,
+          "production_hits": 81,
+          "production_items": 112,
+          "production_accuracy": 0.7232142857142857,
+          "categories": {
+            "role_reversal": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 440,
+              "items": 448,
+              "accuracy": 0.9821428571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 94,
+          "production_items": 112,
+          "production_accuracy": 0.8392857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 444,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9910714285714286,
+          "production_hits": 108,
+          "production_items": 112,
+          "production_accuracy": 0.9642857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 444,
+              "items": 448,
+              "accuracy": 0.9910714285714286,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+        "producer": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "701a2d092798e41bb0ecac11b12fc8d56a8756cfcd89bab18c691463581aa812",
+        "full_state": "c7306985e63ea74990932ff97f8524af3d69034ea1d83260bde22219f5532df5"
+      },
+      "meaning_stream_sha256": "4c431ee66ab3a8a6145ef954d4635ceae5966e3a72d619370265cfa53a512dbc",
+      "caption_stream_sha256": "02a765c3423204995593cc94c01fb305d1013eabb2a718ed55ecdb4c0147755b",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "seed_pair": [
+        69007,
+        69009
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 240,
+              "items": 448,
+              "accuracy": 0.5357142857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 244,
+              "items": 432,
+              "accuracy": 0.5648148148148148,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 116,
+              "items": 240,
+              "accuracy": 0.48333333333333334,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 442,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9866071428571429,
+          "production_hits": 107,
+          "production_items": 112,
+          "production_accuracy": 0.9553571428571429,
+          "categories": {
+            "role_reversal": {
+              "hits": 442,
+              "items": 448,
+              "accuracy": 0.9866071428571429,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 428,
+              "items": 448,
+              "accuracy": 0.9553571428571429,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 436,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9732142857142857,
+          "production_hits": 104,
+          "production_items": 112,
+          "production_accuracy": 0.9285714285714286,
+          "categories": {
+            "role_reversal": {
+              "hits": 436,
+              "items": 448,
+              "accuracy": 0.9732142857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 423,
+              "items": 448,
+              "accuracy": 0.9441964285714286,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 426,
+              "items": 432,
+              "accuracy": 0.9861111111111112,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 234,
+              "items": 240,
+              "accuracy": 0.975,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 106,
+          "production_items": 112,
+          "production_accuracy": 0.9464285714285714,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 444,
+              "items": 448,
+              "accuracy": 0.9910714285714286,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+        "producer": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "701a2d092798e41bb0ecac11b12fc8d56a8756cfcd89bab18c691463581aa812",
+        "full_state": "c7306985e63ea74990932ff97f8524af3d69034ea1d83260bde22219f5532df5"
+      },
+      "meaning_stream_sha256": "4c431ee66ab3a8a6145ef954d4635ceae5966e3a72d619370265cfa53a512dbc",
+      "caption_stream_sha256": "631ced00ad2277506a649a790d4d733042bc747046891303ddbd8f1064910938",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "seed_pair": [
+        69007,
+        69009
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 108,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.24107142857142858,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 210,
+              "items": 448,
+              "accuracy": 0.46875,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 255,
+              "items": 448,
+              "accuracy": 0.5691964285714286,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 220,
+              "items": 432,
+              "accuracy": 0.5092592592592593,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 115,
+              "items": 240,
+              "accuracy": 0.4791666666666667,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 447,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9977678571428571,
+          "production_hits": 46,
+          "production_items": 112,
+          "production_accuracy": 0.4107142857142857,
+          "categories": {
+            "role_reversal": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 442,
+              "items": 448,
+              "accuracy": 0.9866071428571429,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+        "producer": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "701a2d092798e41bb0ecac11b12fc8d56a8756cfcd89bab18c691463581aa812",
+        "full_state": "c7306985e63ea74990932ff97f8524af3d69034ea1d83260bde22219f5532df5"
+      },
+      "meaning_stream_sha256": "4c431ee66ab3a8a6145ef954d4635ceae5966e3a72d619370265cfa53a512dbc",
+      "caption_stream_sha256": "468c95100a949547201205c2453171cbefbb2663ee25a69abb059f46ff6a18ba",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "seed_pair": [
+        69007,
+        69009
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 118,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.26339285714285715,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 236,
+              "items": 448,
+              "accuracy": 0.5267857142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 239,
+              "items": 448,
+              "accuracy": 0.5334821428571429,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 224,
+              "items": 432,
+              "accuracy": 0.5185185185185185,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 127,
+              "items": 240,
+              "accuracy": 0.5291666666666667,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 443,
+              "items": 448,
+              "accuracy": 0.9888392857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 431,
+              "items": 432,
+              "accuracy": 0.9976851851851852,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 111,
+          "production_items": 112,
+          "production_accuracy": 0.9910714285714286,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+        "producer": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "701a2d092798e41bb0ecac11b12fc8d56a8756cfcd89bab18c691463581aa812",
+        "full_state": "c7306985e63ea74990932ff97f8524af3d69034ea1d83260bde22219f5532df5"
+      },
+      "meaning_stream_sha256": "4c431ee66ab3a8a6145ef954d4635ceae5966e3a72d619370265cfa53a512dbc",
+      "caption_stream_sha256": "e3cbb33805d555f5bb333355dee8473daa44a99bcf7e87e2447a73ab52e228f1",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 236,
+              "items": 448,
+              "accuracy": 0.5267857142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 209,
+              "items": 432,
+              "accuracy": 0.4837962962962963,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 128,
+              "items": 240,
+              "accuracy": 0.5333333333333333,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 446,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9955357142857143,
+          "production_hits": 75,
+          "production_items": 112,
+          "production_accuracy": 0.6696428571428571,
+          "categories": {
+            "role_reversal": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 443,
+              "items": 448,
+              "accuracy": 0.9888392857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 446,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9955357142857143,
+          "production_hits": 78,
+          "production_items": 112,
+          "production_accuracy": 0.6964285714285714,
+          "categories": {
+            "role_reversal": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 447,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9977678571428571,
+          "production_hits": 81,
+          "production_items": 112,
+          "production_accuracy": 0.7232142857142857,
+          "categories": {
+            "role_reversal": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+        "producer": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "10beebfb4e952ea0f37f4e55ad4fdce432b8c91007eda95df66667a838d8bb40",
+        "full_state": "f8e6e3120758bd952e4e8085bf170c1ff715da723b212d00b4c00542d724018a"
+      },
+      "meaning_stream_sha256": "f88b9ef6840ff605a54533543580a9cc6827d89941e9736e904c48e256731b3c",
+      "caption_stream_sha256": "928b2c62c494139a98076f385ac3f2b051c9c99b5d20bd138de4a8f8f0bdfac2",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": false,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 259,
+              "items": 448,
+              "accuracy": 0.578125,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 212,
+              "items": 432,
+              "accuracy": 0.49074074074074076,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 128,
+              "items": 240,
+              "accuracy": 0.5333333333333333,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 94,
+          "production_items": 112,
+          "production_accuracy": 0.8392857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 444,
+              "items": 448,
+              "accuracy": 0.9910714285714286,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 431,
+              "items": 432,
+              "accuracy": 0.9976851851851852,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 96,
+          "production_items": 112,
+          "production_accuracy": 0.8571428571428571,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 99,
+          "production_items": 112,
+          "production_accuracy": 0.8839285714285714,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+        "producer": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "10beebfb4e952ea0f37f4e55ad4fdce432b8c91007eda95df66667a838d8bb40",
+        "full_state": "f8e6e3120758bd952e4e8085bf170c1ff715da723b212d00b4c00542d724018a"
+      },
+      "meaning_stream_sha256": "f88b9ef6840ff605a54533543580a9cc6827d89941e9736e904c48e256731b3c",
+      "caption_stream_sha256": "9c6d7f1d06bad0e1a8d0dea9516c8b52693d50236a5fc6dade4c7ae5d67ee95a",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": false,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 228,
+              "items": 448,
+              "accuracy": 0.5089285714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 235,
+              "items": 448,
+              "accuracy": 0.5245535714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 209,
+              "items": 432,
+              "accuracy": 0.4837962962962963,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 123,
+              "items": 240,
+              "accuracy": 0.5125,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 108,
+          "production_items": 112,
+          "production_accuracy": 0.9642857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 443,
+              "items": 448,
+              "accuracy": 0.9888392857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 108,
+          "production_items": 112,
+          "production_accuracy": 0.9642857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 446,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9955357142857143,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+        "producer": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "10beebfb4e952ea0f37f4e55ad4fdce432b8c91007eda95df66667a838d8bb40",
+        "full_state": "f8e6e3120758bd952e4e8085bf170c1ff715da723b212d00b4c00542d724018a"
+      },
+      "meaning_stream_sha256": "f88b9ef6840ff605a54533543580a9cc6827d89941e9736e904c48e256731b3c",
+      "caption_stream_sha256": "5484d3b8a1ee526de3a3f0dc4313e7d92a585390092300cf2c071b3e64b4369a",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 114,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.2544642857142857,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 226,
+              "items": 448,
+              "accuracy": 0.5044642857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 210,
+              "items": 432,
+              "accuracy": 0.4861111111111111,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 126,
+              "items": 240,
+              "accuracy": 0.525,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 446,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9955357142857143,
+          "production_hits": 110,
+          "production_items": 112,
+          "production_accuracy": 0.9821428571428571,
+          "categories": {
+            "role_reversal": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 441,
+              "items": 448,
+              "accuracy": 0.984375,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 447,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9977678571428571,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+        "producer": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "10beebfb4e952ea0f37f4e55ad4fdce432b8c91007eda95df66667a838d8bb40",
+        "full_state": "f8e6e3120758bd952e4e8085bf170c1ff715da723b212d00b4c00542d724018a"
+      },
+      "meaning_stream_sha256": "f88b9ef6840ff605a54533543580a9cc6827d89941e9736e904c48e256731b3c",
+      "caption_stream_sha256": "885570529cb5005997b40210838013201e1c150a5d893d166d39ab4b6635f584",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "seed_pair": [
+        69027,
+        69029
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 198,
+              "items": 448,
+              "accuracy": 0.4419642857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 200,
+              "items": 432,
+              "accuracy": 0.46296296296296297,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 116,
+              "items": 240,
+              "accuracy": 0.48333333333333334,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 445,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9933035714285714,
+          "production_hits": 94,
+          "production_items": 112,
+          "production_accuracy": 0.8392857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 429,
+              "items": 448,
+              "accuracy": 0.9575892857142857,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 103,
+          "production_items": 112,
+          "production_accuracy": 0.9196428571428571,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 439,
+              "items": 448,
+              "accuracy": 0.9799107142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 431,
+              "items": 432,
+              "accuracy": 0.9976851851851852,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 447,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9977678571428571,
+          "production_hits": 107,
+          "production_items": 112,
+          "production_accuracy": 0.9553571428571429,
+          "categories": {
+            "role_reversal": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "989a221f4627851f148b4fcd3ac8e9715455d0abc9a4154c87bf591d69ff70cd",
+        "producer": "c719adc2323da66495b914104761be56d26ea1471b039c736718be3ecc2ecf56",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "d3284c3c8a04f6cb80bb7d68ad9a82b024746c5ed1d958ae7dd7f06e9099acb7",
+        "full_state": "9066d0558c4bf8480a9f4da4cb5e633284922b673808b88110dbdea7ccc26f1b"
+      },
+      "meaning_stream_sha256": "00594808bfa4334dd0f9ead4c986af8d17b9567bdd11d598230548b6df14833e",
+      "caption_stream_sha256": "375d311a37f6a774831c3527c592a3ecd8ab7d693c4a1317334ef0eb745c94d9",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "seed_pair": [
+        69027,
+        69029
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 208,
+              "items": 448,
+              "accuracy": 0.4642857142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 189,
+              "items": 432,
+              "accuracy": 0.4375,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 124,
+              "items": 240,
+              "accuracy": 0.5166666666666667,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 441,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.984375,
+          "production_hits": 94,
+          "production_items": 112,
+          "production_accuracy": 0.8392857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 441,
+              "items": 448,
+              "accuracy": 0.984375,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 438,
+              "items": 448,
+              "accuracy": 0.9776785714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 438,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.9776785714285714,
+          "production_hits": 101,
+          "production_items": 112,
+          "production_accuracy": 0.9017857142857143,
+          "categories": {
+            "role_reversal": {
+              "hits": 438,
+              "items": 448,
+              "accuracy": 0.9776785714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 441,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.984375,
+          "production_hits": 105,
+          "production_items": 112,
+          "production_accuracy": 0.9375,
+          "categories": {
+            "role_reversal": {
+              "hits": 441,
+              "items": 448,
+              "accuracy": 0.984375,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "989a221f4627851f148b4fcd3ac8e9715455d0abc9a4154c87bf591d69ff70cd",
+        "producer": "c719adc2323da66495b914104761be56d26ea1471b039c736718be3ecc2ecf56",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "d3284c3c8a04f6cb80bb7d68ad9a82b024746c5ed1d958ae7dd7f06e9099acb7",
+        "full_state": "9066d0558c4bf8480a9f4da4cb5e633284922b673808b88110dbdea7ccc26f1b"
+      },
+      "meaning_stream_sha256": "00594808bfa4334dd0f9ead4c986af8d17b9567bdd11d598230548b6df14833e",
+      "caption_stream_sha256": "5b56f068e12030516086694c04437c1490ef3e0b49ad246f7da549deb8ad12dd",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "seed_pair": [
+        69027,
+        69029
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 224,
+              "items": 448,
+              "accuracy": 0.5,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 201,
+              "items": 448,
+              "accuracy": 0.4486607142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 184,
+              "items": 432,
+              "accuracy": 0.42592592592592593,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 118,
+              "items": 240,
+              "accuracy": 0.49166666666666664,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 445,
+              "items": 448,
+              "accuracy": 0.9933035714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 431,
+              "items": 432,
+              "accuracy": 0.9976851851851852,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 446,
+              "items": 448,
+              "accuracy": 0.9955357142857143,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "989a221f4627851f148b4fcd3ac8e9715455d0abc9a4154c87bf591d69ff70cd",
+        "producer": "c719adc2323da66495b914104761be56d26ea1471b039c736718be3ecc2ecf56",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "d3284c3c8a04f6cb80bb7d68ad9a82b024746c5ed1d958ae7dd7f06e9099acb7",
+        "full_state": "9066d0558c4bf8480a9f4da4cb5e633284922b673808b88110dbdea7ccc26f1b"
+      },
+      "meaning_stream_sha256": "00594808bfa4334dd0f9ead4c986af8d17b9567bdd11d598230548b6df14833e",
+      "caption_stream_sha256": "5cc8607ab0e654522ce860d766d578324a04742f6c9f507a6db13c835f199ea8",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+            }
+          },
+          "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6973P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "seed_pair": [
+        69027,
+        69029
+      ],
+      "status": "completed",
+      "points": [
+        {
+          "step": 0,
+          "understanding_hits": 112,
+          "understanding_items": 448,
+          "understanding_accuracy": 0.25,
+          "production_hits": 0,
+          "production_items": 112,
+          "production_accuracy": 0.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 228,
+              "items": 448,
+              "accuracy": 0.5089285714285714,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 197,
+              "items": 448,
+              "accuracy": 0.43973214285714285,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 184,
+              "items": 432,
+              "accuracy": 0.42592592592592593,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 122,
+              "items": 240,
+              "accuracy": 0.5083333333333333,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "targets_not_met",
+          "score_targets_met": false,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 2400,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 111,
+          "production_items": 112,
+          "production_accuracy": 0.9910714285714286,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 447,
+              "items": 448,
+              "accuracy": 0.9977678571428571,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 4800,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        },
+        {
+          "step": 9600,
+          "understanding_hits": 448,
+          "understanding_items": 448,
+          "understanding_accuracy": 1.0,
+          "production_hits": 112,
+          "production_items": 112,
+          "production_accuracy": 1.0,
+          "categories": {
+            "role_reversal": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "color_only": {
+              "hits": 448,
+              "items": 448,
+              "accuracy": 1.0,
+              "anchors": 112,
+              "pairs": 28
+            },
+            "shape_only": {
+              "hits": 432,
+              "items": 432,
+              "accuracy": 1.0,
+              "anchors": 108,
+              "pairs": 27
+            },
+            "binding_swap": {
+              "hits": 240,
+              "items": 240,
+              "accuracy": 1.0,
+              "anchors": 60,
+              "pairs": 15
+            }
+          },
+          "candidate_status": "development_candidate",
+          "score_targets_met": true,
+          "coverage_sufficient": true
+        }
+      ],
+      "initial_tensor_hashes": {
+        "understanding": "989a221f4627851f148b4fcd3ac8e9715455d0abc9a4154c87bf591d69ff70cd",
+        "producer": "c719adc2323da66495b914104761be56d26ea1471b039c736718be3ecc2ecf56",
+        "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+        "base_understanding": "d3284c3c8a04f6cb80bb7d68ad9a82b024746c5ed1d958ae7dd7f06e9099acb7",
+        "full_state": "9066d0558c4bf8480a9f4da4cb5e633284922b673808b88110dbdea7ccc26f1b"
+      },
+      "meaning_stream_sha256": "00594808bfa4334dd0f9ead4c986af8d17b9567bdd11d598230548b6df14833e",
+      "caption_stream_sha256": "695f9d9553fb7beed68b000f5efdfb70e768a4b3b4f3c5d6bdba278316775ee5",
+      "feature_tables": {
+        "step_0": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        },
+        "final": {
+          "policy": "per_png_singleton_v1",
+          "caches": {
+            "object_memory_cache": {
+              "entries": 332,
+              "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+            },
+            "spatial_grid_cache": {
+              "entries": 0,
+              "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+            },
+            "understanding_object_cache": {
+              "entries": 332,
+              "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+            },
+            "visual_cache": {
+              "entries": 332,
+              "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+            }
+          },
+          "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      },
+      "fresh_optimizer_and_rng_verified": true,
+      "final_candidate": true,
+      "declared_seed_initial_tensor_reconstruction_verified": true
+    }
+  ],
+  "missing_cells": [],
+  "failed_cells": [],
+  "audit_errors": [],
+  "protected_pairs_excluded": 22,
+  "same_selected_development_population": true,
+  "one_shared_image_prior": true,
+  "independent_visual_replications": false,
+  "cross_host_feature_table_bit_equality_required": false,
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false,
+  "seed_blocks": [
+    {
+      "replica": 0,
+      "seed_pair": [
+        69007,
+        69009
+      ],
+      "checks": {
+        "initial_understanding": true,
+        "initial_producer": true,
+        "initial_visual_encoder": true,
+        "initial_base_understanding": true,
+        "initial_full_state": true,
+        "meaning_stream": true
+      },
+      "final_candidate_count": 4
+    },
+    {
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "checks": {
+        "initial_understanding": true,
+        "initial_producer": true,
+        "initial_visual_encoder": true,
+        "initial_base_understanding": true,
+        "initial_full_state": true,
+        "meaning_stream": true
+      },
+      "final_candidate_count": 2
+    },
+    {
+      "replica": 2,
+      "seed_pair": [
+        69027,
+        69029
+      ],
+      "checks": {
+        "initial_understanding": true,
+        "initial_producer": true,
+        "initial_visual_encoder": true,
+        "initial_base_understanding": true,
+        "initial_full_state": true,
+        "meaning_stream": true
+      },
+      "final_candidate_count": 4
+    }
+  ],
+  "distinct_native_initializations_across_blocks": true,
+  "all_seed_blocks_initialization_and_meanings_match": true,
+  "observed_feature_tables": [
+    {
+      "language": "ko",
+      "replica": 0,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "Intel(R) Xeon(R) 6973P-C",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 2,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "caches": {
+        "object_memory_cache": {
+          "entries": 332,
+          "sha256": "f4271f87168d043e77a5792ef8dfcdab217dc6c3c78a9eca6ca313cbfc5779d6"
+        },
+        "spatial_grid_cache": {
+          "entries": 0,
+          "sha256": "e4f60d0aa6d7f3d3b6a6494b1c861b99f649c6f9ec51abaf201b20f297327c95"
+        },
+        "understanding_object_cache": {
+          "entries": 332,
+          "sha256": "354d558488890f935ad429241c05bbf136cba617f98d10a5c7d23abefe14218f"
+        },
+        "visual_cache": {
+          "entries": 332,
+          "sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+        }
+      },
+      "environment": {
+        "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+        "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+        "machine": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "torch": "2.15.0+cpu",
+        "numpy": "2.5.4",
+        "pillow": "12.3.0",
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 202002\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.13.3 (Git Hash b38f97eb6f2173513112f15a0481750b8a66e901)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=d0f2af8b66b20da4baa50644c0cd3f887a2eae2e, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xfatbin -compress-all  -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -DC10_NODEPRECATED, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.15.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_HIPSPARSELT=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "threads": 1,
+        "interop_threads": 4,
+        "deterministic_algorithms": true,
+        "mkldnn_enabled": true,
+        "mkldnn_deterministic": false,
+        "environment": {
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "PYTHONHASHSEED": "0",
+          "MKL_CBWR": null,
+          "ONEDNN_MAX_CPU_ISA": null
+        }
+      }
+    }
+  ],
+  "feature_table_variation": {
+    "overall_unique_hashes": 2,
+    "per_seed_unique_hashes": {
+      "0": 2,
+      "1": 2,
+      "2": 2
+    }
+  },
+  "execution_completed": true,
+  "final_candidate_count": 10,
+  "provenance_valid": true,
+  "robust_development_candidate": false,
+  "assessment": "targets_not_met",
+  "official_summary_sha256": "31154a7910a2653d7c9a6043af111f1eacaf050ae0fed8d21391f84ea89d48a5",
+  "official_aggregate_matches_independent_recomputation": true,
+  "declared_initial_seed_reconstruction": {
+    "constructors": 3,
+    "actual_step_zero_checkpoints_matched": 12,
+    "records": [
+      {
+        "replica": 0,
+        "seed_pair": [
+          69007,
+          69009
+        ],
+        "initial_tensor_hashes": {
+          "understanding": "6a80ae80a4fa7744ac0a47661b1aacd0a6ced2be94927170b8289f57de6946c7",
+          "producer": "8a2d87cadae4ee9406265480035b35460d74a4d3611a4121f384cc5fb37c5765",
+          "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+          "base_understanding": "701a2d092798e41bb0ecac11b12fc8d56a8756cfcd89bab18c691463581aa812",
+          "full_state": "c7306985e63ea74990932ff97f8524af3d69034ea1d83260bde22219f5532df5"
+        },
+        "actual_step_zero_matches": 4,
+        "construction_scope": "Fresh architecture from the declared initialization/training seed and shared image-only prior; no language weights or optimizer loaded; no learning or evaluation performed"
+      },
+      {
+        "replica": 1,
+        "seed_pair": [
+          69017,
+          69019
+        ],
+        "initial_tensor_hashes": {
+          "understanding": "72e1315ecd552e83e544add0021fd3860bad29e50b942786fc624abe808e9e3a",
+          "producer": "2f109b3b0c574d9681015f5f29e4978ab64bcf68ecf62afd418fd4822a3f35e9",
+          "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+          "base_understanding": "10beebfb4e952ea0f37f4e55ad4fdce432b8c91007eda95df66667a838d8bb40",
+          "full_state": "f8e6e3120758bd952e4e8085bf170c1ff715da723b212d00b4c00542d724018a"
+        },
+        "actual_step_zero_matches": 4,
+        "construction_scope": "Fresh architecture from the declared initialization/training seed and shared image-only prior; no language weights or optimizer loaded; no learning or evaluation performed"
+      },
+      {
+        "replica": 2,
+        "seed_pair": [
+          69027,
+          69029
+        ],
+        "initial_tensor_hashes": {
+          "understanding": "989a221f4627851f148b4fcd3ac8e9715455d0abc9a4154c87bf591d69ff70cd",
+          "producer": "c719adc2323da66495b914104761be56d26ea1471b039c736718be3ecc2ecf56",
+          "visual_encoder": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+          "base_understanding": "d3284c3c8a04f6cb80bb7d68ad9a82b024746c5ed1d958ae7dd7f06e9099acb7",
+          "full_state": "9066d0558c4bf8480a9f4da4cb5e633284922b673808b88110dbdea7ccc26f1b"
+        },
+        "actual_step_zero_matches": 4,
+        "construction_scope": "Fresh architecture from the declared initialization/training seed and shared image-only prior; no language weights or optimizer loaded; no learning or evaluation performed"
+      }
+    ]
+  },
+  "noncandidate_final_trials": [
+    {
+      "language": "ko",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "execution_status": "completed",
+      "fixed_final_step": 9600,
+      "missed_targets": [
+        "production"
+      ],
+      "understanding_hits": 447,
+      "understanding_items": 448,
+      "production_hits": 81,
+      "production_items": 112,
+      "all_binary_diagnostic_scores": {
+        "role_reversal": 0.9977678571428571,
+        "color_only": 1.0,
+        "shape_only": 1.0,
+        "binding_swap": 1.0
+      },
+      "terminated_outputs": 96,
+      "invalid_encoding_outputs": 12,
+      "special_token_outputs": 0,
+      "recognized_semantically_correct": 81,
+      "generation_error_counts": {
+        "unrecognized_surface": 26,
+        "no_eos": 16,
+        "invalid_encoding": 12,
+        "shape_error": 5,
+        "object_identity_error": 5
+      },
+      "error_examples": [
+        {
+          "scene": {
+            "subject": {
+              "color": "blue",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "green",
+              "shape": "triangle"
+            }
+          },
+          "text": "파란 삼각형의 왼쪽에 있다.",
+          "recognized_meaning": null,
+          "error_flags": [
+            "unrecognized_surface"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "blue",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "green",
+              "shape": "triangle"
+            }
+          },
+          "text": "파란 삼각형의 위쪽에 있다.",
+          "recognized_meaning": null,
+          "error_flags": [
+            "unrecognized_surface"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "green",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "blue",
+              "shape": "triangle"
+            }
+          },
+          "text": "초록 삼각형의 왼쪽에 있다.",
+          "recognized_meaning": null,
+          "error_flags": [
+            "unrecognized_surface"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "green",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "blue",
+              "shape": "triangle"
+            }
+          },
+          "text": "초록 삼각형의 위쪽에 있다.",
+          "recognized_meaning": null,
+          "error_flags": [
+            "unrecognized_surface"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "purple",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "green",
+              "shape": "circle"
+            }
+          },
+          "text": "보라색 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼각형은 초록 삼",
+          "recognized_meaning": null,
+          "error_flags": [
+            "unrecognized_surface",
+            "no_eos",
+            "invalid_encoding"
+          ]
+        }
+      ],
+      "outcome_preserved": true,
+      "retried_or_replaced": false,
+      "earlier_peak_cannot_rescue_final": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "seed_pair": [
+        69017,
+        69019
+      ],
+      "execution_status": "completed",
+      "fixed_final_step": 9600,
+      "missed_targets": [
+        "production"
+      ],
+      "understanding_hits": 448,
+      "understanding_items": 448,
+      "production_hits": 99,
+      "production_items": 112,
+      "all_binary_diagnostic_scores": {
+        "role_reversal": 1.0,
+        "color_only": 1.0,
+        "shape_only": 1.0,
+        "binding_swap": 1.0
+      },
+      "terminated_outputs": 112,
+      "invalid_encoding_outputs": 0,
+      "special_token_outputs": 0,
+      "recognized_semantically_correct": 99,
+      "generation_error_counts": {
+        "color_error": 13,
+        "object_identity_error": 13
+      },
+      "error_examples": [
+        {
+          "scene": {
+            "subject": {
+              "color": "red",
+              "shape": "circle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "blue",
+              "shape": "square"
+            }
+          },
+          "text": "赤い円は緑の四角の上にある。",
+          "recognized_meaning": {
+            "subject": {
+              "color": "red",
+              "shape": "circle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "green",
+              "shape": "square"
+            }
+          },
+          "error_flags": [
+            "color_error",
+            "object_identity_error"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "red",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "blue",
+              "shape": "triangle"
+            }
+          },
+          "text": "赤い三角は紫の三角の左にある。",
+          "recognized_meaning": {
+            "subject": {
+              "color": "red",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "purple",
+              "shape": "triangle"
+            }
+          },
+          "error_flags": [
+            "color_error",
+            "object_identity_error"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "red",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "blue",
+              "shape": "triangle"
+            }
+          },
+          "text": "赤い三角は紫の三角の上にある。",
+          "recognized_meaning": {
+            "subject": {
+              "color": "red",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "purple",
+              "shape": "triangle"
+            }
+          },
+          "error_flags": [
+            "color_error",
+            "object_identity_error"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "purple",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "green",
+              "shape": "square"
+            }
+          },
+          "text": "紫の三角は青い四角の左にある。",
+          "recognized_meaning": {
+            "subject": {
+              "color": "purple",
+              "shape": "triangle"
+            },
+            "relation": "left_of",
+            "object": {
+              "color": "blue",
+              "shape": "square"
+            }
+          },
+          "error_flags": [
+            "color_error",
+            "object_identity_error"
+          ]
+        },
+        {
+          "scene": {
+            "subject": {
+              "color": "purple",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "green",
+              "shape": "square"
+            }
+          },
+          "text": "紫の三角は青い四角の上にある。",
+          "recognized_meaning": {
+            "subject": {
+              "color": "purple",
+              "shape": "triangle"
+            },
+            "relation": "above",
+            "object": {
+              "color": "blue",
+              "shape": "square"
+            }
+          },
+          "error_flags": [
+            "color_error",
+            "object_identity_error"
+          ]
+        }
+      ],
+      "outcome_preserved": true,
+      "retried_or_replaced": false,
+      "earlier_peak_cannot_rescue_final": true
+    }
+  ],
+  "audit_framework_adversarial_selfcheck": {
+    "status": "pass",
+    "rejected_adversarial_cases": [
+      "copied_step_zero_payload",
+      "bool_payload_step",
+      "duplicate_easy_generation",
+      "train_dev_relabel_same_counts",
+      "duplicate_native_template",
+      "duplicate_binary_probe_template"
+    ],
+    "exact_seed_types_checked": true,
+    "valid_complete_multisets_accepted": true
+  },
+  "interpretation": "All12 executions and provenance checks completed validly;10/12 fixed-final development candidates, so the selected G1_objects architecture did NOT pass the preregistered12/12 seed-stability gate. JA/KO replica1 production failures remain unchanged. Same selected development population and one shared image prior, not independent visual/fresh-data replication or research qualification.",
+  "final_audit_frozen": true
+}

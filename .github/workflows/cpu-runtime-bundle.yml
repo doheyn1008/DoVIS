@@ -1,0 +1,28 @@
+name: CPU runtime bundle for local development
+
+on:
+  push:
+    branches: [codex/l1-mastery]
+    paths: ['.github/workflows/cpu-runtime-bundle.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - name: Download pinned CPU runtime and its dependencies
+        run: python -m pip download --dest cpu-wheels -r experiments/mutual-understanding/configs/composition-cpu-requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cpu-runtime-cp312
+          path: cpu-wheels/
+          if-no-files-found: error
+          retention-days: 1

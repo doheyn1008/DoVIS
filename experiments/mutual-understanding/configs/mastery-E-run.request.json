@@ -8,9 +8,12 @@
   "fixed_prior_condition": "B1",
   "data_version": "five-colors-three-shapes-v1",
   "model": "attentive",
-  "rationale": "Fixed-9600 C color/shape comprehension remains below90%. Compare same_pair versus predeclared16/16 mixed_blocks on a fixed attentive model, chosen BEFORE D outcomes. U/P branches and clipping are independent; require final producer equality inside E. This tests a separate negative-policy axis, not a D-winner selection.",
+  "rationale": "Corrected reexecution of the INVALID E comparison: original four pairs failed final producer equality because request-grouped frozen CNN caches persisted from benchmark. Canonical singleton vector/grid extraction and cache reset repair the control. Keep the SAME native data, B1 prior, architecture, seed59007/59009, observation budgets2400/4800/9600 and score/coverage rules; preserve every original failed result. No original E policy winner is assumed.",
   "parallel_design": {
-    "shared_condition": "D1 and E0 repeat the same configured system; not independent statistical replications. Cross-host final tensor equality is not assumed.",
-    "qualification": "Judge all targets at the fixed final budget in one actual E1 checkpoint; never splice E1 understanding with D1 production or select an intermediate peak."
-  }
+    "current_parallel_experiment": "Corrected E2 and new F use canonical per-PNG features. F fixes mixed_blocks as a working hypothesis before any corrected E2 outcome; F is not selecting a winner from original invalid E. Each comparison retains its own matched arms.",
+    "qualification": "A single actual fixed-final checkpoint must meet every target; no splicing or intermediate peak selection."
+  },
+  "execution_id": "E2-singleton-frozen-features",
+  "correction_of_run_id": 43634532997,
+  "frozen_feature_policy": "per_png_singleton_v1"
 }

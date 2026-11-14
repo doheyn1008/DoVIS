@@ -68,21 +68,30 @@ class InferenceModelTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temporary.cleanup()
 
-    def fixture(self, name, *, phase="C", factory="default"):
+    def fixture(self, name, *, phase="C", factory="default", feature_policy=None):
         from mutual_lab.attentive_spatial import build_attentive_spatial_model
         from mutual_lab.development_models import build_development_model
         from mutual_lab.development_world import make_examples
         from mutual_lab.mastery_lab import MasteryPlan
         from mutual_lab.neural import torch
         from mutual_lab.spatial_prior import build_spatial_model
+        memory_source = ("objects" if factory.endswith(".F1") else "cnn") if factory.startswith(
+            "mutual_lab.memory_study.RecordingFactory.") else None
         attentive = factory.endswith(("build_attentive_spatial_model", ".D1", ".attentive"))
         if phase == "A":
             model = build_development_model(self.profile, 39007)
             prior_metadata = {"kind": "fixed_pixel_random_projection"}
+        elif memory_source is not None:
+            from mutual_lab.object_memory import build_object_memory_model
+            model = build_object_memory_model(self.profile, 39007, self.bundle, "B1", memory=memory_source)
+            prior_metadata = model.spatial_prior_metadata
         else:
             builder = build_attentive_spatial_model if attentive else build_spatial_model
             model = builder(self.profile, 39007, self.bundle, "B1")
             prior_metadata = model.spatial_prior_metadata
+        if feature_policy is not None:
+            from mutual_lab.frozen_features import enforce_singleton_features
+            enforce_singleton_features(model)
         # Save one real language-weight update, rather than testing only random initialization.
         examples = make_examples(model, self.scenes[:1], "ko")
         optimizer = torch.optim.Adam((p for p in model.parameters() if p.requires_grad), lr=.003)
@@ -96,6 +105,8 @@ class InferenceModelTests(unittest.TestCase):
                    "model_factory": factory, "model": model.state_dict(), "prior_metadata": prior_metadata,
                    "revision": {"commit": "test-fixture"}, "source_sha256": {
                        p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "mutual_lab").glob("*.py")}}
+        if feature_policy is not None:
+            payload["frozen_feature_policy"] = feature_policy
         path = self.save(name, payload)
         model.eval()
         return path, payload, model
@@ -247,6 +258,37 @@ class InferenceModelTests(unittest.TestCase):
             next(model.producer.parameters()).add_(.1)
         with self.assertRaisesRegex(ValueError, "no longer matches"):
             infer_development(model, self.pngs[0])
+
+    def test_explicit_singleton_policy_restores_canonical_features_and_rejects_unknown_or_changed_helper(self):
+        from mutual_lab.frozen_features import FROZEN_FEATURE_POLICY
+        from mutual_lab.neural import digest, torch
+        for index, factory in enumerate(("default", "mutual_lab.attentive_spatial.build_attentive_spatial_model",
+                "mutual_lab.memory_study.RecordingFactory.F0", "mutual_lab.memory_study.RecordingFactory.F1")):
+            with self.subTest(factory=factory):
+                path, payload, original = self.fixture("singleton-" + str(index), factory=factory,
+                                                        feature_policy=FROZEN_FEATURE_POLICY)
+                restored = load_development_model(path, self.prior_path)
+                self.assertEqual(restored.mastery_inference_metadata["frozen_feature_policy"], FROZEN_FEATURE_POLICY)
+                self.assertEqual(digest(original.state_dict()), digest(restored.state_dict()))
+                with torch.no_grad():
+                    self.assertTrue(torch.equal(original.visual(self.pngs), restored.visual(self.pngs)))
+                self.assertEqual(infer_development(restored, self.pngs[0])["generation"],
+                                 original.generate_with_trace(self.pngs[0]))
+                if factory.endswith((".F0", ".F1")):
+                    self.assertEqual(restored.object_memory_source, "objects" if factory.endswith(".F1") else "cnn")
+                    changed = {**payload, "source_sha256": {**payload["source_sha256"], "object_memory.py": "wrong"}}
+                    with self.assertRaisesRegex(ValueError, "object_memory.py"):
+                        load_development_model(self.save("wrong-object-source", changed), self.prior_path)
+                for policy in ("unknown", None):
+                    with self.assertRaisesRegex(ValueError, "frozen feature policy"):
+                        load_development_model(self.save("unknown-policy", {**payload, "frozen_feature_policy": policy}), self.prior_path)
+                changed = {**payload, "source_sha256": {**payload["source_sha256"], "frozen_features.py": "wrong"}}
+                with self.assertRaisesRegex(ValueError, "frozen_features.py"):
+                    load_development_model(self.save("wrong-helper-source", changed), self.prior_path)
+        path, _, _ = self.fixture("legacy-no-cache-policy")
+        restored = load_development_model(path, self.prior_path)
+        self.assertFalse(hasattr(restored, "frozen_feature_policy"))
+        self.assertEqual(restored.mastery_inference_metadata["frozen_feature_policy"], "legacy_unspecified")
 
     def test_cli_preserves_real_unicode_bmp_surrogate_trace_with_strict_utf8_stdout(self):
         from mutual_lab.neural import torch

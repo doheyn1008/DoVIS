@@ -174,6 +174,8 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         prior_condition = "B" + condition[-1]
         builder = build_spatial_model if model_factory is None else model_factory
         model = builder(plan.model_profile, initial_seed, prior_bundle, condition=prior_condition)
+        from .frozen_features import enforce_singleton_features
+        model = enforce_singleton_features(model)
         prior_hash = lambda: spatial_prior_hash(model)
         prior_metadata = model.spatial_prior_metadata
     example_builder = native_examples if example_builder is None else example_builder
@@ -215,6 +217,9 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         "negative_sampling_seed": training_seed + plan.negative_seed_offset,
         "training_steps_completed": 0, "curves": [], "checkpoints": [], "negative_exposures": {},
         "runtime_allowance_seconds": allowance, "benchmark": None}
+    if phase in ("B", "C"):
+        report["frozen_feature_policy"] = model.frozen_feature_policy
+        report["frozen_feature_tables"] = {"step_0": None, "final": None}
     meaning_stream, caption_stream = hashlib.sha256(), hashlib.sha256()
     generations, predictions, step = [], [], 0
     index = world.semantic_index(language) if phase == "C" else semantic_index(language)
@@ -240,6 +245,12 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
                       final_producer_sha256=digest(model.producer.state_dict()))
         if report["initial_prior_sha256"] != report["final_prior_sha256"]:
             raise RuntimeError("Frozen visual prior parameters or buffers changed")
+        if phase in ("B", "C"):
+            from .frozen_features import feature_cache_manifest
+            tables = report["frozen_feature_tables"]
+            tables["final"] = feature_cache_manifest(model)
+            if tables["step_0"] is not None and tables["final"] != tables["step_0"]:
+                raise RuntimeError("Frozen feature tables changed after the initial full evaluation")
         safe_json(directory / "report.json", report)
         safe_json(directory / "generations.json", generations)
         safe_json(directory / "comprehension_predictions.json", predictions)
@@ -255,6 +266,9 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
             "source_sha256": sources, "data_sha256": report["data_sha256"], "split": report["split"],
             "environment": environment, "prior_metadata": prior_metadata, "revision": report["revision"],
             "data_version": data_version, "model_factory": report["model_factory"]}
+        if phase in ("B", "C"):
+            payload["frozen_feature_policy"] = report["frozen_feature_policy"]
+            payload["frozen_feature_tables"] = copy.deepcopy(report["frozen_feature_tables"])
         payload["negative_exposure_offset"] = step * config.native_training_profile.batch_size
         temporary = path.with_suffix(".pt.tmp")
         torch.save(payload, temporary); temporary.replace(path)
@@ -289,13 +303,18 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
                     exposure_offset=index * len(batch), policy=effective_policy)
                 update(batch, selected)
         finally:
-            model.load_state_dict(weights)
-            torch.random.set_rng_state(torch_rng)
-            optimizer = torch.optim.Adam(model.parameters(), lr=config.native_training_profile.learning_rate)
+            try:
+                model.load_state_dict(weights)
+                torch.random.set_rng_state(torch_rng)
+                optimizer = torch.optim.Adam(model.parameters(), lr=config.native_training_profile.learning_rate)
+            finally:
+                from .frozen_features import clear_feature_caches
+                cleared = clear_feature_caches(model)
         seconds = time.monotonic() - started
         report["benchmark"] = {"steps": plan.benchmark_steps, "training_seconds": seconds,
             "steps_per_second": plan.benchmark_steps / max(seconds, 1e-12),
             "initial_weights_restored": digest(model.state_dict()) == digest(weights),
+            "image_caches_cleared": cleared,
             "scope": "Training-only throughput; evaluation/setup overhead excluded; budget not adapted"}
 
     def evaluate():
@@ -323,6 +342,16 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         point["candidate"] = candidate_assessment(point, probes, plan)
         if before != state_hash():
             raise RuntimeError("Evaluation changed model/optimizer/training RNG state")
+        if phase in ("B", "C"):
+            from .frozen_features import feature_cache_manifest
+            tables = report["frozen_feature_tables"]
+            current = feature_cache_manifest(model)
+            if step == 0 and tables["step_0"] is None:
+                tables["step_0"] = current
+            if current != tables["step_0"]:
+                raise RuntimeError("Frozen feature tables changed after the initial full evaluation")
+            tables["final"] = current
+            point["frozen_feature_table_sha256"] = current["sha256"]
         report["curves"].append(point)
         checkpoint(); snapshot(); check_deadline()
         if progress:

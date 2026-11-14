@@ -90,7 +90,7 @@ def negative_policy_pair_audit(reports, prior_condition, model):
         "choice_count", "training_chance_accuracy", "comprehension_forms", "production_forms", "teacher_forced_evaluation_forms",
         "initial_understanding_sha256", "initial_producer_sha256", "initial_prior_sha256",
         "final_producer_sha256", "final_prior_sha256", "meaning_stream_sha256", "comprehension_caption_stream_sha256",
-        "environment_sha256")
+        "environment_sha256", "frozen_feature_policy", "frozen_feature_tables")
     checks = {key: key in a and key in b and a[key] == b[key] for key in keys}
     checks.update({
         "complete_initial_state": init_a == init_b and bool(init_a),
@@ -123,6 +123,11 @@ def negative_policy_pair_audit(reports, prior_condition, model):
             and p["candidate"].get("excluded_from_research") is True
             and set(p["candidate"]["categories"]) == set(CATEGORIES) for raw in (a, b) for p in raw.get("curves", [])),
         "four_choices": all(raw.get("choice_count") == 4 and raw.get("training_chance_accuracy") == .25 for raw in (a, b)),
+        "deterministic_frozen_features": all(raw.get("frozen_feature_policy") == "per_png_singleton_v1"
+            and isinstance(raw.get("frozen_feature_tables", {}).get("step_0"), dict)
+            and raw["frozen_feature_tables"]["step_0"].get("policy") == "per_png_singleton_v1"
+            and raw["frozen_feature_tables"].get("final") == raw["frozen_feature_tables"]["step_0"]
+            for raw in (a, b)),
     })
     expected = a["training_steps_completed"] * a["batch_size"]
     checks["negative_exposure_totals"] = all(raw.get("negative_exposures", {}).get("examples") == expected

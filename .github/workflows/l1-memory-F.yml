@@ -1,0 +1,381 @@
+# Preparing this workflow does not activate F. An explicit pinned request is
+# required after review of the invalid original E control and new F hypothesis.
+name: Conditional perceptual-memory development comparison
+
+on:
+  push:
+    branches: [codex/l1-mastery, codex/l1-memory]
+    paths:
+      - 'experiments/mutual-understanding/configs/mastery-F-run.request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: l1-memory-F-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONUNBUFFERED: '1'
+
+defaults:
+  run:
+    working-directory: experiments/mutual-understanding
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      policy: ${{ steps.request.outputs.policy }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - name: Validate the explicit F hypothesis and unchanged C training plan
+        id: request
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, shutil
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import VERSION, development_manifest
+          if os.environ['GITHUB_REF'] not in ('refs/heads/codex/l1-mastery', 'refs/heads/codex/l1-memory'):
+              raise ValueError('F is restricted to an explicitly prepared development branch')
+          path = Path('configs/mastery-F-run.request.json')
+          if not path.is_file():
+              raise RuntimeError('F requires a pinned request and explicit rationale after D/E review; preparation does not activate it')
+          request = json.loads(path.read_text())
+          if type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+              raise ValueError('Unsupported F request schema')
+          if (type(request.get('source_e_run_id')) is not int or request['source_e_run_id'] != 43634532997
+                  or request.get('source_e_revision') != '9cf239215883258ea538fdc7579d67ae8442b610'):
+              raise ValueError('F must inherit the explicitly pinned E discovery input')
+          expected_pins = {
+              'prior_manifest_sha256': '3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6',
+              'plan_sha256': 'bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47'}
+          for key, expected in expected_pins.items():
+              if request.get(key) != expected:
+                  raise ValueError('The fixed C/E asset pin changed: ' + key)
+          for key in ('memory_implementation_sha256', 'study_implementation_sha256', 'helper_implementation_sha256', 'training_implementation_sha256'):
+              if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{64}', request[key]):
+                  raise ValueError('Pin each reviewed new F module explicitly: ' + key)
+          summary_sha = request.get('source_e_summary_sha256')
+          if summary_sha is not None and (not isinstance(summary_sha, str) or not re.fullmatch('[0-9a-f]{64}', summary_sha)):
+              raise ValueError('The optional E summary pin must be a SHA256')
+          if (request.get('model') != 'attentive' or request.get('fixed_prior_condition') != 'B1'
+                  or request.get('policy') != 'mixed_blocks'
+                  or request.get('frozen_feature_policy') != 'per_png_singleton_v1'
+                  or request.get('memory_normalization') != 'l2_first32_raw_yx_v1'
+                  or type(request.get('fixed_final_step')) is not int or request['fixed_final_step'] != 9600
+                  or request.get('data_version') != VERSION):
+              raise ValueError('F fixes attentive+B1+mixed_blocks with per-PNG singleton features and the common normalization contract')
+          if not isinstance(request.get('rationale'), str) or not request['rationale'].strip():
+              raise ValueError('An explicit memory-provider hypothesis and policy rationale are required')
+          plan_path = Path('configs/mastery-C-plan.json')
+          if hashlib.sha256(plan_path.read_bytes()).hexdigest() != request['plan_sha256']:
+              raise ValueError('F must retain the exact C model, L1 seeds and training budgets')
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load(plan_path).validate(config)
+          if (plan.budgets != (2400, 4800, 9600) or plan.b_seed_pair != (59007, 59009)
+                  or plan.max_trial_seconds != 3600 or plan.max_suite_seconds != 10800):
+              raise ValueError('The predeclared discovery budgets, seeds or CPU bounds changed')
+          data = development_manifest(config, plan.data_seed)
+          if (data['scene_counts'] != {'train': 220, 'dev': 112} or data['protected_pairs_excluded'] != 22
+                  or plan.metadata.get('data_version') != VERSION
+                  or plan.metadata.get('data_pair_sha256') != data['pair_sha256']):
+              raise ValueError('The frozen C population or protected-pair exclusion changed')
+          for name, key in (('object_memory.py', 'memory_implementation_sha256'), ('memory_study.py', 'study_implementation_sha256'),
+                  ('frozen_features.py', 'helper_implementation_sha256'), ('mastery_lab.py', 'training_implementation_sha256')):
+              if hashlib.sha256((Path('mutual_lab') / name).read_bytes()).hexdigest() != request[key]:
+                  raise ValueError('The promoted F implementation differs from its reviewed source pin: ' + name)
+          provenance = Path('runs/memory-F-input/provenance')
+          provenance.mkdir(parents=True, exist_ok=True)
+          for original, name in ((path, 'request.json'), (plan_path, 'plan.json'),
+                  (Path('configs/neural.example.json'), 'config.json')):
+              shutil.copyfile(original, provenance / name)
+          (provenance / 'data-manifest.json').write_text(json.dumps(data, indent=2) + '\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('source_run_id=' + str(request['source_e_run_id']) + '\n')
+              output.write('policy=' + request['policy'] + '\n')
+              output.write('has_e_summary=' + ('true' if summary_sha is not None else 'false') + '\n')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-E-input-${{ steps.request.outputs.source_run_id }}
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/memory-F-input/source-E/
+      - uses: actions/download-artifact@v4
+        if: steps.request.outputs.has_e_summary == 'true'
+        with:
+          name: l1-E-summary-${{ steps.request.outputs.source_run_id }}
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/memory-F-input/source-E-summary/
+      - name: Verify inherited prior and unchanged language/readout/data implementation
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, json, os, urllib.parse, urllib.request
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import VERSION, development_manifest, development_splits, render_scene
+          from mutual_lab.spatial_prior import FORMAT, fit_pool_hash
+          directory = Path('runs/memory-F-input')
+          source, prior = directory / 'source-E', directory / 'source-E/prior'
+          request_path = Path('configs/mastery-F-run.request.json')
+          request = json.loads(request_path.read_text())
+          inherited = source / 'provenance'
+          e_request_path = inherited / 'request.json'
+          e_request, e_context = json.loads(e_request_path.read_text()), json.loads((inherited / 'run-context.json').read_text())
+          if (e_context.get('code_revision') != request['source_e_revision']
+                  or str(e_context.get('run_id')) != str(request['source_e_run_id'])
+                  or e_context.get('repository') != os.environ['GITHUB_REPOSITORY'] or e_context.get('request') != e_request
+                  or e_context.get('request_sha256') != hashlib.sha256(e_request_path.read_bytes()).hexdigest()
+                  or e_request.get('model') != 'attentive' or e_request.get('fixed_prior_condition') != 'B1'
+                  or e_request.get('plan_sha256') != request['plan_sha256']
+                  or e_request.get('prior_manifest_sha256') != request['prior_manifest_sha256']
+                  or e_request.get('data_version') != VERSION):
+              raise ValueError('The inherited E input does not match the requested attentive/B1 discovery system')
+          # F policy is independently declared. E request.policy names its source
+          # C baseline and must NOT constrain F to same_pair or choose E0/E1 here.
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-C-plan.json').validate(config)
+          data = development_manifest(config, plan.data_seed)
+          if (hashlib.sha256((inherited / 'plan.json').read_bytes()).hexdigest() != request['plan_sha256']
+                  or json.loads((inherited / 'data-manifest.json').read_text()) != data):
+              raise ValueError('The inherited E training plan or development PNG population changed')
+          core_names = ('neural.py', 'spatial_prior.py', 'attentive_spatial.py',
+              'development_world.py', 'fit_distractors.py', 'development_models.py', 'profiles.py',
+              'config.py', 'world.py', 'images.py', 'native_preparation.py', 'composition_diagnostics.py',
+              'composition_suite.py', 'diagnostics.py', 'languages.py')
+          recorded = e_context.get('source_sha256', {})
+          core_hashes = {}
+          for name in core_names:
+              sha = hashlib.sha256((Path('mutual_lab') / name).read_bytes()).hexdigest()
+              if recorded.get(name) != sha:
+                  raise ValueError('The fixed language architecture, attentive readout, training or data core changed: ' + name)
+              core_hashes[name] = sha
+          training_sha = hashlib.sha256(Path('mutual_lab/mastery_lab.py').read_bytes()).hexdigest()
+          helper_sha = hashlib.sha256(Path('mutual_lab/frozen_features.py').read_bytes()).hexdigest()
+          if (training_sha != request['training_implementation_sha256']
+                  or helper_sha != request['helper_implementation_sha256']):
+              raise ValueError('The preregistered singleton-feature engine or helper changed')
+          manifest_path = prior / 'prior.json'
+          if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != request['prior_manifest_sha256']:
+              raise ValueError('The inherited completed C/E prior manifest differs from its pin')
+          manifest = json.loads(manifest_path.read_text())
+          if (manifest.get('format') != FORMAT or manifest.get('kind') != 'development_only'
+                  or manifest.get('excluded_from_research') is not True
+                  or hashlib.sha256((prior / 'prior.pt').read_bytes()).hexdigest() != manifest.get('sha256')):
+              raise ValueError('The inherited development-only prior checkpoint or manifest changed')
+          pngs = [render_scene(scene) for scene in development_splits(config, plan.data_seed)['train']]
+          png_hashes = [hashlib.sha256(png).hexdigest() for png in pngs]
+          report, settings = manifest['report'], plan.metadata['b_prior']
+          expected = {'status': 'completed', 'image_count': 220, 'seed': settings['seed'],
+              'steps': settings['steps'], 'steps_completed': settings['steps'], 'batch_size': settings['batch_size'],
+              'learning_rate': settings['learning_rate'], 'runtime_allowance_seconds': settings['max_seconds'],
+              'dimension': plan.model_profile.hidden_dim, 'fit_png_sha256': sorted(png_hashes),
+              'fit_png_order_sha256': png_hashes, 'fit_pool_sha256': fit_pool_hash(pngs)}
+          if any(report.get(key) != value for key, value in expected.items()):
+              raise ValueError('F must reuse the same completed 220-fit-PNG image-only prior; no retraining or dev/protected images')
+          for name in ('spatial_prior.py', 'neural.py'):
+              if report.get('source_sha256', {}).get(name) != core_hashes[name]:
+                  raise ValueError('The inherited image prior implementation changed: ' + name)
+          c_provenance = prior / 'provenance'
+          c_request, c_context = json.loads((c_provenance / 'request.json').read_text()), json.loads((c_provenance / 'run-context.json').read_text())
+          if (hashlib.sha256((c_provenance / 'plan.json').read_bytes()).hexdigest() != request['plan_sha256']
+                  or json.loads((c_provenance / 'data-manifest.json').read_text()) != data
+                  or c_request.get('policy') != 'same_pair' or c_request.get('plan_sha256') != request['plan_sha256']
+                  or c_context.get('code_revision') != e_request.get('source_c_revision')
+                  or str(c_context.get('run_id')) != str(e_request.get('source_c_run_id'))
+                  or c_context.get('repository') != os.environ['GITHUB_REPOSITORY'] or c_context.get('request') != c_request):
+              raise ValueError('The source C fit-only prior provenance differs from E')
+          summary = None
+          if request.get('source_e_summary_sha256') is not None:
+              path = directory / 'source-E-summary/negative-E-summary.json'
+              if hashlib.sha256(path.read_bytes()).hexdigest() != request['source_e_summary_sha256']:
+                  raise ValueError('The optional E evidence summary differs from its pinned hash')
+              summary = json.loads(path.read_text())
+              if (summary.get('kind') != 'negative-policy-study-v1-comparison' or summary.get('study_phase') != 'E'
+                      or summary.get('axis') != 'negative_policy' or summary.get('model') != 'attentive'
+                      or summary.get('fixed_prior_condition') != 'B1'):
+                  raise ValueError('The optional evidence is not the pinned attentive/B1 E comparison')
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect())
+          base = 'https://api.github.com/repos/' + os.environ['GITHUB_REPOSITORY']
+          def github(path):
+              query = urllib.request.Request(base + path, headers={'Authorization': 'Bearer ' + os.environ['SOURCE_GITHUB_TOKEN'],
+                  'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with opener.open(query, timeout=30) as response:
+                  return json.load(response)
+          run = github('/actions/runs/' + str(request['source_e_run_id']))
+          if (run.get('id') != request['source_e_run_id'] or run.get('head_sha') != request['source_e_revision']
+                  or run.get('path') != '.github/workflows/l1-negative-E.yml' or run.get('head_branch') != 'codex/l1-mastery'
+                  or run.get('event') not in ('push', 'workflow_dispatch') or run.get('status') != 'completed'
+                  or run.get('repository', {}).get('full_name') != os.environ['GITHUB_REPOSITORY']):
+              raise ValueError('Review the completed pinned E workflow before explicitly requesting F')
+          config_hashes = {}
+          for name in ('neural.example.json', 'composition-cpu-requirements.txt'):
+              item = github('/contents/experiments/mutual-understanding/configs/' + name + '?'
+                            + urllib.parse.urlencode({'ref': request['source_e_revision']}))
+              if item.get('encoding') != 'base64' or item.get('type') != 'file':
+                  raise ValueError('Expected a pinned E configuration file')
+              raw = base64.b64decode(item['content'], validate=False)
+              if raw != (Path('configs') / name).read_bytes():
+                  raise ValueError('The fixed E language training configuration changed: ' + name)
+              config_hashes[name] = hashlib.sha256(raw).hexdigest()
+          context = {'code_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'repository': os.environ['GITHUB_REPOSITORY'],
+              'request': request, 'request_sha256': hashlib.sha256(request_path.read_bytes()).hexdigest(),
+              'source_e': {key: run.get(key) for key in ('id', 'head_sha', 'html_url', 'path', 'event', 'status', 'conclusion')},
+              'source_e_summary_sha256': request.get('source_e_summary_sha256'),
+              'source_e_summary_status': None if summary is None else summary.get('status'),
+              'source_e_summary_role': 'Optional manually reviewed evidence, never an automatic winner or qualification gate',
+              'source_e_control_valid': False,
+              'source_e_invalid_reason': 'Original E final producers differed across policies because policy-dependent batched frozen-CNN cache population changed floating point features; old E is not a policy winner or matched control',
+              'source_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('mutual_lab').glob('*.py'))},
+              'unchanged_core_source_sha256': core_hashes, 'unchanged_e_config_sha256': config_hashes,
+              'frozen_feature_policy': 'per_png_singleton_v1',
+              'singleton_helper_sha256': helper_sha,
+              'training_engine_compatibility': {'source_e_sha256': recorded.get('mastery_lab.py'),
+                  'validation_sha256': training_sha, 'scope': 'Versioned correction: frozen features computed per PNG, benchmark cache reset and feature-table provenance; neural, spatial prior and attentive parameter code remain byte-identical to E'},
+              'model': 'attentive', 'fixed_prior_condition': 'B1', 'policy': request['policy'],
+              'memory_normalization': 'l2_first32_raw_yx_v1', 'coordinate_order': 'y,x', 'capacity_matched': True,
+              'f0': 'NEW normalized frozen-CNN memory baseline, distinct from old unnormalized D1',
+              'f1': 'PNG-only two-component descriptors, repeated12x each; engineered idealized perception with strict world assumptions',
+              'inherited_asset': 'Exactly the same C/E B1 image prior; fresh identical native-language initialization, no language weights or optimizer resumed',
+              'interpretation': 'Whole memory-source/partition/descriptor bundle comparison including shared normalization; not single-feature causality, general vision, independent visual replication or research promotion'}
+          (directory / 'provenance/run-context.json').write_text(json.dumps(context, indent=2) + '\n')
+          print('Verified fixed B1/C plan/core source and explicitly declared F policy:', request['policy'])
+          PY
+      - name: Install pinned numerical dependencies
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Verify prior tensors, the common normalization contract, and all tests
+        run: |
+          python - <<'PY'
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_splits, render_scene
+          from mutual_lab.spatial_prior import fit_pool_hash, load_prior_bundle
+          from mutual_lab.object_memory import build_object_memory_model, component_descriptors
+          from mutual_lab.frozen_features import FROZEN_FEATURE_POLICY, enforce_singleton_features, feature_cache_manifest
+          from mutual_lab.neural import F, digest, torch
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-C-plan.json').validate(config)
+          pngs = [render_scene(scene) for scene in development_splits(config, plan.data_seed)['train']]
+          bundle = load_prior_bundle('runs/memory-F-input/source-E/prior/prior.pt', expected_fit_pool_sha256=fit_pool_hash(pngs))
+          if bundle['report']['status'] != 'completed':
+              raise ValueError('Only the identical completed C/E B1 prior may be reused')
+          initial = None
+          for source in ('cnn', 'objects'):
+              model = build_object_memory_model(plan.model_profile, plan.b_seed_pair[0], bundle, memory=source)
+              enforce_singleton_features(model)
+              if FROZEN_FEATURE_POLICY != 'per_png_singleton_v1':
+                  raise ValueError('The versioned singleton feature computation policy changed')
+              if (model.object_memory_metadata.get('memory_normalization') != 'l2_first32_raw_yx_v1'
+                      or model.object_memory_metadata.get('coordinate_order') != 'y,x'):
+                  raise ValueError('Both F arms must preserve the inherited CNN y,x coordinate convention')
+              before = digest(model.state_dict())
+              raw = (model.object_memory_cnn_grid(pngs[:1]) if source == 'cnn' else
+                     component_descriptors(pngs[0]).repeat_interleave(12, 0)[None])
+              grid = model.visual_grid(pngs[:1])
+              if (grid.shape != (1, 24, 34) or not torch.equal(grid[:, :, :32], F.normalize(raw[:, :, :32], dim=-1))
+                      or not torch.equal(grid[:, :, 32:], raw[:, :, 32:]) or digest(model.state_dict()) != before):
+                  raise ValueError('F0/F1 must apply identical per-token first32 L2 normalization and preserve raw yx without changing state')
+              if initial is None:
+                  initial = before
+              elif initial != before:
+                  raise ValueError('F0 and F1 must start with exactly the same registered parameter and buffer state')
+              if feature_cache_manifest(model).get('policy') != 'per_png_singleton_v1':
+                  raise ValueError('The actual F model did not enable the required per-PNG feature policy')
+          PY
+          python -m unittest discover -s tests -v
+          python -m pip freeze > runs/memory-F-input/provenance/dependencies.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-F-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/memory-F-input/
+          if-no-files-found: error
+          retention-days: 30
+
+  phase_f:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-F-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/memory-F-input/
+      - name: Preserve each language's exact F hypothesis and runtime provenance
+        run: |
+          mkdir -p runs/memory-F/provenance-${{ matrix.language }}
+          cp -R runs/memory-F-input/provenance/. runs/memory-F/provenance-${{ matrix.language }}/
+          python -m pip freeze > runs/memory-F/provenance-${{ matrix.language }}/language-dependencies.txt
+      - name: Compare the new normalized CNN baseline and engineered object memory
+        run: timeout --signal=INT --kill-after=30s 183m python -m mutual_lab.memory_study --language '${{ matrix.language }}' --plan configs/mastery-C-plan.json --policy '${{ needs.verify.outputs.policy }}' --prior-bundle runs/memory-F-input/source-E/prior/prior.pt --study-request configs/mastery-F-run.request.json --output runs/memory-F
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-F-trials-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/memory-F/
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate_f:
+    if: always()
+    needs: [verify, phase_f]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: l1-F-trials-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/memory-F-downloads/
+          merge-multiple: true
+      - name: Aggregate F manifests with every failed or missing language retained
+        run: |
+          mkdir -p runs/memory-F-downloads
+          python -m mutual_lab.memory_study --aggregate-dir runs/memory-F-downloads --plan configs/mastery-C-plan.json --policy '${{ needs.verify.outputs.policy }}' --study-request configs/mastery-F-run.request.json --output runs/memory-F-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-F-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/memory-F-summary.json
+          if-no-files-found: error
+          retention-days: 30

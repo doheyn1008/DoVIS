@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source_e_run_id": 43634532997,
+  "source_e_revision": "9cf239215883258ea538fdc7579d67ae8442b610",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "source_e_summary_sha256": "8d80ef62479495ebe0d34a3a4b92096444151352c1ec494aec7513416e065abc",
+  "memory_implementation_sha256": "0003db8ce10cc07773372644435d868e1a7737138eac7d5af3651bed84bd4fc7",
+  "study_implementation_sha256": "570e81a21901748b25dbd15cd2730df4d2f50868c2b32037405f105ac91da867",
+  "helper_implementation_sha256": "3a6c1d99e9c5322e7ec6cf1ff74f28abe3fa866826d7dccff058235525f21d5b",
+  "training_implementation_sha256": "d2cdb759564aeed19d1ac43d302e8c7ec90e3ffc1d4600224f45aac09cbabe9f",
+  "model": "attentive",
+  "fixed_prior_condition": "B1",
+  "policy": "mixed_blocks",
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "memory_normalization": "l2_first32_raw_yx_v1",
+  "fixed_final_step": 9600,
+  "data_version": "five-colors-three-shapes-v1",
+  "rationale": "D did not achieve90% generation in any language and remaining errors mostly name the wrong color/object. Compare P-only perceptual memory: new common-L2-normalized CNN24cell baselineF0 versus PNG-derived unordered2component continuous descriptors repeated12timesF1. Same globalCNN, U, P structure/initial weights/capacity, fit/dev boundary, native stream, seed and budget; final U must stay identical. This is an ENGINEERED ideal-perception diagnostic using a uniform background and exactly two separate flat objects, not learned general/human vision or a single internal feature ablation. No Scene, palette/class/role IDs, filenames or fitted dev/protected statistics. Mixed policy is an explicitly fixed working hypothesis, NOT an accepted winner of invalid E; corrected E2 runs independently in parallel.",
+  "selection_rule": {
+    "full_candidate": "Require every language in ONE condition at fixed9600 to meet all original U/P/four diagnostic score+coverage criteria. If both conditions meet all, prefer F0; no intermediate peaks or spliced metrics.",
+    "producer_for_next_U_test": "If full L1 criteria still fail, prefer a condition whose final P is >=.9 in all four languages; if both, F0. If neither, maximize the minimum final P across four languages; exact tie F0. This is a developmental engineering rule, not significance or qualification.",
+    "failure_policy": "No anchor removal, score relaxation, retries or silent fallback; keep invalid original E and every F failure."
+  }
+}

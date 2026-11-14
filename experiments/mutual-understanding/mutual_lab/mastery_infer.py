@@ -23,6 +23,8 @@ FACTORIES = {
     "mutual_lab.decoder_study.RecordingFactory.D1": "attentive",
     "mutual_lab.negative_policy_study.FixedLanguageFactory.standard": "standard",
     "mutual_lab.negative_policy_study.FixedLanguageFactory.attentive": "attentive",
+    "mutual_lab.memory_study.RecordingFactory.F0": "memory_cnn",
+    "mutual_lab.memory_study.RecordingFactory.F1": "memory_objects",
 }
 # Running the original D/E study entrypoints with ``python -m`` recorded their
 # wrapper class under __main__. These are exact historical CLI spellings, not
@@ -113,7 +115,16 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
     weights = payload.get("model")
     if not isinstance(weights, dict):
         raise ValueError("Checkpoint has no tensor model state")
-    attentive = FACTORIES[factory] == "attentive"
+    architecture = FACTORIES[factory]
+    memory_provider = architecture.removeprefix("memory_") if architecture.startswith("memory_") else None
+    attentive = architecture in ("attentive", "memory_cnn", "memory_objects")
+    if memory_provider is not None and (phase != "C" or condition != "C1"):
+        raise ValueError("Producer-memory checkpoints require the C1/B1 engine condition")
+    feature_policy = payload.get("frozen_feature_policy")
+    if "frozen_feature_policy" in payload and feature_policy != "per_png_singleton_v1":
+        raise ValueError("Unsupported frozen feature policy")
+    if phase == "A" and feature_policy is not None:
+        raise ValueError("Singleton CNN feature policy does not apply to A checkpoints")
     present_attention = ATTENTION_KEYS & set(weights)
     if (attentive and present_attention != ATTENTION_KEYS) or (not attentive and present_attention):
         raise ValueError("Ambiguous model factory and attention state")
@@ -124,6 +135,10 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         relevant.append("spatial_prior.py")
     if attentive:
         relevant.append("attentive_spatial.py")
+    if memory_provider is not None:
+        relevant.append("object_memory.py")
+    if feature_policy is not None:
+        relevant.append("frozen_features.py")
     sources = _verify_sources(payload.get("source_sha256"), relevant)
     prior_metadata = payload.get("prior_metadata", {})
     if not isinstance(prior_metadata, dict):
@@ -154,12 +169,19 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         if phase == "A":
             from .development_models import build_development_model
             model = build_development_model(profile, seed_pair[0])
+        elif memory_provider is not None:
+            from .object_memory import build_object_memory_model
+            model = build_object_memory_model(profile, seed_pair[0], bundle, prior_metadata["condition"],
+                                              memory="objects" if memory_provider == "objects" else "cnn")
         elif attentive:
             from .attentive_spatial import build_attentive_spatial_model
             model = build_attentive_spatial_model(profile, seed_pair[0], bundle, prior_metadata["condition"])
         else:
             from .spatial_prior import build_spatial_model
             model = build_spatial_model(profile, seed_pair[0], bundle, prior_metadata["condition"])
+        if feature_policy is not None:
+            from .frozen_features import enforce_singleton_features
+            enforce_singleton_features(model)
         if attentive and not torch.equal(model.spatial_coordinates, weights["spatial_coordinates"]):
             raise ValueError("Checkpoint changed the fixed spatial coordinate grid")
         if (not isinstance(weights.get("visual_projection"), torch.Tensor)
@@ -190,6 +212,8 @@ def load_development_model(checkpoint_path, prior_bundle_path=None):
         "factory_compatibility_note": ("Exact historical D/E __main__ CLI alias; C phase, tensor layout and core source hashes verified"
                                        if legacy_cli else None),
         "prior_sha256": prior_metadata.get("prior_sha256"), "verified_source_sha256": sources,
+        "frozen_feature_policy": getattr(model, "frozen_feature_policy", "legacy_unspecified"),
+        "producer_memory": getattr(model, "object_memory_metadata", None),
         "restored_model_sha256": digest(model.state_dict()), "training_revision": payload.get("revision"),
         "training_torch_version": payload.get("environment", {}).get("torch"),
         "inference_torch_version": str(torch.__version__),

@@ -322,6 +322,52 @@ class MasteryNeuralTests(unittest.TestCase):
                     path = next(Path(temporary).rglob("mastery-suite.json"))
                     self.assertEqual(json.loads(path.read_text()), json.loads(json.dumps(suites[0])))
 
+    def test_real_cnn_policy_pair_with_twenty_step_benchmark_keeps_final_producer_bit_exact(self):
+        from mutual_lab import development_world as world
+        from mutual_lab.attentive_spatial import build_attentive_spatial_model
+        from mutual_lab.frozen_features import FROZEN_FEATURE_POLICY
+        from mutual_lab.neural import torch
+        from mutual_lab.spatial_prior import pretrain_prior
+        config = experiment()
+        plan = replace(self.plan, budgets=(4, 8), data_seed=59003, b_seed_pair=(59007, 59009),
+                       benchmark_steps=20)
+        full = world.development_splits(config, plan.data_seed)
+        fixture = {"train": full["train"][:40], "dev": full["dev"][:4]}
+        bundle = pretrain_prior([world.render_scene(scene) for scene in fixture["train"]],
+                               dim=16, steps=1, batch_size=4, eval_every=1)
+        with tempfile.TemporaryDirectory() as temporary, patch.object(
+                world, "development_splits", return_value=fixture), patch.object(
+                world, "development_manifest", return_value={"fixture": "singleton-policy-pair"}):
+            reports = []
+            for policy in ("same_pair", "mixed_blocks"):
+                path = run_trial(config, "en", "C", "C1", 0, plan.b_seed_pair, plan,
+                                 output=temporary, progress=None, prior_bundle=bundle, policy=policy,
+                                 model_factory=build_attentive_spatial_model)
+                report = json.loads((path / "report.json").read_text()); reports.append(report)
+                self.assertEqual(report["status"], "completed", report.get("error"))
+                self.assertEqual(report["frozen_feature_policy"], FROZEN_FEATURE_POLICY)
+                self.assertEqual(report["benchmark"]["steps"], 20)
+                self.assertTrue(report["benchmark"]["initial_weights_restored"])
+                self.assertGreater(report["benchmark"]["image_caches_cleared"]["visual_cache"], 0)
+                tables = report["frozen_feature_tables"]
+                self.assertEqual(tables["step_0"], tables["final"])
+                self.assertEqual(tables["final"]["caches"]["visual_cache"]["entries"], 44)
+                self.assertEqual(tables["final"]["caches"]["spatial_grid_cache"]["entries"], 44)
+                self.assertTrue(all(point["frozen_feature_table_sha256"] == tables["final"]["sha256"]
+                                    for point in report["curves"]))
+                for manifest in report["checkpoints"]:
+                    state = torch.load(path / manifest["path"], map_location="cpu", weights_only=True)
+                    self.assertEqual(state["frozen_feature_policy"], FROZEN_FEATURE_POLICY)
+                    self.assertEqual(state["frozen_feature_tables"], tables)
+            a, b = reports
+            for key in ("initial_understanding_sha256", "initial_producer_sha256", "initial_prior_sha256",
+                        "final_producer_sha256", "meaning_stream_sha256", "comprehension_caption_stream_sha256",
+                        "frozen_feature_policy", "frozen_feature_tables"):
+                self.assertEqual(a[key], b[key], key)
+            self.assertNotEqual(a["final_understanding_sha256"], b["final_understanding_sha256"])
+            self.assertEqual(b["negative_exposures"]["branch_same_pair_examples"], 16)
+            self.assertEqual(b["negative_exposures"]["branch_attributes_examples"], 16)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -58,6 +58,8 @@ jobs:
               raise ValueError('Unsupported E request schema')
           if request.get('policy') != 'same_pair':
               raise ValueError('E requires the source C same_pair baseline policy')
+          if request.get('frozen_feature_policy') != 'per_png_singleton_v1':
+              raise ValueError('Corrected E requires canonical per-PNG frozen features')
           if request.get('fixed_prior_condition') not in ('B0', 'B1'):
               raise ValueError('E requires an explicit fixed B0 or B1 prior')
           if request.get('model') not in ('standard', 'attentive'):

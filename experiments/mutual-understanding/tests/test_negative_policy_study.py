@@ -184,6 +184,9 @@ class NegativePolicyNeuralTests(unittest.TestCase):
                 self.assertEqual(a["final_producer_sha256"], b["final_producer_sha256"])
                 self.assertNotEqual(a["final_understanding_sha256"], b["final_understanding_sha256"])
                 self.assertEqual(a["initial_prior_sha256"], b["final_prior_sha256"])
+                self.assertEqual(a["frozen_feature_policy"], "per_png_singleton_v1")
+                self.assertEqual(a["frozen_feature_tables"], b["frozen_feature_tables"])
+                self.assertEqual(a["frozen_feature_tables"]["step_0"], a["frozen_feature_tables"]["final"])
                 self.assertEqual((a["policy"], b["policy"]), ("same_pair", "mixed_blocks"))
                 self.assertEqual(b["negative_exposures"]["branch_same_pair_examples"], 16)
                 self.assertEqual(b["negative_exposures"]["branch_attributes_examples"], 16)
@@ -224,7 +227,9 @@ class NegativePolicyNeuralTests(unittest.TestCase):
                      ("parameter_count", 1, "parameter_count"),
                      ("choice_count", 5, "four_choices"),
                      ("meaning_stream_sha256", "changed", "meaning_stream_sha256"),
-                     ("condition", "C0", "engine_adapter"))
+                     ("condition", "C0", "engine_adapter"),
+                     ("frozen_feature_policy", "old_batched_cache", "deterministic_frozen_features"),
+                     ("frozen_feature_tables", {}, "deterministic_frozen_features"))
         for key, value, check in mutations:
             reports = copy.deepcopy(self.suites["standard"]["reports"])
             reports[1]["engine_report"][key] = value

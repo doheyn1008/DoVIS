@@ -29,7 +29,10 @@ PRIOR_FORMAT = "mutual-spatial-prior-development-v1"
 SCHEMA = "dovis-l1-state-archive-v1"
 CONTEXT_FILES = ("dataset.json", "config.json", "contrast_probes.json", "training_catalog.json")
 SUITE_FILES = ("mastery-suite.json", "decoder-study.json", "negative-policy-study.json",
-               "memory-study.json", "grounding-study.json", "cohort-validation.json")
+               "memory-study.json", "grounding-study.json", "cohort-validation.json",
+               "producer-context-study.json", "producer-context-H-summary.json",
+               "cohort-context-validation.json", "cohort-context-validation-comparison.json",
+               "H-cohort-summary.json")
 REPOSITORY = "https://github.com/doheyn1008/DoVIS"
 
 

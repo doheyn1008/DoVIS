@@ -273,6 +273,42 @@ class L1StatePackagingTests(unittest.TestCase):
                     if output.name == "light.zip":
                         self.assertFalse(any(name.startswith("provenance/other/") for name in archive.namelist()))
 
+    def test_H_discovery_and_cohort_raw_summaries_preserved_in_selected_bundle(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            stage = root / "H-cohort"
+            trial(stage, "ja-r1", steps=(0, 9600))
+            trial(root / "earlier")
+            # These paths deliberately sit outside provenance directories, so
+            # preservation depends on the actual H filename catalog.
+            paths = ("source-H/producer-context-study.json", "source-H/producer-context-H-summary.json",
+                     "ja-r1/cohort-context-validation.json", "manual/cohort-context-validation-comparison.json",
+                     "H-cohort-summary.json")
+            originals = {}
+            for name in paths:
+                path = stage / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                data = ('{ "kind": "cohort-context-validation-v2-comparison", "file": "' + name
+                        + '", "final_candidate_count": 12, "status": "completed" }\r\n\r\n').encode()
+                path.write_bytes(data)
+                originals[str(path)] = data
+            unknown = stage / "unofficial-H-summary.json"
+            unknown.write_bytes(b'{"not":"a declared H output"}')
+            write_json(root / "earlier" / "H-cohort-summary.json", {"stage": "earlier"})
+            packaging.package_states({"H_cohort": stage, "earlier": root / "earlier"}, {}, root / "all.zip",
+                                     selected_stage="H_cohort", selected_output=root / "selected.zip")
+            for output in (root / "all.zip", root / "selected.zip"):
+                with self.subTest(output=output), zipfile.ZipFile(output) as archive:
+                    index = json.loads(archive.read("index.json"))
+                    found = {item["source_path"]: archive.read(name) for name, item in index["members"].items()
+                             if item["purpose"] == "original_runtime_suite_provenance"
+                             and item["source_stage"] == "H_cohort"}
+                    self.assertEqual(found, originals)
+                    self.assertFalse(any(item.get("source_path") == str(unknown) for item in index["members"].values()))
+                    if output.name == "selected.zip":
+                        self.assertEqual(index["archive_scope"], "selected_stage")
+                        self.assertFalse(any(item.get("source_stage") == "earlier" for item in index["members"].values()))
+
 
 if __name__ == "__main__":
     unittest.main()

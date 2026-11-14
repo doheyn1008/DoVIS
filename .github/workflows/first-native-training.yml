@@ -1,0 +1,55 @@
+name: First native understanding training
+
+on:
+  push:
+    branches: [codex/first-native-training]
+    paths:
+      - '.github/workflows/first-native-training.yml'
+      - 'experiments/mutual-understanding/scripts/first_native_training.py'
+      - 'experiments/mutual-understanding/tests/test_first_native_training.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: first-native-training-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  train:
+    name: L1 understanding (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, es]
+    defaults:
+      run:
+        working-directory: experiments/mutual-understanding
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training dependencies
+        run: |
+          python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[neural]'
+      - name: Verify development training boundaries
+        run: python -m unittest discover -s tests -p test_first_native_training.py -v
+      - name: Train on monolingual development examples
+        run: timeout --signal=INT --kill-after=30s 10m python scripts/first_native_training.py --language '${{ matrix.language }}'
+      - name: Save learning curves and development checkpoint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-native-understanding-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/first-native-training/
+          if-no-files-found: error
+          retention-days: 90

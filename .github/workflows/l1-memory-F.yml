@@ -369,9 +369,41 @@ jobs:
           path: experiments/mutual-understanding/runs/memory-F-downloads/
           merge-multiple: true
       - name: Aggregate F manifests with every failed or missing language retained
+        env:
+          F_VERIFY_RESULT: ${{ needs.verify.result }}
         run: |
-          mkdir -p runs/memory-F-downloads
-          python -m mutual_lab.memory_study --aggregate-dir runs/memory-F-downloads --plan configs/mastery-C-plan.json --study-request configs/mastery-F-run.request.json --output runs/memory-F-summary.json
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          downloads = Path('runs/memory-F-downloads')
+          downloads.mkdir(parents=True, exist_ok=True)
+          request = Path('configs/mastery-F-run.request.json')
+          destination = Path('runs/memory-F-summary.json')
+          aggregate_exit_code = subprocess.call([sys.executable, '-m', 'mutual_lab.memory_study',
+              '--aggregate-dir', str(downloads), '--plan', 'configs/mastery-C-plan.json',
+              '--study-request', str(request), '--output', str(destination)])
+          try:
+              if aggregate_exit_code != 0 and not destination.is_file():
+                  verification_status = os.environ.get('F_VERIFY_RESULT', 'unknown')
+                  request_present = request.is_file()
+                  fallback = {
+                      'schema_version': 1, 'kind': 'memory-study-v1-execution-fallback',
+                      'study_phase': 'F', 'axis': 'execution_failure',
+                      'status': ('invalid_or_unavailable_input'
+                          if verification_status != 'success' or not request_present else 'execution_failed'),
+                      'excluded_from_research': True, 'eligible_for_fresh_experiment': False,
+                      'robust_development_candidate': False,
+                      'missing_languages': ['ko', 'ja', 'en', 'es'], 'rows': [],
+                      'verification_job_status': verification_status,
+                      'aggregation_module_exit_code': aggregate_exit_code,
+                      'request_present': request_present,
+                      'native_aggregation_summary_available': False,
+                      'interpretation': 'Workflow failure context only; no scores, validated request, completed F comparison or qualification'}
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  destination.write_text(json.dumps(fallback, indent=2, allow_nan=False) + '\n')
+          finally:
+              raise SystemExit(aggregate_exit_code)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:

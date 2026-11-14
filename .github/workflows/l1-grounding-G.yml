@@ -55,7 +55,8 @@ jobs:
           if not path.is_file():
               raise RuntimeError('G requires a pinned request after the complete F comparison; preparation does not activate it')
           request = json.loads(path.read_text())
-          if type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+          if (type(request.get('schema_version')) is not int or request['schema_version'] != 1
+                  or request.get('phase') != 'G'):
               raise ValueError('Unsupported G request schema')
           if (type(request.get('source_f_run_id')) is not int or request['source_f_run_id'] != 43640297162
                   or request.get('source_f_revision') != '12f4453d0e77e8e1c5cebc68cd54b9d3082194f6'):
@@ -399,7 +400,7 @@ jobs:
           cp -R runs/grounding-G-input/provenance/. runs/grounding-G/provenance-${{ matrix.language }}/
           python -m pip freeze > runs/grounding-G/provenance-${{ matrix.language }}/language-dependencies.txt
       - name: Compare base understanding and object-context understanding with one fixed producer
-        run: timeout --signal=INT --kill-after=30s 183m python -m mutual_lab.grounding_study --language '${{ matrix.language }}' --plan configs/mastery-C-plan.json --policy '${{ needs.verify.outputs.policy }}' --producer-memory '${{ needs.verify.outputs.producer_memory }}' --prior-bundle runs/grounding-G-input/source-F/source-E/prior/prior.pt --study-request configs/mastery-G-run.request.json --output runs/grounding-G
+        run: timeout --signal=INT --kill-after=30s 183m python -m mutual_lab.grounding_study --language '${{ matrix.language }}' --plan configs/mastery-C-plan.json --producer-memory '${{ needs.verify.outputs.producer_memory }}' --prior-bundle runs/grounding-G-input/source-F/source-E/prior/prior.pt --study-request configs/mastery-G-run.request.json --output runs/grounding-G
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -427,7 +428,7 @@ jobs:
       - name: Aggregate all six fixed-final criteria and preserve every missing or failed language
         run: |
           mkdir -p runs/grounding-G-downloads
-          python -m mutual_lab.grounding_study --aggregate-dir runs/grounding-G-downloads --plan configs/mastery-C-plan.json --policy '${{ needs.verify.outputs.policy }}' --producer-memory '${{ needs.verify.outputs.producer_memory }}' --study-request configs/mastery-G-run.request.json --output runs/grounding-G-summary.json
+          python -m mutual_lab.grounding_study --aggregate-dir runs/grounding-G-downloads --plan configs/mastery-C-plan.json --study-request configs/mastery-G-run.request.json --output runs/grounding-G-summary.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

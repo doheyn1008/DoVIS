@@ -295,7 +295,12 @@ def evaluate_development(model, examples, scenes, language, batch_size):
             comprehension_loss += float(model.grounding_loss(batch)) * len(batch)
             ids, _ = model.tokenizer.batch([row["text"] for row in batch])
             targets = ids[:, 1:]
-            logits, _ = model.producer(ids[:, :-1], model.visual([row["image"] for row in batch]))
+            pngs = [row["image"] for row in batch]
+            teacher_forced_logits = getattr(model, "teacher_forced_logits", None)
+            if callable(teacher_forced_logits):
+                logits = teacher_forced_logits(ids[:, :-1], pngs)
+            else:
+                logits, _ = model.producer(ids[:, :-1], model.visual(pngs))
             production_loss += float(F.cross_entropy(logits.reshape(-1, logits.shape[-1]), targets.reshape(-1),
                                                     ignore_index=0, reduction="sum"))
             mask = targets != 0

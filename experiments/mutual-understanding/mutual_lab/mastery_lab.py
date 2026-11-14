@@ -17,7 +17,7 @@ from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from .composition_diagnostics import balanced_splits, build_contrast_probes, contrast_manifest, score_contrasts, split_manifest
+from .composition_diagnostics import CATEGORIES, balanced_splits, build_contrast_probes, contrast_manifest, score_contrasts, split_manifest
 from .composition_suite import ArmCancelled, environment_metadata
 from .config import ExperimentConfig, integer
 from .development_models import build_development_model
@@ -30,6 +30,12 @@ from .world import native_captions, variants
 
 VERSION = "mastery-lab-v1"
 FORMAT = "mutual-mastery-development-v1"
+
+
+def phase_conditions(phase):
+    if phase not in ("A", "B", "C"):
+        raise ValueError("Unknown mastery phase")
+    return ("A0", "A1") if phase == "A" else (phase + "0", phase + "1")
 
 
 @dataclass(frozen=True)
@@ -97,6 +103,8 @@ class MasteryPlan:
 
 def candidate_assessment(point, probes, plan):
     """Keep performance and insufficient evaluation coverage as separate facts."""
+    if set(point["contrasts"]["categories"]) != set(CATEGORIES):
+        raise ValueError("Candidate assessment requires exactly the four declared contrast categories")
     details = {}
     for category, metrics in point["contrasts"]["categories"].items():
         matching = [probe for probe in probes["probes"] if probe.category == category]
@@ -120,27 +128,39 @@ class _Deadline(Exception):
 
 def run_trial(config, language, phase, condition, replica, seed_pair, plan=MasteryPlan(),
               output="runs/mastery-lab", progress=print, *, policy="same_pair", prior_bundle=None,
-              remaining_seconds=None):
+              remaining_seconds=None, model_factory=None):
     begun = time.monotonic()
     plan.validate(config)
-    if language not in LANGUAGES_ORDER or phase not in ("A", "B"):
+    if language not in LANGUAGES_ORDER or phase not in ("A", "B", "C"):
         raise ValueError("Unknown mastery phase or language")
-    expected = ("A0", "A1") if phase == "A" else ("B0", "B1")
+    expected = phase_conditions(phase)
     if condition not in expected or policy not in ("same_pair", "attributes"):
         raise ValueError("Unknown condition or distractor policy")
-    if phase == "B" and prior_bundle is None:
-        raise ValueError("Phase B requires the frozen common prior bundle")
+    if phase in ("B", "C") and prior_bundle is None:
+        raise ValueError("Spatial-prior phases require the frozen common prior bundle")
     allowance = min(plan.max_trial_seconds, remaining_seconds if remaining_seconds is not None else plan.max_trial_seconds)
     deadline = begun + allowance
     initial_seed, training_seed = seed_pair
     prep = PreparationPlan(budgets=plan.budgets, data_seed=plan.data_seed,
                            initialization_seed=initial_seed, training_seed=training_seed)
-    splits = balanced_splits(config, prep)
+    if phase == "C":
+        from . import development_world as world
+        splits = world.development_splits(config, plan.data_seed)
+        renderer, captioner, example_builder = world.render_scene, world.captions, world.make_examples
+        probes = world.build_development_contrasts(config, splits)
+        contrast_scorer = world.score_development_contrasts
+        data_version, data_manifest = world.VERSION, world.development_manifest(config, plan.data_seed)
+    else:
+        splits = balanced_splits(config, prep)
+        renderer, captioner, example_builder = scene_png, native_captions, None
+        probes = build_contrast_probes(config, splits["dev"])
+        contrast_scorer = score_contrasts
+        data_version, data_manifest = "three-colors-balanced-development-v1", split_manifest(splits)
     from .fit_distractors import build_fit_catalog, make_training_examples
     from .neural import configure_cpu, digest, native_examples, nn, torch
     configure_cpu()
     torch.manual_seed(training_seed)
-    catalog = build_fit_catalog(splits["train"])
+    catalog = build_fit_catalog(splits["train"], render_fn=renderer)
     effective_policy = ("same_pair" if condition == "A0" else "attributes") if phase == "A" else policy
     if phase == "A":
         model = build_development_model(plan.model_profile, initial_seed)
@@ -148,21 +168,23 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         prior_metadata = {"kind": "fixed_pixel_random_projection"}
     else:
         from .spatial_prior import build_spatial_model, spatial_prior_hash
-        expected_hashes = sorted(hashlib.sha256(scene_png(scene)).hexdigest() for scene in splits["train"])
+        expected_hashes = sorted(hashlib.sha256(renderer(scene)).hexdigest() for scene in splits["train"])
         if sorted(prior_bundle["report"]["fit_png_sha256"]) != expected_hashes:
             raise ValueError("Common prior was not trained exclusively on this trial's fit PNGs")
-        model = build_spatial_model(plan.model_profile, initial_seed, prior_bundle, condition=condition)
+        prior_condition = "B" + condition[-1]
+        builder = build_spatial_model if model_factory is None else model_factory
+        model = builder(plan.model_profile, initial_seed, prior_bundle, condition=prior_condition)
         prior_hash = lambda: spatial_prior_hash(model)
         prior_metadata = model.spatial_prior_metadata
-    examples = {key: native_examples(model, scenes, language) for key, scenes in splits.items()}
+    example_builder = native_examples if example_builder is None else example_builder
+    examples = {key: example_builder(model, scenes, language) for key, scenes in splits.items()}
     for key, pool in examples.items():
         for example, scene in zip(pool, (scene for scene in splits[key] for _ in range(4))):
-            example.update(_scene_key=scene.key, _first_caption=native_captions(scene, language)[0])
-    probes = build_contrast_probes(config, splits["dev"])
+            example.update(_scene_key=scene.key, _first_caption=captioner(scene, language)[0])
     environment = environment_metadata(torch)
     directory = Path(output).resolve() / f"{condition}-r{replica}-{uuid.uuid4().hex[:8]}"
     directory.mkdir(parents=True)
-    data = {key: [{"scene": scene.to_dict(), "captions": native_captions(scene, language)} for scene in scenes]
+    data = {key: [{"scene": scene.to_dict(), "captions": captioner(scene, language)} for scene in scenes]
             for key, scenes in splits.items()}
     safe_json(directory / "dataset.json", data)
     safe_json(directory / "config.json", config.to_dict())
@@ -175,7 +197,9 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         "phase": phase, "language": language, "condition": condition, "replica": replica,
         "seed_pair": list(seed_pair), "plan": asdict(plan), "plan_sha256": digest(asdict(plan)),
         "status": "running", "policy": effective_policy, "data_sha256": digest(data),
-        "split": split_manifest(splits), "source_sha256": sources, "config_sha256": digest(config.to_dict()),
+        "data_version": data_version, "split": data_manifest,
+        "source_sha256": sources, "config_sha256": digest(config.to_dict()),
+        "model_factory": "default" if model_factory is None else model_factory.__module__ + "." + model_factory.__qualname__,
         "model_profile": asdict(plan.model_profile), "parameter_count": sum(p.numel() for p in model.parameters()),
         "trainable_parameter_count": sum(p.numel() for p in model.parameters() if p.requires_grad),
         "environment": environment, "environment_sha256": digest(environment),
@@ -193,7 +217,7 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         "runtime_allowance_seconds": allowance, "benchmark": None}
     meaning_stream, caption_stream = hashlib.sha256(), hashlib.sha256()
     generations, predictions, step = [], [], 0
-    index = semantic_index(language)
+    index = world.semantic_index(language) if phase == "C" else semantic_index(language)
     optimizer = torch.optim.Adam(model.parameters(), lr=config.native_training_profile.learning_rate)
     rng, negative_rng = random.Random(training_seed), random.Random(training_seed + plan.negative_seed_offset)
     audit = Counter()
@@ -229,7 +253,8 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
             "training_rng_state": rng.getstate(), "negative_rng_state": negative_rng.getstate(),
             "torch_rng_state": torch.random.get_rng_state(), "plan": asdict(plan),
             "source_sha256": sources, "data_sha256": report["data_sha256"], "split": report["split"],
-            "environment": environment, "prior_metadata": prior_metadata, "revision": report["revision"]}
+            "environment": environment, "prior_metadata": prior_metadata, "revision": report["revision"],
+            "data_version": data_version, "model_factory": report["model_factory"]}
         payload["negative_exposure_offset"] = step * config.native_training_profile.batch_size
         temporary = path.with_suffix(".pt.tmp")
         torch.save(payload, temporary); temporary.replace(path)
@@ -277,8 +302,12 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
         check_deadline()
         before, point = state_hash(), {"step": step}
         for key, scenes in splits.items():
-            metrics, outputs = evaluate_diagnostic(model, examples[key], scenes, language, index,
-                                                   config.native_training_profile.batch_size)
+            if phase == "C":
+                metrics, outputs = world.evaluate_development(model, examples[key], scenes, language,
+                                                               config.native_training_profile.batch_size)
+            else:
+                metrics, outputs = evaluate_diagnostic(model, examples[key], scenes, language, index,
+                                                       config.native_training_profile.batch_size)
             valid = sum(item["exact_match"] and item["terminated"] and not item["invalid_encoding"]
                         and not item["special_tokens_in_body"] for item in outputs)
             metrics.update(valid_generation_hits=valid, valid_generation_accuracy=valid / len(outputs))
@@ -290,7 +319,7 @@ def run_trial(config, language, phase, condition, replica, seed_pair, plan=Maste
                     "template_index": i % 4, "text": example["text"], "answer": example["answer"],
                     "prediction": predicted, "correct": predicted == example["answer"],
                     "predicted_scene": variants(scenes[i // 4].group)[predicted].to_dict()})
-        point["contrasts"] = score_contrasts(model, probes, language)
+        point["contrasts"] = contrast_scorer(model, probes, language)
         point["candidate"] = candidate_assessment(point, probes, plan)
         if before != state_hash():
             raise RuntimeError("Evaluation changed model/optimizer/training RNG state")
@@ -333,7 +362,7 @@ def pair_audit(reports, phase):
     replicas = sorted({report["replica"] for report in reports})
     for replica in replicas:
         pair = {report["condition"]: report for report in reports if report["replica"] == replica}
-        names = ("A0", "A1") if phase == "A" else ("B0", "B1")
+        names = phase_conditions(phase)
         if any(name not in pair or pair[name]["status"] != "completed" for name in names):
             results.append({"replica": replica, "status": "incomplete"}); continue
         left, right = (pair[name] for name in names)
@@ -341,6 +370,8 @@ def pair_audit(reports, phase):
                 "parameter_count", "batch_size", "learning_rate",
                 "initial_understanding_sha256", "initial_producer_sha256",
                 "meaning_stream_sha256", "comprehension_caption_stream_sha256", "environment_sha256")
+        if phase != "A":
+            keys += ("policy",)
         matching = {key: left[key] == right[key] for key in keys}
         if phase == "A":
             matching["initial_prior_sha256"] = left["initial_prior_sha256"] == right["initial_prior_sha256"]
@@ -351,12 +382,12 @@ def pair_audit(reports, phase):
 
 
 def run_phase(config, language, phase, plan=MasteryPlan(), output="runs/mastery-lab", progress=print,
-              *, policy="same_pair", prior_bundle=None):
+              *, policy="same_pair", prior_bundle=None, model_factory=None):
     plan.validate(config)
-    if phase not in ("A", "B") or language not in LANGUAGES_ORDER:
+    if phase not in ("A", "B", "C") or language not in LANGUAGES_ORDER:
         raise ValueError("Unknown mastery phase or language")
-    if phase == "B" and prior_bundle is None:
-        raise ValueError("Phase B requires a common prior bundle")
+    if phase in ("B", "C") and prior_bundle is None:
+        raise ValueError("Spatial-prior phases require a common prior bundle")
     directory = Path(output).resolve() / f"phase-{phase}-{language}-{uuid.uuid4().hex[:8]}"
     directory.mkdir(parents=True)
     suite = {"schema_version": 1, "kind": VERSION + "-suite", "phase": phase, "language": language,
@@ -364,7 +395,7 @@ def run_phase(config, language, phase, plan=MasteryPlan(), output="runs/mastery-
         "status": "running", "created_at": now(), "reports": [], "pair_audit": []}
     begun = time.monotonic()
     seeds = plan.seed_pairs if phase == "A" else (plan.b_seed_pair,)
-    conditions = ("A0", "A1") if phase == "A" else ("B0", "B1")
+    conditions = phase_conditions(phase)
     safe_json(directory / "mastery-suite.json", suite)
     for replica, pair in enumerate(seeds):
         for condition in conditions:
@@ -376,7 +407,7 @@ def run_phase(config, language, phase, plan=MasteryPlan(), output="runs/mastery-
                 try:
                     path = run_trial(config, language, phase, condition, replica, pair, plan,
                         directory / "trials", progress, policy=policy, prior_bundle=prior_bundle,
-                        remaining_seconds=remaining)
+                        remaining_seconds=remaining, model_factory=model_factory)
                     report = json.loads((path / "report.json").read_text())
                 except KeyboardInterrupt as exc:
                     report = (json.loads(exc.report_path.read_text()) if isinstance(exc, ArmCancelled) else
@@ -398,6 +429,7 @@ def run_phase(config, language, phase, plan=MasteryPlan(), output="runs/mastery-
 
 
 def aggregate_reports(suites, phase):
+    phase_conditions(phase)
     seen, plans, rows, failed, signatures = set(), set(), [], [], {}
     paired_deltas, prior_hashes = [], {}
     for suite in suites:
@@ -407,7 +439,7 @@ def aggregate_reports(suites, phase):
         seen.add(language); plans.add(json.dumps(suite["plan"], sort_keys=True))
         plan = MasteryPlan.from_dict(suite["plan"])
         expected = {(replica, condition) for replica in range(len(plan.seed_pairs) if phase == "A" else 1)
-                    for condition in (("A0", "A1") if phase == "A" else ("B0", "B1"))}
+                    for condition in phase_conditions(phase)}
         actual = [(r["replica"], r["condition"]) for r in suite["reports"]]
         if len(actual) != len(set(actual)) or set(actual) - expected:
             raise ValueError("Duplicate or undeclared trial")
@@ -419,14 +451,17 @@ def aggregate_reports(suites, phase):
             if report["status"] != "completed":
                 failed.append({"language": language, "replica": key[0], "condition": key[1], "status": report["status"]})
             else:
-                signature = json.dumps({name: report[name] for name in
-                    ("source_sha256", "config_sha256", "split", "model_profile", "seed_pair", "policy")}, sort_keys=True)
+                signature_data = {name: report[name] for name in
+                    ("source_sha256", "config_sha256", "split", "model_profile", "seed_pair", "policy",
+                     "initial_understanding_sha256", "initial_producer_sha256", "initial_prior_sha256")}
+                signature_data["model_factory"] = report.get("model_factory", "default")
+                signature = json.dumps(signature_data, sort_keys=True)
                 if key in signatures and signatures[key] != signature:
                     raise ValueError("Matched trial metadata differs across languages")
                 signatures[key] = signature
                 if {point["step"] for point in report["curves"]} != {0, *plan.budgets}:
                     failed.append({"language": language, "replica": key[0], "condition": key[1], "status": "missing_budget"})
-                if phase == "B":
+                if phase in ("B", "C"):
                     previous = prior_hashes.setdefault(key[1], report["initial_prior_sha256"])
                     if previous != report["initial_prior_sha256"]:
                         raise ValueError("Languages did not share the same frozen visual prior")
@@ -484,7 +519,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default=str(Path(__file__).resolve().parents[1] / "configs/neural.example.json"))
     parser.add_argument("--plan", default=str(Path(__file__).resolve().parents[1] / "configs/mastery-plan.json"))
-    parser.add_argument("--phase", choices=("A", "B"), required=True)
+    parser.add_argument("--phase", choices=("A", "B", "C"), required=True)
     parser.add_argument("--language", choices=LANGUAGES_ORDER)
     parser.add_argument("--policy", choices=("same_pair", "attributes"), default="same_pair")
     parser.add_argument("--prior-bundle", type=Path)

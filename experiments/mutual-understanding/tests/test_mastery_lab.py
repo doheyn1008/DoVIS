@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from mutual_lab.composition_diagnostics import balanced_splits, build_contrast_probes
 from mutual_lab.config import ExperimentConfig
-from mutual_lab.mastery_lab import MasteryPlan, aggregate_reports, candidate_assessment, pair_audit, run_phase, run_trial
+from mutual_lab.mastery_lab import MasteryPlan, aggregate_reports, candidate_assessment, pair_audit, phase_conditions, run_phase, run_trial
 from mutual_lab.native_preparation import PreparationPlan
 from mutual_lab.profiles import ModelProfile
 
@@ -28,7 +28,7 @@ def experiment():
 def synthetic_suite(language, phase="A"):
     plan = MasteryPlan(budgets=(1, 2), benchmark_steps=0)
     pairs = plan.seed_pairs if phase == "A" else (plan.b_seed_pair,)
-    conditions = ("A0", "A1") if phase == "A" else ("B0", "B1")
+    conditions = phase_conditions(phase)
     reports = []
     for replica, seeds in enumerate(pairs):
         for condition in conditions:
@@ -40,7 +40,7 @@ def synthetic_suite(language, phase="A"):
                 "model_profile": {"id": "same"}, "parameter_count": 100, "batch_size": 4,
                 "learning_rate": .003, "initial_understanding_sha256": "u" + str(replica),
                 "initial_producer_sha256": "p" + str(replica),
-                "initial_prior_sha256": "shared-" + (condition if phase == "B" else "projection"),
+                "initial_prior_sha256": "shared-" + (condition if phase != "A" else "projection"),
                 "meaning_stream_sha256": "same-meanings", "comprehension_caption_stream_sha256": "same-texts",
                 "environment_sha256": "environment-" + language, "final_producer_sha256": "p-final" + str(replica),
                 "policy": "attributes" if condition == "A1" else "same_pair",
@@ -87,6 +87,20 @@ class MasteryProtocolTests(unittest.TestCase):
         self.assertEqual(result["categories"]["binding_swap"]["available_pairs"], 1)
         self.assertFalse(result["eligible_for_fresh_experiment"])
 
+    def test_candidate_gate_rejects_missing_or_unknown_contrast_categories(self):
+        config, plan = experiment(), MasteryPlan()
+        probes = build_contrast_probes(config, balanced_splits(config, PreparationPlan())["dev"])
+        point = {"dev": {"comprehension_accuracy": 1.0, "valid_generation_accuracy": 1.0},
+                 "contrasts": {"categories": {category: {"hits": 1, "items": 1, "accuracy": 1.0}
+                                                  for category in CATEGORIES}}}
+        missing = copy.deepcopy(point)
+        del missing["contrasts"]["categories"]["shape_only"]
+        unknown = copy.deepcopy(point)
+        unknown["contrasts"]["categories"]["other"] = unknown["contrasts"]["categories"].pop("shape_only")
+        for malformed in (missing, unknown):
+            with self.subTest(categories=list(malformed["contrasts"]["categories"])), self.assertRaises(ValueError):
+                candidate_assessment(malformed, probes, plan)
+
     def test_all_three_seed_pairs_and_four_languages_are_reported(self):
         suites = [synthetic_suite(language) for language in LANGUAGES]
         result = aggregate_reports(suites, "A")
@@ -108,10 +122,11 @@ class MasteryProtocolTests(unittest.TestCase):
         self.assertEqual(comparison["status"], "incomplete")
         self.assertEqual(comparison["b_policy_selection"]["policy"], "undetermined")
         self.assertTrue(any(row["status"] == "pair_mismatch" for row in comparison["failed_trials"]))
-        mismatched = copy.deepcopy(suites)
-        mismatched[-1]["reports"][0]["source_sha256"] = {"module": "different"}
-        with self.assertRaises(ValueError):
-            aggregate_reports(mismatched, "A")
+        for key in ("source_sha256", "initial_understanding_sha256", "initial_producer_sha256", "initial_prior_sha256"):
+            mismatched = copy.deepcopy(suites)
+            mismatched[-1]["reports"][0][key] = {"module": "different"} if key == "source_sha256" else "different"
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                aggregate_reports(mismatched, "A")
 
     def test_policy_rule_requires_old_four_choice_not_to_regress_beyond_tolerance(self):
         suites = [synthetic_suite(language) for language in LANGUAGES]
@@ -126,6 +141,42 @@ class MasteryProtocolTests(unittest.TestCase):
         suites = [synthetic_suite(language, "B") for language in LANGUAGES]
         self.assertEqual(aggregate_reports(suites, "B")["status"], "completed")
         suites[-1]["reports"][1]["initial_prior_sha256"] = "not-the-shared-prior"
+        with self.assertRaises(ValueError):
+            aggregate_reports(suites, "B")
+
+    def test_spatial_prior_comparison_rejects_changed_distractor_policy_within_a_pair(self):
+        suites = [synthetic_suite(language, "B") for language in LANGUAGES]
+        # Across-language metadata remains matched; only the within-pair policy differs.
+        for one in suites:
+            one["reports"][1]["policy"] = "attributes"
+        result = aggregate_reports(suites, "B")
+        self.assertEqual(result["status"], "incomplete")
+        self.assertEqual(len(result["failed_trials"]), 4)
+        self.assertTrue(all(row["status"] == "pair_mismatch" for row in result["failed_trials"]))
+
+    def test_phase_c_coverage_is_measured_on_a_separate_development_population(self):
+        from mutual_lab import development_world as world
+        config, plan = experiment(), MasteryPlan(data_seed=59003)
+        splits = world.development_splits(config, plan.data_seed)
+        probes = world.build_development_contrasts(config, splits)
+        self.assertEqual({key: len(scenes) for key, scenes in splits.items()}, {"train": 220, "dev": 112})
+        point = {"dev": {"comprehension_accuracy": 1.0, "valid_generation_accuracy": 1.0},
+                 "contrasts": {"categories": {category: {"hits": 4, "items": 4, "accuracy": 1.0}
+                                                  for category in CATEGORIES}}}
+        result = candidate_assessment(point, probes, plan)
+        self.assertTrue(result["coverage_sufficient"])
+        self.assertTrue(result["score_targets_met"])
+        self.assertEqual(result["status"], "development_candidate")
+        self.assertFalse(result["eligible_for_fresh_experiment"])
+        for detail in result["categories"].values():
+            self.assertGreaterEqual(detail["available_anchors"], 8)
+            self.assertGreaterEqual(detail["available_pairs"], 2)
+
+    def test_phase_c_summary_keeps_conditions_separate_from_phase_b(self):
+        suites = [synthetic_suite(language, "C") for language in LANGUAGES]
+        result = aggregate_reports(suites, "C")
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual({row["condition"] for row in result["rows"]}, {"C0", "C1"})
         with self.assertRaises(ValueError):
             aggregate_reports(suites, "B")
 

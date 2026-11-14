@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "budgets": [
+    2400,
+    4800,
+    9600
+  ],
+  "seed_pairs": [
+    [
+      59007,
+      59009
+    ]
+  ],
+  "b_seed_pair": [
+    59007,
+    59009
+  ],
+  "data_seed": 59003,
+  "negative_seed_offset": 100003,
+  "max_trial_seconds": 3600,
+  "max_suite_seconds": 10800,
+  "benchmark_steps": 20,
+  "comprehension_min": 0.9,
+  "production_min": 0.9,
+  "contrast_min": 0.9,
+  "min_contrast_anchors": 8,
+  "min_contrast_pairs": 2,
+  "model_profile": {
+    "id": "mastery-medium-v1",
+    "embedding_dim": 64,
+    "hidden_dim": 128,
+    "layers": 1
+  },
+  "metadata": {
+    "scope": "Development-only, never sufficient for research eligibility or open-domain L1 fluency",
+    "a_policy": "A0 original four arrangements; A1 exactly three unique fit-only distractors with rotating category omission and deterministic fit-only fallback",
+    "a_position_rule": "Omitted category=(exposure//4)%4; correct position=exposure%4; orthogonal over each sixteen exposures",
+    "b_policy_selection": {
+      "budget": 2400,
+      "requires": "All twelve language-by-seed pairs complete; initial weights, meaning and comprehension-caption streams match; final producers match",
+      "score": "Equal-weight macro over four binary diagnostic categories; mean four languages inside each seed block, then mean three seed blocks",
+      "choose_attributes_if": "Grand paired delta >0, at least two of three seed-block deltas >0, and every language mean original four-choice delta >=-0.05",
+      "otherwise": "same_pair",
+      "incomplete": "selection undetermined; B may run predeclared same_pair fallback with explicit non-selection label"
+    },
+    "b_prior": {
+      "seed": 59001,
+      "steps": 1000,
+      "batch_size": 16,
+      "learning_rate": 0.001,
+      "max_seconds": 300,
+      "images": "Exactly220newdevelopmentfitPNGs;nodev/protectedimages/captions/labels",
+      "augmentation": "None",
+      "conditions": "Same spatial CNN random frozen vs image-reconstruction-pretrained frozen, same language initialization and L1 stream"
+    },
+    "candidate_rule": "Same>=90%scores/eachdiagnostic,min8anchors/2pairs;Cbinding60anchors15pairsnowhascoverage",
+    "known_coverage_limit": "Current balanced dev has only four binding anchors from one object pair. A/B binding qualification is structurally indeterminate; do not lower the rule",
+    "conditional_stage_c": "Separate five-color development world may be prepared because all fourteen current balanced splits have binding coverage <=4. Preserve all old protected pairs and the old fit/dev boundary; freeze new data before training and label changed population",
+    "resource_policy": "Measure twenty disposable steps, reset before training; do not increase seeds or budgets based on scores; retain timeout/failed/cancelled runs",
+    "data_version": "five-colors-three-shapes-v1",
+    "stage": "Conditional C: changed development population; activate after A/B review",
+    "data_pair_sha256": "1c3c190107ce23ce8245fb17c402c17d21f836ed4e96b5b13172b082a6ed26f6",
+    "fit_pairs": 55,
+    "dev_pairs": 28,
+    "old_fit_pairs_preserved": 10,
+    "old_dev_pairs_preserved": 4,
+    "old_protected_pairs_excluded": 22,
+    "budget_rationale": "Fit captions increase5.5x; observefixed2400/4800/9600beforetraining, notautomaticextensionbasedonscores",
+    "negative_policy": "CarryAselectedpolicy;separatelylabelanynewpolicycomparison"
+  }
+}

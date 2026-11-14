@@ -53,20 +53,12 @@ jobs:
         run: |
           python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -e '.[neural]'
-      - name: Check native transfer, persistent updates, controls, restart and nested grid
-        run: |
-          python -m unittest discover -s tests -p test_research.py -v
-          python -m unittest discover -s tests -p test_diagnostics.py -v
-          python -m unittest discover -s tests -p test_first_native_training.py -v
-          python -m unittest discover -s tests -p test_native_preparation.py -v
-          python -m unittest discover -s tests -p test_composition_diagnostics.py -v
-          python -m unittest discover -s tests -p test_development_models.py -v
-          python -m unittest discover -s tests -p test_composition_suite.py -v
-          python -m unittest discover -s tests -p test_composition_failure_paths.py -v
-          python -m unittest discover -s tests -p test_fit_distractors.py -v
-          python -m unittest discover -s tests -p test_spatial_prior.py -v
-          python -m unittest discover -s tests -p test_mastery_lab.py -v
-          python -m unittest discover -s tests -p test_development_world.py -v
+      - name: Run all checks with real neural dependencies
+        env:
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '1'
+        run: python -m unittest discover -s tests -v
       - name: Exercise development-only diagnostic commands
         run: |
           python -m mutual_lab diagnose-native configs/neural.example.json --language es --steps 2 --eval-every 1 --train-pairs 1 --dev-pairs 1 --quiet

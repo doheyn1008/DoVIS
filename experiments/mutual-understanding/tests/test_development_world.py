@@ -5,6 +5,7 @@ import unittest
 from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from mutual_lab import development_world as world
 from mutual_lab.composition_diagnostics import balanced_splits, is_contrast
@@ -125,6 +126,30 @@ class DevelopmentWorldTests(unittest.TestCase):
 
 @unittest.skipUnless(importlib.util.find_spec("torch"), "requires optional CPU torch")
 class DevelopmentWorldNeuralTests(unittest.TestCase):
+    def test_attentive_decoder_evaluation_uses_its_teacher_forced_image_grid_hook(self):
+        from mutual_lab.attentive_spatial import build_attentive_spatial_model
+        from mutual_lab.neural import configure_cpu, digest, torch
+        from mutual_lab.profiles import ModelProfile
+        from mutual_lab.spatial_prior import pretrain_prior, spatial_prior_hash
+        configure_cpu()
+        scenes = tuple(variants((Object("yellow", "circle"), Object("purple", "triangle")))[:2])
+        pngs = [world.render_scene(scene) for scene in scenes]
+        bundle = pretrain_prior(pngs, dim=16, steps=2, batch_size=2, eval_every=1)
+        profile = ModelProfile("development-world-attention-test", embedding_dim=8, hidden_dim=16,
+                               max_sequence_length=128)
+        model = build_attentive_spatial_model(profile, 59101, bundle)
+        examples = world.make_examples(model, scenes, "ko")
+        before = digest({"weights": model.state_dict(), "rng": torch.random.get_rng_state()})
+        prior_before = spatial_prior_hash(model)
+        with patch.object(model, "teacher_forced_logits", wraps=model.teacher_forced_logits) as hook:
+            metrics, generated = world.evaluate_development(model, examples, scenes, "ko", 4)
+        self.assertEqual(hook.call_count, 2)
+        self.assertEqual(metrics["comprehension_items"], 8)
+        self.assertEqual(metrics["generation_scenes"], 2)
+        self.assertEqual(len(generated), 2)
+        self.assertEqual(prior_before, spatial_prior_hash(model))
+        self.assertEqual(before, digest({"weights": model.state_dict(), "rng": torch.random.get_rng_state()}))
+
     def test_real_evaluation_uses_extended_captions_without_mutating_weights_or_rng(self):
         from mutual_lab.neural import NativeModel, configure_cpu, digest, torch
         from mutual_lab.profiles import ModelProfile

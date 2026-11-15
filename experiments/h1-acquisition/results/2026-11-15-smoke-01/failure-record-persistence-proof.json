@@ -1,0 +1,17 @@
+{
+  "kind": "completed-evaluation-prefix-persistence-regression",
+  "status": "pass",
+  "failing_original_cases": 2,
+  "original_failures": "FileNotFoundError for aligned-predictions.json after both injected post-evaluation failures",
+  "patched_runner_tests": {
+    "tests": 8,
+    "status": "pass",
+    "seconds": 3.578
+  },
+  "old_runner_sha256": "2a310ef7b56483e0f5627dd626023ecbd5115e64c2d3136c39dc97d33722f926",
+  "new_runner_sha256": "eacebb7f971073b3a905497b23650b37db786662f1cb91e076ca49710b24a740",
+  "adapter_sha256": "a6365307abd2b6fcca051830c7f62439813662fc156f2d1ded298d5dc8692eee",
+  "only_original_runner_change": "two atomic JSON snapshots after completed evaluation prefix; existing final writes retained",
+  "actual_prior_model_training_or_pilot_rerun": false,
+  "actual99_results_modified": false
+}

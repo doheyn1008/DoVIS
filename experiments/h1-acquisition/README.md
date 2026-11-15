@@ -23,7 +23,7 @@ python run_smoke.py --models-zip /path/to/DoVIS-L1-H1-12-validated-models.zip \
 
 실제 실행 전 계획과 구현을 GitHub에 고정하고 준비 커밋을 전달합니다. 보고서에는 계획·스트림·소스·원본 파일 해시, 네 조건의 학습 곡선, 원시 평가 행, 생성 오류, 모든 상태 검사를 남깁니다. 상태는 별도 `h1-development-acquisition-v1`/`h1-development-pair-acquisition-v1` 형식이며 기존 연구 로더가 읽는 native/acquisition 형식으로 저장하지 않습니다.
 
-새 스냅샷의 복원 전에는 같은 허용 PNG 풀을 `warm()`해 각 캐시 텐서를 독립적으로 재구성해야 합니다. Adam 상태·순서·카운터·개인 RNG와 캐시를 검증해 복원합니다. 쌍 체크포인트는 두 학습자를 한 tensor 파일에 담고, 해당 SHA의 sidecar가 게시된 경우에만 유효합니다. 새 저장의 실패로 이전 파일을 덮어쓰지 않습니다.
+새 스냅샷의 복원 전에는 같은 허용 PNG 풀을 `warm()`해 각 캐시 텐서를 독립적으로 재구성해야 합니다. Adam 상태·순서·카운터·개인 RNG와 캐시를 검증해 복원합니다. 정확한 재개는 이번 CPU 수치 환경에서 확인하며, 다른 환경의 정규 특징 값이 비트 단위로 다르면 복원을 거부합니다. 쌍 체크포인트는 두 학습자를 한 tensor 파일에 담고, 해당 SHA의 sidecar가 게시된 경우에만 유효합니다. 새 저장의 실패로 이전 파일을 덮어쓰지 않습니다.
 
 ```bash
 python -m unittest discover -s tests -v

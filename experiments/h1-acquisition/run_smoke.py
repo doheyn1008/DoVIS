@@ -380,6 +380,9 @@ def run(archive, plan_path, output, revision):
                 p, rows = evaluate_pair(learners, evaluation, pngs, frozen_dev, stop)
                 points.extend(p)
                 raw_rows.extend(rows)
+                # Preserve each completed prefix before a later save/integrity check can fail.
+                write_json(output / f"{condition}-predictions.json", raw_rows)
+                write_json(output / f"{condition}-events.json", events)
                 metadata = {"condition": condition, "exchange": stop, "plan_sha256": summary["plan_sha256"],
                             "stream_sha256": summary["stream_sha256"], "semantic_plan_sha256": summary["semantic_plan_sha256"],
                             "frozen_peer_eval_sha256": summary["frozen_peer_eval_sha256"], "revision": revision}

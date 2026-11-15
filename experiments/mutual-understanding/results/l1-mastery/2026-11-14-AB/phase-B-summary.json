@@ -1,0 +1,2397 @@
+{
+  "schema_version": 1,
+  "kind": "mastery-lab-v1-comparison",
+  "phase": "B",
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false,
+  "status": "completed",
+  "missing_languages": [],
+  "failed_trials": [],
+  "rows": [
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B0",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.3902981579303741,
+        "production_loss": 5.578275143330103,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 16,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 10
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 39,
+          "items": 64,
+          "accuracy": 0.609375,
+          "corrected_accuracy": 0.21875
+        },
+        "shape_only": {
+          "hits": 24,
+          "items": 48,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "binding_swap": {
+          "hits": 12,
+          "items": 16,
+          "accuracy": 0.75,
+          "corrected_accuracy": 0.5
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 39,
+            "items": 64,
+            "accuracy": 0.609375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 24,
+            "items": 48,
+            "accuracy": 0.5,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 12,
+            "items": 16,
+            "accuracy": 0.75,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B0",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.7536969929933548,
+        "production_loss": 0.9392684423954296,
+        "teacher_forced_token_accuracy": 0.8669250645994832,
+        "comprehension_hits": 63,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.984375,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 9,
+        "generation_error_counts": {
+          "color_error": 5,
+          "shape_error": 6,
+          "object_identity_error": 7,
+          "unrecognized_surface": 9
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 63,
+          "items": 64,
+          "accuracy": 0.984375,
+          "corrected_accuracy": 0.96875
+        },
+        "color_only": {
+          "hits": 54,
+          "items": 64,
+          "accuracy": 0.84375,
+          "corrected_accuracy": 0.6875
+        },
+        "shape_only": {
+          "hits": 20,
+          "items": 48,
+          "accuracy": 0.4166666666666667,
+          "corrected_accuracy": -0.16666666666666663
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 63,
+            "items": 64,
+            "accuracy": 0.984375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": true
+          },
+          "color_only": {
+            "hits": 54,
+            "items": 64,
+            "accuracy": 0.84375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 20,
+            "items": 48,
+            "accuracy": 0.4166666666666667,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B0",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.7520897537469864,
+        "production_loss": 1.1224940494665496,
+        "teacher_forced_token_accuracy": 0.8662790697674418,
+        "comprehension_hits": 63,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.984375,
+        "generation_scenes": 16,
+        "generation_exact_hits": 5,
+        "generation_exact_accuracy": 0.3125,
+        "recognized_semantic_correct": 5,
+        "semantic_success_lower_bound": 0.3125,
+        "semantic_unknown_count": 2,
+        "generation_error_counts": {
+          "shape_error": 6,
+          "object_identity_error": 8,
+          "color_error": 7,
+          "unrecognized_surface": 2,
+          "subject_object_order": 1
+        },
+        "valid_generation_hits": 5,
+        "valid_generation_accuracy": 0.3125
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 63,
+          "items": 64,
+          "accuracy": 0.984375,
+          "corrected_accuracy": 0.96875
+        },
+        "color_only": {
+          "hits": 54,
+          "items": 64,
+          "accuracy": 0.84375,
+          "corrected_accuracy": 0.6875
+        },
+        "shape_only": {
+          "hits": 20,
+          "items": 48,
+          "accuracy": 0.4166666666666667,
+          "corrected_accuracy": -0.16666666666666663
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 63,
+            "items": 64,
+            "accuracy": 0.984375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": true
+          },
+          "color_only": {
+            "hits": 54,
+            "items": 64,
+            "accuracy": 0.84375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 20,
+            "items": 48,
+            "accuracy": 0.4166666666666667,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B1",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.6772516965866089,
+        "production_loss": 5.579193746088703,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 15,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 8,
+          "special_tokens_in_body": 4
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "shape_only": {
+          "hits": 21,
+          "items": 48,
+          "accuracy": 0.4375,
+          "corrected_accuracy": -0.125
+        },
+        "binding_swap": {
+          "hits": 9,
+          "items": 16,
+          "accuracy": 0.5625,
+          "corrected_accuracy": 0.125
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 21,
+            "items": 48,
+            "accuracy": 0.4375,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 9,
+            "items": 16,
+            "accuracy": 0.5625,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B1",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.3561209111503558,
+        "production_loss": 1.1194309954187358,
+        "teacher_forced_token_accuracy": 0.8772609819121447,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 14,
+        "generation_exact_accuracy": 0.875,
+        "recognized_semantic_correct": 14,
+        "semantic_success_lower_bound": 0.875,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 2,
+          "object_identity_error": 2
+        },
+        "valid_generation_hits": 14,
+        "valid_generation_accuracy": 0.875
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 46,
+          "items": 64,
+          "accuracy": 0.71875,
+          "corrected_accuracy": 0.4375
+        },
+        "shape_only": {
+          "hits": 37,
+          "items": 48,
+          "accuracy": 0.7708333333333334,
+          "corrected_accuracy": 0.5416666666666667
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 46,
+            "items": 64,
+            "accuracy": 0.71875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 37,
+            "items": 48,
+            "accuracy": 0.7708333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "condition": "B1",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.2792295556864701,
+        "production_loss": 1.2349625225214995,
+        "teacher_forced_token_accuracy": 0.8788759689922481,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 14,
+        "generation_exact_accuracy": 0.875,
+        "recognized_semantic_correct": 14,
+        "semantic_success_lower_bound": 0.875,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 2,
+          "object_identity_error": 2
+        },
+        "valid_generation_hits": 14,
+        "valid_generation_accuracy": 0.875
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 51,
+          "items": 64,
+          "accuracy": 0.796875,
+          "corrected_accuracy": 0.59375
+        },
+        "shape_only": {
+          "hits": 31,
+          "items": 48,
+          "accuracy": 0.6458333333333334,
+          "corrected_accuracy": 0.29166666666666674
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 51,
+            "items": 64,
+            "accuracy": 0.796875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 31,
+            "items": 48,
+            "accuracy": 0.6458333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B0",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.395778238773346,
+        "production_loss": 5.571100547096946,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 16,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 10
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 28,
+          "items": 64,
+          "accuracy": 0.4375,
+          "corrected_accuracy": -0.125
+        },
+        "color_only": {
+          "hits": 34,
+          "items": 64,
+          "accuracy": 0.53125,
+          "corrected_accuracy": 0.0625
+        },
+        "shape_only": {
+          "hits": 26,
+          "items": 48,
+          "accuracy": 0.5416666666666666,
+          "corrected_accuracy": 0.08333333333333326
+        },
+        "binding_swap": {
+          "hits": 7,
+          "items": 16,
+          "accuracy": 0.4375,
+          "corrected_accuracy": -0.125
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 28,
+            "items": 64,
+            "accuracy": 0.4375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 34,
+            "items": 64,
+            "accuracy": 0.53125,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 26,
+            "items": 48,
+            "accuracy": 0.5416666666666666,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 7,
+            "items": 16,
+            "accuracy": 0.4375,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B0",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.7504052966833115,
+        "production_loss": 1.1670209364457564,
+        "teacher_forced_token_accuracy": 0.8471590909090909,
+        "comprehension_hits": 64,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 1.0,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 4,
+        "generation_error_counts": {
+          "color_error": 8,
+          "shape_error": 11,
+          "object_identity_error": 12,
+          "unrecognized_surface": 4
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 64,
+          "items": 64,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        },
+        "color_only": {
+          "hits": 55,
+          "items": 64,
+          "accuracy": 0.859375,
+          "corrected_accuracy": 0.71875
+        },
+        "shape_only": {
+          "hits": 23,
+          "items": 48,
+          "accuracy": 0.4791666666666667,
+          "corrected_accuracy": -0.04166666666666663
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 64,
+            "items": 64,
+            "accuracy": 1.0,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": true
+          },
+          "color_only": {
+            "hits": 55,
+            "items": 64,
+            "accuracy": 0.859375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 23,
+            "items": 48,
+            "accuracy": 0.4791666666666667,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B0",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.7487083822488785,
+        "production_loss": 1.200731832330877,
+        "teacher_forced_token_accuracy": 0.8568181818181818,
+        "comprehension_hits": 63,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.984375,
+        "generation_scenes": 16,
+        "generation_exact_hits": 7,
+        "generation_exact_accuracy": 0.4375,
+        "recognized_semantic_correct": 7,
+        "semantic_success_lower_bound": 0.4375,
+        "semantic_unknown_count": 1,
+        "generation_error_counts": {
+          "color_error": 8,
+          "shape_error": 1,
+          "object_identity_error": 6,
+          "unrecognized_surface": 1,
+          "subject_object_order": 2
+        },
+        "valid_generation_hits": 7,
+        "valid_generation_accuracy": 0.4375
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 63,
+          "items": 64,
+          "accuracy": 0.984375,
+          "corrected_accuracy": 0.96875
+        },
+        "color_only": {
+          "hits": 52,
+          "items": 64,
+          "accuracy": 0.8125,
+          "corrected_accuracy": 0.625
+        },
+        "shape_only": {
+          "hits": 25,
+          "items": 48,
+          "accuracy": 0.5208333333333334,
+          "corrected_accuracy": 0.04166666666666674
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 63,
+            "items": 64,
+            "accuracy": 0.984375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": true
+          },
+          "color_only": {
+            "hits": 52,
+            "items": 64,
+            "accuracy": 0.8125,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 25,
+            "items": 48,
+            "accuracy": 0.5208333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B1",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.7237661182880402,
+        "production_loss": 5.571198896928267,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 18,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.28125,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 15,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 8,
+          "special_tokens_in_body": 4
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 39,
+          "items": 64,
+          "accuracy": 0.609375,
+          "corrected_accuracy": 0.21875
+        },
+        "shape_only": {
+          "hits": 22,
+          "items": 48,
+          "accuracy": 0.4583333333333333,
+          "corrected_accuracy": -0.08333333333333337
+        },
+        "binding_swap": {
+          "hits": 12,
+          "items": 16,
+          "accuracy": 0.75,
+          "corrected_accuracy": 0.5
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 39,
+            "items": 64,
+            "accuracy": 0.609375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 22,
+            "items": 48,
+            "accuracy": 0.4583333333333333,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 12,
+            "items": 16,
+            "accuracy": 0.75,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B1",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.3998839597879851,
+        "production_loss": 1.2710547707297586,
+        "teacher_forced_token_accuracy": 0.8610795454545455,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 15,
+        "generation_exact_accuracy": 0.9375,
+        "recognized_semantic_correct": 15,
+        "semantic_success_lower_bound": 0.9375,
+        "semantic_unknown_count": 1,
+        "generation_error_counts": {
+          "unrecognized_surface": 1
+        },
+        "valid_generation_hits": 15,
+        "valid_generation_accuracy": 0.9375
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 54,
+          "items": 64,
+          "accuracy": 0.84375,
+          "corrected_accuracy": 0.6875
+        },
+        "shape_only": {
+          "hits": 35,
+          "items": 48,
+          "accuracy": 0.7291666666666666,
+          "corrected_accuracy": 0.45833333333333326
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 54,
+            "items": 64,
+            "accuracy": 0.84375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 35,
+            "items": 48,
+            "accuracy": 0.7291666666666666,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "condition": "B1",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.4466072574359714,
+        "production_loss": 1.3799002907492899,
+        "teacher_forced_token_accuracy": 0.8599431818181819,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 13,
+        "generation_exact_accuracy": 0.8125,
+        "recognized_semantic_correct": 13,
+        "semantic_success_lower_bound": 0.8125,
+        "semantic_unknown_count": 2,
+        "generation_error_counts": {
+          "unrecognized_surface": 2,
+          "color_error": 1,
+          "object_identity_error": 1
+        },
+        "valid_generation_hits": 13,
+        "valid_generation_accuracy": 0.8125
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 58,
+          "items": 64,
+          "accuracy": 0.90625,
+          "corrected_accuracy": 0.8125
+        },
+        "shape_only": {
+          "hits": 38,
+          "items": 48,
+          "accuracy": 0.7916666666666666,
+          "corrected_accuracy": 0.5833333333333333
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 58,
+            "items": 64,
+            "accuracy": 0.90625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": true
+          },
+          "shape_only": {
+            "hits": 38,
+            "items": 48,
+            "accuracy": 0.7916666666666666,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B0",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.3932105600833893,
+        "production_loss": 5.569772981342516,
+        "teacher_forced_token_accuracy": 0.025,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 16,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 10
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "shape_only": {
+          "hits": 24,
+          "items": 48,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "binding_swap": {
+          "hits": 12,
+          "items": 16,
+          "accuracy": 0.75,
+          "corrected_accuracy": 0.5
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 24,
+            "items": 48,
+            "accuracy": 0.5,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 12,
+            "items": 16,
+            "accuracy": 0.75,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B0",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.8156125396490097,
+        "production_loss": 1.1362506464907998,
+        "teacher_forced_token_accuracy": 0.8427631578947369,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 13,
+          "object_identity_error": 16,
+          "color_error": 11
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 36,
+          "items": 64,
+          "accuracy": 0.5625,
+          "corrected_accuracy": 0.125
+        },
+        "shape_only": {
+          "hits": 29,
+          "items": 48,
+          "accuracy": 0.6041666666666666,
+          "corrected_accuracy": 0.20833333333333326
+        },
+        "binding_swap": {
+          "hits": 11,
+          "items": 16,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 36,
+            "items": 64,
+            "accuracy": 0.5625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 29,
+            "items": 48,
+            "accuracy": 0.6041666666666666,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 11,
+            "items": 16,
+            "accuracy": 0.6875,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B0",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.8112450689077377,
+        "production_loss": 1.2887874402497943,
+        "teacher_forced_token_accuracy": 0.8470394736842105,
+        "comprehension_hits": 57,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.890625,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 13,
+          "object_identity_error": 16,
+          "color_error": 9
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 57,
+          "items": 64,
+          "accuracy": 0.890625,
+          "corrected_accuracy": 0.78125
+        },
+        "color_only": {
+          "hits": 35,
+          "items": 64,
+          "accuracy": 0.546875,
+          "corrected_accuracy": 0.09375
+        },
+        "shape_only": {
+          "hits": 31,
+          "items": 48,
+          "accuracy": 0.6458333333333334,
+          "corrected_accuracy": 0.29166666666666674
+        },
+        "binding_swap": {
+          "hits": 10,
+          "items": 16,
+          "accuracy": 0.625,
+          "corrected_accuracy": 0.25
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 57,
+            "items": 64,
+            "accuracy": 0.890625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 35,
+            "items": 64,
+            "accuracy": 0.546875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 31,
+            "items": 48,
+            "accuracy": 0.6458333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 10,
+            "items": 16,
+            "accuracy": 0.625,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B1",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.4756704270839691,
+        "production_loss": 5.565126599763569,
+        "teacher_forced_token_accuracy": 0.020394736842105264,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 15,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 8,
+          "special_tokens_in_body": 4
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 40,
+          "items": 64,
+          "accuracy": 0.625,
+          "corrected_accuracy": 0.25
+        },
+        "shape_only": {
+          "hits": 20,
+          "items": 48,
+          "accuracy": 0.4166666666666667,
+          "corrected_accuracy": -0.16666666666666663
+        },
+        "binding_swap": {
+          "hits": 8,
+          "items": 16,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 40,
+            "items": 64,
+            "accuracy": 0.625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 20,
+            "items": 48,
+            "accuracy": 0.4166666666666667,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 8,
+            "items": 16,
+            "accuracy": 0.5,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B1",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.3691250098636374,
+        "production_loss": 1.2246875963712993,
+        "teacher_forced_token_accuracy": 0.8661184210526316,
+        "comprehension_hits": 44,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.6875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 7,
+        "generation_exact_accuracy": 0.4375,
+        "recognized_semantic_correct": 7,
+        "semantic_success_lower_bound": 0.4375,
+        "semantic_unknown_count": 4,
+        "generation_error_counts": {
+          "shape_error": 5,
+          "object_identity_error": 5,
+          "unrecognized_surface": 4
+        },
+        "valid_generation_hits": 7,
+        "valid_generation_accuracy": 0.4375
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "color_only": {
+          "hits": 24,
+          "items": 64,
+          "accuracy": 0.375,
+          "corrected_accuracy": -0.25
+        },
+        "shape_only": {
+          "hits": 39,
+          "items": 48,
+          "accuracy": 0.8125,
+          "corrected_accuracy": 0.625
+        },
+        "binding_swap": {
+          "hits": 1,
+          "items": 16,
+          "accuracy": 0.0625,
+          "corrected_accuracy": -0.875
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 24,
+            "items": 64,
+            "accuracy": 0.375,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 39,
+            "items": 48,
+            "accuracy": 0.8125,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 1,
+            "items": 16,
+            "accuracy": 0.0625,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "condition": "B1",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.5787994556012563,
+        "production_loss": 1.3399340980931331,
+        "teacher_forced_token_accuracy": 0.8654605263157895,
+        "comprehension_hits": 44,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.6875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 8,
+        "generation_exact_accuracy": 0.5,
+        "recognized_semantic_correct": 8,
+        "semantic_success_lower_bound": 0.5,
+        "semantic_unknown_count": 4,
+        "generation_error_counts": {
+          "shape_error": 4,
+          "object_identity_error": 4,
+          "unrecognized_surface": 4
+        },
+        "valid_generation_hits": 8,
+        "valid_generation_accuracy": 0.5
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "color_only": {
+          "hits": 27,
+          "items": 64,
+          "accuracy": 0.421875,
+          "corrected_accuracy": -0.15625
+        },
+        "shape_only": {
+          "hits": 37,
+          "items": 48,
+          "accuracy": 0.7708333333333334,
+          "corrected_accuracy": 0.5416666666666667
+        },
+        "binding_swap": {
+          "hits": 13,
+          "items": 16,
+          "accuracy": 0.8125,
+          "corrected_accuracy": 0.625
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 27,
+            "items": 64,
+            "accuracy": 0.421875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 37,
+            "items": 48,
+            "accuracy": 0.7708333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 13,
+            "items": 16,
+            "accuracy": 0.8125,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B0",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.3884803652763367,
+        "production_loss": 5.5726818582286,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 16,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 10
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 34,
+          "items": 64,
+          "accuracy": 0.53125,
+          "corrected_accuracy": 0.0625
+        },
+        "shape_only": {
+          "hits": 32,
+          "items": 48,
+          "accuracy": 0.6666666666666666,
+          "corrected_accuracy": 0.33333333333333326
+        },
+        "binding_swap": {
+          "hits": 14,
+          "items": 16,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 34,
+            "items": 64,
+            "accuracy": 0.53125,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 32,
+            "items": 48,
+            "accuracy": 0.6666666666666666,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 14,
+            "items": 16,
+            "accuracy": 0.875,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B0",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.7816495895385742,
+        "production_loss": 0.8656413700269616,
+        "teacher_forced_token_accuracy": 0.88125,
+        "comprehension_hits": 53,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.828125,
+        "generation_scenes": 16,
+        "generation_exact_hits": 2,
+        "generation_exact_accuracy": 0.125,
+        "recognized_semantic_correct": 2,
+        "semantic_success_lower_bound": 0.125,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 9,
+          "object_identity_error": 14,
+          "color_error": 9
+        },
+        "valid_generation_hits": 2,
+        "valid_generation_accuracy": 0.125
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 53,
+          "items": 64,
+          "accuracy": 0.828125,
+          "corrected_accuracy": 0.65625
+        },
+        "color_only": {
+          "hits": 51,
+          "items": 64,
+          "accuracy": 0.796875,
+          "corrected_accuracy": 0.59375
+        },
+        "shape_only": {
+          "hits": 19,
+          "items": 48,
+          "accuracy": 0.3958333333333333,
+          "corrected_accuracy": -0.20833333333333337
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 53,
+            "items": 64,
+            "accuracy": 0.828125,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 51,
+            "items": 64,
+            "accuracy": 0.796875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 19,
+            "items": 48,
+            "accuracy": 0.3958333333333333,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B0",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.8013715744018555,
+        "production_loss": 1.0622975722603176,
+        "teacher_forced_token_accuracy": 0.8777173913043478,
+        "comprehension_hits": 53,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.828125,
+        "generation_scenes": 16,
+        "generation_exact_hits": 2,
+        "generation_exact_accuracy": 0.125,
+        "recognized_semantic_correct": 2,
+        "semantic_success_lower_bound": 0.125,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {
+          "shape_error": 8,
+          "object_identity_error": 14,
+          "color_error": 10
+        },
+        "valid_generation_hits": 2,
+        "valid_generation_accuracy": 0.125
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 53,
+          "items": 64,
+          "accuracy": 0.828125,
+          "corrected_accuracy": 0.65625
+        },
+        "color_only": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "shape_only": {
+          "hits": 28,
+          "items": 48,
+          "accuracy": 0.5833333333333334,
+          "corrected_accuracy": 0.16666666666666674
+        },
+        "binding_swap": {
+          "hits": 16,
+          "items": 16,
+          "accuracy": 1.0,
+          "corrected_accuracy": 1.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 53,
+            "items": 64,
+            "accuracy": 0.828125,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 28,
+            "items": 48,
+            "accuracy": 0.5833333333333334,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 16,
+            "items": 16,
+            "accuracy": 1.0,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B1",
+      "step": 0,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 1.7316069602966309,
+        "production_loss": 5.5655521558678664,
+        "teacher_forced_token_accuracy": 0.0,
+        "comprehension_hits": 16,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.25,
+        "generation_scenes": 16,
+        "generation_exact_hits": 0,
+        "generation_exact_accuracy": 0.0,
+        "recognized_semantic_correct": 0,
+        "semantic_success_lower_bound": 0.0,
+        "semantic_unknown_count": 16,
+        "generation_error_counts": {
+          "unrecognized_surface": 16,
+          "no_eos": 15,
+          "invalid_encoding": 16,
+          "repetition_heuristic": 8,
+          "special_tokens_in_body": 4
+        },
+        "valid_generation_hits": 0,
+        "valid_generation_accuracy": 0.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 32,
+          "items": 64,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        },
+        "color_only": {
+          "hits": 36,
+          "items": 64,
+          "accuracy": 0.5625,
+          "corrected_accuracy": 0.125
+        },
+        "shape_only": {
+          "hits": 20,
+          "items": 48,
+          "accuracy": 0.4166666666666667,
+          "corrected_accuracy": -0.16666666666666663
+        },
+        "binding_swap": {
+          "hits": 8,
+          "items": 16,
+          "accuracy": 0.5,
+          "corrected_accuracy": 0.0
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 32,
+            "items": 64,
+            "accuracy": 0.5,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 36,
+            "items": 64,
+            "accuracy": 0.5625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 20,
+            "items": 48,
+            "accuracy": 0.4166666666666667,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 8,
+            "items": 16,
+            "accuracy": 0.5,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B1",
+      "step": 1200,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.2565572545863688,
+        "production_loss": 0.9983207536780316,
+        "teacher_forced_token_accuracy": 0.8932065217391304,
+        "comprehension_hits": 57,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.890625,
+        "generation_scenes": 16,
+        "generation_exact_hits": 16,
+        "generation_exact_accuracy": 1.0,
+        "recognized_semantic_correct": 16,
+        "semantic_success_lower_bound": 1.0,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {},
+        "valid_generation_hits": 16,
+        "valid_generation_accuracy": 1.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 57,
+          "items": 64,
+          "accuracy": 0.890625,
+          "corrected_accuracy": 0.78125
+        },
+        "color_only": {
+          "hits": 44,
+          "items": 64,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "shape_only": {
+          "hits": 33,
+          "items": 48,
+          "accuracy": 0.6875,
+          "corrected_accuracy": 0.375
+        },
+        "binding_swap": {
+          "hits": 13,
+          "items": 16,
+          "accuracy": 0.8125,
+          "corrected_accuracy": 0.625
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 57,
+            "items": 64,
+            "accuracy": 0.890625,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 44,
+            "items": 64,
+            "accuracy": 0.6875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 33,
+            "items": 48,
+            "accuracy": 0.6875,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 13,
+            "items": 16,
+            "accuracy": 0.8125,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": false
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "condition": "B1",
+      "step": 2400,
+      "status": "completed",
+      "dev": {
+        "comprehension_loss": 0.3344531441980507,
+        "production_loss": 1.096382937224015,
+        "teacher_forced_token_accuracy": 0.8942934782608696,
+        "comprehension_hits": 56,
+        "comprehension_items": 64,
+        "comprehension_accuracy": 0.875,
+        "generation_scenes": 16,
+        "generation_exact_hits": 16,
+        "generation_exact_accuracy": 1.0,
+        "recognized_semantic_correct": 16,
+        "semantic_success_lower_bound": 1.0,
+        "semantic_unknown_count": 0,
+        "generation_error_counts": {},
+        "valid_generation_hits": 16,
+        "valid_generation_accuracy": 1.0
+      },
+      "contrasts": {
+        "role_reversal": {
+          "hits": 56,
+          "items": 64,
+          "accuracy": 0.875,
+          "corrected_accuracy": 0.75
+        },
+        "color_only": {
+          "hits": 48,
+          "items": 64,
+          "accuracy": 0.75,
+          "corrected_accuracy": 0.5
+        },
+        "shape_only": {
+          "hits": 36,
+          "items": 48,
+          "accuracy": 0.75,
+          "corrected_accuracy": 0.5
+        },
+        "binding_swap": {
+          "hits": 15,
+          "items": 16,
+          "accuracy": 0.9375,
+          "corrected_accuracy": 0.875
+        }
+      },
+      "candidate": {
+        "status": "indeterminate_coverage",
+        "score_targets_met": false,
+        "coverage_sufficient": false,
+        "categories": {
+          "role_reversal": {
+            "hits": 56,
+            "items": 64,
+            "accuracy": 0.875,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "color_only": {
+            "hits": 48,
+            "items": 64,
+            "accuracy": 0.75,
+            "available_anchors": 16,
+            "available_pairs": 4,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "shape_only": {
+            "hits": 36,
+            "items": 48,
+            "accuracy": 0.75,
+            "available_anchors": 12,
+            "available_pairs": 3,
+            "coverage_sufficient": true,
+            "score_target_met": false
+          },
+          "binding_swap": {
+            "hits": 15,
+            "items": 16,
+            "accuracy": 0.9375,
+            "available_anchors": 4,
+            "available_pairs": 1,
+            "coverage_sufficient": false,
+            "score_target_met": true
+          }
+        },
+        "eligible_for_fresh_experiment": false,
+        "excluded_from_research": true
+      }
+    }
+  ],
+  "paired_deltas": [],
+  "b_policy_selection": null,
+  "interpretation": "Development observations only; shared prior is not independent visual replication"
+}

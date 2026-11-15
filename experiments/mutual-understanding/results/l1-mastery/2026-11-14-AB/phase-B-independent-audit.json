@@ -1,0 +1,49 @@
+{
+  "status": "pass",
+  "trials": 8,
+  "checkpoints_verified": 24,
+  "paired_conditions_match": true,
+  "all_priors_frozen_and_shared": true,
+  "cross_language_initials_match": true,
+  "policy": "same_pair",
+  "fixed_final_budget": 2400,
+  "comparisons": [
+    {
+      "language": "ko",
+      "u0": 53,
+      "u1": 56,
+      "p0": 2,
+      "p1": 16,
+      "shape0": 28,
+      "shape1": 36
+    },
+    {
+      "language": "ja",
+      "u0": 57,
+      "u1": 44,
+      "p0": 0,
+      "p1": 8,
+      "shape0": 31,
+      "shape1": 37
+    },
+    {
+      "language": "en",
+      "u0": 63,
+      "u1": 56,
+      "p0": 5,
+      "p1": 14,
+      "shape0": 20,
+      "shape1": 31
+    },
+    {
+      "language": "es",
+      "u0": 63,
+      "u1": 56,
+      "p0": 7,
+      "p1": 13,
+      "shape0": 25,
+      "shape1": 38
+    }
+  ],
+  "score_targets_met_observations": 0
+}

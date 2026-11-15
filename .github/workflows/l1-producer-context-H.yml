@@ -1,0 +1,567 @@
+# Preparation only. A pinned new H request is required; the failed 690xx
+# cohort remains immutable and is never resumed or retried by this workflow.
+name: Producer global-conditioning discovery
+
+on:
+  push:
+    branches: [codex/l1-mastery, codex/l1-memory]
+    paths:
+      - 'experiments/mutual-understanding/configs/mastery-H-run.request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: l1-producer-context-H
+  cancel-in-progress: false
+
+env:
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONUNBUFFERED: '1'
+
+defaults:
+  run:
+    working-directory: experiments/mutual-understanding
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - name: Validate the explicit H request and three fixed discovery seed blocks
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, shutil
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import VERSION, development_manifest
+          if os.environ['GITHUB_REF'] not in ('refs/heads/codex/l1-mastery','refs/heads/codex/l1-memory'):
+              raise ValueError('H is restricted to the prepared development branches')
+          if os.environ['GITHUB_RUN_ATTEMPT'] != '1':
+              raise ValueError('Preserve every H discovery outcome; do not replace cells with a rerun')
+          path=Path('configs/mastery-H-run.request.json')
+          if not path.is_file():
+              raise RuntimeError('A pinned H hypothesis and failed-cohort proof are required; preparation is inert')
+          request=json.loads(path.read_text())
+          if type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+              raise ValueError('Unsupported H request schema')
+          expected={'phase':'H','model':'attentive','fixed_prior_condition':'B1','policy':'mixed_blocks',
+              'producer_memory':'objects','understanding':'objects','hidden_dim':128,
+              'frozen_feature_policy':'per_png_singleton_v1','memory_normalization':'l2_first32_raw_yx_v1',
+              'fixed_final_step':9600,'data_version':VERSION,
+              'source_rule':'all_discovery_cells_minimum_final_production_tie_h0_v1',
+              'source_cohort_run_id':43647997707,'source_cohort_run_attempt':1,
+              'source_cohort_revision':'c65ab2752c117ddf66c98c4e871f553cf9c8f95a',
+              'source_cohort_summary_sha256':'31154a7910a2653d7c9a6043af111f1eacaf050ae0fed8d21391f84ea89d48a5',
+              'source_plan_sha256':'bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47',
+              'plan_sha256':'a2622ee9bada8ce5f79365fa790d90bf2902a806c8af4d4a389b5081009a962c',
+              'prior_manifest_sha256':'3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6',
+              'prior_checkpoint_sha256':'862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d'}
+          if any(request.get(key)!=value for key,value in expected.items()):
+              raise ValueError('The preregistered H source, architecture, data, budget or selection rule changed')
+          for key in ('source_cohort_run_id','source_cohort_run_attempt','hidden_dim','fixed_final_step'):
+              if type(request.get(key)) is not int:raise ValueError('Invalid integer H control: '+key)
+          if not isinstance(request.get('rationale'),str) or not request['rationale'].strip():
+              raise ValueError('Record the whole-global-conditioning/OOD/optimization hypothesis')
+          for name,key in (('producer_context.py','context_implementation_sha256'),
+              ('producer_context_study.py','study_implementation_sha256'),('mastery_infer.py','inference_compatibility_sha256')):
+              pin=request.get(key)
+              if not isinstance(pin,str) or not re.fullmatch('[0-9a-f]{64}',pin) or hashlib.sha256((Path('mutual_lab')/name).read_bytes()).hexdigest()!=pin:
+                  raise ValueError('The reviewed H implementation differs from its pin: '+name)
+          config=ExperimentConfig.load('configs/neural.example.json')
+          plan_path=Path('configs/mastery-H-plan.json');base_path=Path('configs/mastery-C-plan.json')
+          if hashlib.sha256(plan_path.read_bytes()).hexdigest()!=request['plan_sha256'] or hashlib.sha256(base_path.read_bytes()).hexdigest()!=request['source_plan_sha256']:
+              raise ValueError('The exact discovery or original C plan changed')
+          plan,base=json.loads(plan_path.read_text()),json.loads(base_path.read_text())
+          ignore={'seed_pairs','b_seed_pair','metadata'}
+          if {k:v for k,v in plan.items() if k not in ignore}!={k:v for k,v in base.items() if k not in ignore}:
+              raise ValueError('Only discovery L1 seeds and descriptive metadata may differ from C')
+          seeds=[[79007,79009],[79017,79019],[79027,79029]]
+          if plan.get('seed_pairs')!=seeds or plan.get('b_seed_pair')!=seeds[0]:
+              raise ValueError('Use exactly the three preregistered 790xx discovery seed blocks')
+          checked=MasteryPlan.load(plan_path).validate(config)
+          if checked.budgets!=(2400,4800,9600) or checked.max_trial_seconds!=3600 or checked.max_suite_seconds!=10800:
+              raise ValueError('The fixed discovery budgets or CPU bounds changed')
+          if (checked.comprehension_min,checked.production_min,checked.contrast_min,checked.min_contrast_anchors,checked.min_contrast_pairs)!=(.9,.9,.9,8,2):
+              raise ValueError('The original six targets and coverage requirements must remain unchanged')
+          data=development_manifest(config,checked.data_seed)
+          if data['scene_counts']!={'train':220,'dev':112} or data['protected_pairs_excluded']!=22 or checked.metadata.get('data_pair_sha256')!=data['pair_sha256']:
+              raise ValueError('The original native-development images or protected exclusions changed')
+          target=Path('runs/producer-context-H-input/provenance');target.mkdir(parents=True)
+          for source,name in ((path,'request.json'),(plan_path,'plan.json'),(base_path,'source-plan.json'),(Path('configs/neural.example.json'),'config.json')):
+              shutil.copyfile(source,target/name)
+          (target/'data-manifest.json').write_text(json.dumps(data,indent=2)+'\n')
+          PY
+      - name: Reject a previously admitted identical cohort request across both branches
+        id: admission
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64
+          import datetime
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          
+          WORKFLOW_PATH = '.github/workflows/l1-producer-context-H.yml'
+          REQUEST_PATH = 'experiments/mutual-understanding/configs/mastery-H-run.request.json'
+          BRANCHES = ('codex/l1-mastery', 'codex/l1-memory')
+          request_bytes = Path('configs/mastery-H-run.request.json').read_bytes()
+          request_sha = hashlib.sha256(request_bytes).hexdigest()
+          evidence_path = Path('runs/producer-context-H-input/provenance/admission.json')
+          evidence_path.parent.mkdir(parents=True, exist_ok=True)
+          audit = {'schema_version': 1, 'status': 'checking', 'request_sha256': request_sha,
+              'workflow_path': WORKFLOW_PATH, 'branches': list(BRANCHES),
+              'admission_boundary': 'The first workflow attempt verify job completed with success',
+              'history_pages': 0, 'prior_runs_checked': 0, 'requests_missing_before_activation': 0,
+              'matching_prior_requests': []}
+          
+          def save():
+              evidence_path.write_text(json.dumps(audit, indent=2) + '\n')
+          
+          def canonical_request(contents):
+              return json.dumps(json.loads(contents.decode('utf-8')), sort_keys=True,
+                  separators=(',', ':'), ensure_ascii=True, allow_nan=False)
+          
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          def timestamp(value):
+              if not isinstance(value, str):
+                  raise ValueError('A workflow creation timestamp is missing')
+              result = datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
+              if result.tzinfo is None:
+                  raise ValueError('Workflow creation timestamps must include a timezone')
+              return result
+          
+          try:
+              request_identity = canonical_request(request_bytes)
+              audit['request_identity_policy'] = 'canonical_parsed_json_v1'
+              audit['request_identity_sha256'] = hashlib.sha256(request_identity.encode('ascii')).hexdigest()
+              if os.environ['GITHUB_RUN_ATTEMPT'] != '1':
+                  raise ValueError('Only the original cohort workflow attempt may be admitted')
+              raw_id = os.environ['GITHUB_RUN_ID']
+              if not re.fullmatch('[1-9][0-9]*', raw_id):
+                  raise ValueError('The current workflow run ID is invalid')
+              current_id = int(raw_id)
+              repository = os.environ['GITHUB_REPOSITORY']
+              if not re.fullmatch('[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository):
+                  raise ValueError('The repository identity is invalid')
+              opener = urllib.request.build_opener(NoRedirect())
+              base = 'https://api.github.com/repos/' + repository
+          
+              def github(path):
+                  query = urllib.request.Request(base + path, headers={
+                      'Authorization': 'Bearer ' + os.environ['SOURCE_GITHUB_TOKEN'],
+                      'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                  with opener.open(query, timeout=30) as response:
+                      result = json.load(response)
+                  if not isinstance(result, dict):
+                      raise ValueError('GitHub returned an invalid API object')
+                  return result
+          
+              current = github('/actions/runs/' + str(current_id))
+              if (current.get('id') != current_id or current.get('path') != WORKFLOW_PATH
+                      or current.get('head_branch') not in BRANCHES
+                      or current.get('repository', {}).get('full_name') != repository):
+                  raise ValueError('The current cohort workflow identity is uncertain')
+              timestamp(current.get('created_at'))
+              audit['current_run'] = {'id': current_id, 'html_url': current.get('html_url'),
+                  'head_branch': current['head_branch'], 'created_at': current['created_at']}
+              seen_pages, seen_runs = set(), {}
+          
+              # Scan repository-wide history, across both branches and workflow IDs.
+              # No branch/date filter, time cutoff, or page-count cap may hide admission.
+              page = 1
+              while True:
+                  payload = github('/actions/runs?' + urllib.parse.urlencode({'per_page': 100, 'page': page}))
+                  runs = payload.get('workflow_runs')
+                  if not isinstance(runs, list):
+                      raise ValueError('GitHub workflow history is incomplete or invalid')
+                  audit['history_pages'] += 1
+                  if not runs:
+                      break
+                  ids = tuple(run.get('id') if isinstance(run, dict) else None for run in runs)
+                  if any(type(run_id) is not int or run_id <= 0 for run_id in ids) or ids in seen_pages:
+                      raise ValueError('GitHub workflow pagination stalled or contains invalid run IDs')
+                  seen_pages.add(ids)
+                  for run in runs:
+                      run_id = run['id']
+                      if run_id == current_id:
+                          continue
+                      path = run.get('path')
+                      if not isinstance(path, str):
+                          raise ValueError('A historical workflow path is missing')
+                      if path != WORKFLOW_PATH:
+                          continue
+                      branch = run.get('head_branch')
+                      if not isinstance(branch, str):
+                          raise ValueError('A historical cohort branch is missing')
+                      if branch not in BRANCHES:
+                          continue
+                      if run.get('repository', {}).get('full_name') != repository:
+                          raise ValueError('A historical cohort repository is uncertain')
+                      revision = run.get('head_sha')
+                      if not isinstance(revision, str) or not re.fullmatch('[0-9a-f]{40}', revision):
+                          raise ValueError('A historical cohort code revision is missing')
+                      if run_id in seen_runs:
+                          if seen_runs[run_id] != revision:
+                              raise ValueError('A historical run changed revision during pagination')
+                          continue
+                      seen_runs[run_id] = revision
+                      # Global serialization does not promise creation-order execution.
+                      # Inspect every other run's original verification, even when its
+                      # creation timestamp is later than the current run's.
+                      timestamp(run.get('created_at'))
+                      audit['prior_runs_checked'] += 1
+                      try:
+                          item = github('/contents/' + REQUEST_PATH + '?' + urllib.parse.urlencode({'ref': revision}))
+                      except urllib.error.HTTPError as error:
+                          if error.code != 404:
+                              raise
+                          commit = github('/commits/' + revision)
+                          if commit.get('sha') != revision:
+                              raise ValueError('A missing request cannot be distinguished from an unavailable historical revision')
+                          audit['requests_missing_before_activation'] += 1
+                          audit.setdefault('verified_absent_request_revisions', []).append(revision)
+                          continue
+                      if item.get('type') != 'file' or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str):
+                          raise ValueError('A historical request file cannot be verified')
+                      contents = base64.b64decode(''.join(item['content'].split()), validate=True)
+                      if canonical_request(contents) != request_identity:
+                          continue
+                      prior = {key: run.get(key) for key in ('id', 'html_url', 'head_sha', 'head_branch',
+                          'created_at', 'status', 'conclusion', 'run_attempt')}
+                      prior['request_sha256'] = hashlib.sha256(contents).hexdigest()
+                      audit['matching_prior_requests'].append(prior)
+                      jobs, job_pages, job_page = [], set(), 1
+                      while True:
+                          # A later failed rerun cannot hide successful original verify.
+                          response = github('/actions/runs/' + str(run_id) + '/attempts/1/jobs?'
+                              + urllib.parse.urlencode({'per_page': 100, 'page': job_page}))
+                          batch = response.get('jobs')
+                          if not isinstance(batch, list):
+                              raise ValueError('The first-attempt job history is invalid')
+                          if not batch:
+                              break
+                          job_ids = tuple(job.get('id') if isinstance(job, dict) else None for job in batch)
+                          if any(type(job_id) is not int or job_id <= 0 for job_id in job_ids) or job_ids in job_pages:
+                              raise ValueError('First-attempt job pagination stalled or is invalid')
+                          job_pages.add(job_ids)
+                          jobs.extend(batch)
+                          job_page += 1
+                      verify = [job for job in jobs if job.get('name') == 'verify']
+                      if (not jobs and type(run.get('run_attempt')) is int and run['run_attempt'] == 1
+                              and run.get('status') in ('queued', 'waiting', 'pending', 'requested')):
+                          # This first attempt has not started any job and cannot pass
+                          # verify while this workflow owns the shared global lock.
+                          prior['admission'] = 'first_attempt_not_started'
+                          continue
+                      if len(verify) != 1:
+                          raise ValueError('The original verification outcome cannot be established for run ' + str(run_id))
+                      verification = verify[0]
+                      prior['first_attempt_verify'] = {key: verification.get(key) for key in ('id', 'status', 'conclusion')}
+                      if verification.get('status') != 'completed':
+                          raise ValueError('An earlier identical request has unresolved first verification: ' + str(run_id))
+                      conclusion = verification.get('conclusion')
+                      if conclusion == 'success':
+                          audit['status'] = 'previously_admitted'
+                          audit['blocking_run'] = prior
+                          raise RuntimeError('This exact cohort request was already admitted by first-attempt verify SUCCESS in run '
+                              + str(run_id) + ' (' + str(run.get('html_url')) + '), latest status='
+                              + str(run.get('status')) + '/' + str(run.get('conclusion'))
+                              + '. Preserve that run and all failed seed cells; a new run ID cannot replace it.')
+                      if conclusion not in ('failure', 'cancelled', 'timed_out', 'skipped', 'neutral',
+                                            'action_required', 'stale', 'startup_failure'):
+                          raise ValueError('The original verification conclusion is uncertain')
+                      prior['admission'] = 'not_admitted_verify_did_not_succeed'
+                  page += 1
+              audit['status'] = 'no_prior_admission'
+              save()
+              print('No earlier first-attempt verify success for canonical request identity '
+                  + audit['request_identity_sha256'] + ' (raw SHA256 ' + request_sha + ')')
+          except Exception as error:
+              if audit['status'] != 'previously_admitted':
+                  audit['status'] = 'blocked_uncertain'
+              audit['error'] = type(error).__name__ + ': ' + str(error)
+              save()
+              raise
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-cohort-input-43647997707
+          run-id: 43647997707
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/producer-context-H-input/source-cohort/
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-cohort-summary-43647997707
+          run-id: 43647997707
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/producer-context-H-input/source-cohort-summary/
+      - name: Require complete failed old cohort and reuse only its exact image prior
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,hashlib,json,os,re,shutil,urllib.parse,urllib.request
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.candidate_validation import _point_checks
+          from mutual_lab.development_world import development_manifest,development_splits,render_scene
+          from mutual_lab.spatial_prior import FORMAT,fit_pool_hash
+          directory=Path('runs/producer-context-H-input');source=directory/'source-cohort'
+          request_path=Path('configs/mastery-H-run.request.json');request=json.loads(request_path.read_text())
+          config=ExperimentConfig.load('configs/neural.example.json');plan=MasteryPlan.load('configs/mastery-H-plan.json').validate(config)
+          summary_path=directory/'source-cohort-summary/cohort-summary.json'
+          if hashlib.sha256(summary_path.read_bytes()).hexdigest()!=request['source_cohort_summary_sha256']:
+              raise ValueError('The immutable old cohort failure evidence changed')
+          summary=json.loads(summary_path.read_text())
+          expected={'kind':'cohort-validation-v1-comparison','status':'completed','execution_completed':True,
+              'provenance_valid':True,'robust_development_candidate':False,'expected_jobs':12,'reported_jobs':12,
+              'source_condition':'G1','candidate_spec':{'candidate_kind':'grounding','producer_memory':'objects','understanding':'attentive'},
+              'missing_trials':[],'failed_trials':[],'excluded_from_research':True,'eligible_for_fresh_experiment':False}
+          if any(summary.get(key)!=value for key,value in expected.items()):
+              raise ValueError('H requires the complete valid FAILED old cohort, not missing/invalid work or a qualified system')
+          rows=summary.get('rows',[]);keys=[(r.get('language'),r.get('replica'),r.get('step')) for r in rows]
+          expected_keys={(language,replica,step) for language in ('ko','ja','en','es') for replica in range(3) for step in (0,2400,4800,9600)}
+          if len(keys)!=len(set(keys)) or set(keys)!=expected_keys or any(r.get('status')!='completed' for r in rows):
+              raise ValueError('Preserve every completed old native seed cell and fixed-budget observation')
+          finals=[r for r in rows if r['step']==9600];qualified=[]
+          old_pairs=((69007,69009),(69017,69019),(69027,69029))
+          for row in finals:
+              if row.get('seed_pair')!=list(old_pairs[row['replica']]):raise ValueError('The old cohort seed provenance changed')
+              checks,passes=_point_checks({'dev':row['dev'],'contrasts':{'categories':row['contrasts']},'candidate':row['candidate']},plan)
+              if not all(checks.values()):raise ValueError('Old raw scores, counts, coverage or candidate flags are inconsistent')
+              qualified.append(passes)
+          if all(qualified) or summary.get('final_candidate_count')!=sum(qualified):
+              raise ValueError('The old assessment is not a completed, failed twelve-cell cohort')
+          old_context_path=source/'provenance/run-context.json';old_context=json.loads(old_context_path.read_text())
+          old_request_path=source/'provenance/request.json';old_request=json.loads(old_request_path.read_text())
+          if (old_context.get('code_revision')!=request['source_cohort_revision'] or str(old_context.get('run_id'))!=str(request['source_cohort_run_id'])
+              or str(old_context.get('run_attempt'))!=str(request['source_cohort_run_attempt'])
+              or old_context.get('repository')!=os.environ['GITHUB_REPOSITORY'] or old_context.get('request')!=old_request
+              or old_context.get('request_sha256')!=hashlib.sha256(old_request_path.read_bytes()).hexdigest()):
+              raise ValueError('The old cohort input does not match its immutable run/request')
+          data=development_manifest(config,plan.data_seed)
+          if json.loads((source/'provenance/data-manifest.json').read_text())!=data:
+              raise ValueError('The selected image population differs from the original cohort')
+          recorded=old_context.get('source_sha256',{})
+          if not isinstance(recorded,dict) or not recorded:raise ValueError('Missing old cohort scientific source hashes')
+          changed={}
+          for name,pin in recorded.items():
+              if not re.fullmatch('[A-Za-z_][A-Za-z0-9_]*[.]py',name) or not re.fullmatch('[0-9a-f]{64}',pin):
+                  raise ValueError('Invalid recorded package source')
+              current=hashlib.sha256((Path('mutual_lab')/name).read_bytes()).hexdigest()
+              if current!=pin:
+                  if name!='mastery_infer.py' or current!=request['inference_compatibility_sha256']:
+                      raise ValueError('An existing NN, data, native training or old v1 source changed: '+name)
+                  changed[name]={'source_sha256':pin,'H_sha256':current,'scope':'Explicit H-aware read-only loader only'}
+          additions={p.name for p in Path('mutual_lab').glob('*.py')}-recorded.keys()
+          if additions-{'producer_context.py','producer_context_study.py','cohort_context_validation.py'}:
+              raise ValueError('Unregistered package additions: '+str(sorted(additions)))
+          prior_jsons=list(source.rglob('prior.json'))
+          if not prior_jsons or any(hashlib.sha256(p.read_bytes()).hexdigest()!=request['prior_manifest_sha256'] for p in prior_jsons):
+              raise ValueError('All duplicated image-prior manifests must be identical to the canonical C prior')
+          for manifest_path in prior_jsons:
+              if hashlib.sha256(manifest_path.with_suffix('.pt').read_bytes()).hexdigest()!=request['prior_checkpoint_sha256']:
+                  raise ValueError('A prior checkpoint differs from the exact C byte pin')
+          if any(p.name!='prior.pt' or hashlib.sha256(p.read_bytes()).hexdigest()!=request['prior_checkpoint_sha256'] for p in source.rglob('*.pt')):
+              raise ValueError('Only shared image-prior tensors may be inherited, never old language weights')
+          manifest=json.loads(prior_jsons[0].read_text())
+          if manifest.get('format')!=FORMAT or manifest.get('kind')!='development_only' or manifest.get('excluded_from_research') is not True or manifest.get('sha256')!=request['prior_checkpoint_sha256']:
+              raise ValueError('The source is not the pinned development image-only prior')
+          pngs=[render_scene(scene) for scene in development_splits(config,plan.data_seed)['train']]
+          hashes=[hashlib.sha256(png).hexdigest() for png in pngs];report=manifest['report']
+          prior_expected={'status':'completed','image_count':220,'seed':59001,'dimension':128,'steps':1000,'steps_completed':1000,
+              'fit_png_sha256':sorted(hashes),'fit_png_order_sha256':hashes,'fit_pool_sha256':fit_pool_hash(pngs)}
+          if any(report.get(key)!=value for key,value in prior_expected.items()):
+              raise ValueError('The completed shared C prior must use exactly the original 220 fit PNGs')
+          for name in ('neural.py','spatial_prior.py'):
+              if report.get('source_sha256',{}).get(name)!=recorded.get(name):
+                  raise ValueError('The prior implementation differs from the unchanged native model core')
+          canonical=directory/'prior';canonical.mkdir()
+          shutil.copyfile(prior_jsons[0],canonical/'prior.json');shutil.copyfile(prior_jsons[0].with_suffix('.pt'),canonical/'prior.pt')
+          shutil.copyfile(summary_path,directory/'source-cohort-summary.json')
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,req,fp,code,msg,headers,newurl):return None
+          opener=urllib.request.build_opener(NoRedirect());base='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          def github(path):
+              query=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['SOURCE_GITHUB_TOKEN'],
+                  'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
+              with opener.open(query,timeout=30) as response:return json.load(response)
+          run=github('/actions/runs/'+str(request['source_cohort_run_id']))
+          if (run.get('id')!=request['source_cohort_run_id'] or run.get('head_sha')!=request['source_cohort_revision']
+              or run.get('run_attempt')!=1 or run.get('path')!='.github/workflows/l1-cohort-validation.yml'
+              or run.get('head_branch') not in ('codex/l1-mastery','codex/l1-memory') or run.get('event') not in ('push','workflow_dispatch')
+              or run.get('status')!='completed' or run.get('conclusion')!='success'
+              or run.get('repository',{}).get('full_name')!=os.environ['GITHUB_REPOSITORY']):
+              raise ValueError('The prerequisite is not the pinned completed old-cohort workflow')
+          config_pins={}
+          for name in ('neural.example.json','composition-cpu-requirements.txt','mastery-C-plan.json'):
+              item=github('/contents/experiments/mutual-understanding/configs/'+name+'?'+urllib.parse.urlencode({'ref':request['source_cohort_revision']}))
+              if item.get('type')!='file' or item.get('encoding')!='base64':raise ValueError('A pinned source config is unavailable')
+              raw=base64.b64decode(item['content'])
+              if raw!=(Path('configs')/name).read_bytes():raise ValueError('The C/native CPU configuration changed: '+name)
+              config_pins[name]=hashlib.sha256(raw).hexdigest()
+          context={'code_revision':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'run_attempt':os.environ['GITHUB_RUN_ATTEMPT'],
+              'repository':os.environ['GITHUB_REPOSITORY'],'request':request,'request_sha256':hashlib.sha256(request_path.read_bytes()).hexdigest(),
+              'source_cohort':{key:run.get(key) for key in ('id','head_sha','run_attempt','html_url','path','event','status','conclusion')},
+              'source_cohort_summary_sha256':request['source_cohort_summary_sha256'],'old_cohort_completed_failed':True,
+              'old_cohort_qualified_cells':sum(qualified),'old_cohort_total_cells':12,'old_cohort_language_checkpoints_resumed':False,
+              'source_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('mutual_lab').glob('*.py'))},
+              'implementation_source_sha256':{name:hashlib.sha256((Path('mutual_lab')/name).read_bytes()).hexdigest()
+                  for name in ('producer_context.py','producer_context_study.py','mastery_infer.py')},
+              'unchanged_source_core_sha256':recorded,'read_only_loader_compatibility':changed,'configuration_sha256':config_pins,
+              'frozen_feature_policy':'per_png_singleton_v1','fixed_prior_condition':'B1','policy':'mixed_blocks',
+              'understanding':'objects','producer_memory':'objects','source_rule':request['source_rule'],
+              'candidate_spec':{'candidate_kind':'producer_context','producer_memory':'objects','understanding':'attentive'},
+              'interpretation':'Whole producer global conditioning at initial hidden state and every-token concatenation. Same G1 U, object attention memory, NN counts, data and prior. H1 adds engineered PNG mean/y-moment/x-moment 102D padded26 and unitL2; basis/rank/scaling change together. Old KO failure includes no-EOS/encoding/surface errors. Tests OOD/optimization robustness, not proven missing information, isolated initialization causality, general vision, human acquisition or research promotion.'}
+          admission=json.loads((directory/'provenance/admission.json').read_text())
+          if (admission.get('status')!='no_prior_admission' or admission.get('request_sha256')!=context['request_sha256']
+              or str(admission.get('current_run',{}).get('id'))!=os.environ['GITHUB_RUN_ID']):
+              raise ValueError('The global discovery admission differs from this immutable request/run')
+          context['admission']=admission
+          (directory/'provenance/run-context.json').write_text(json.dumps(context,indent=2)+'\n')
+          print('Verified all12 old outcomes and failed assessment; canonical image prior only')
+          PY
+      - name: Install unchanged numerical runtime
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Check real H128 common NN state, frozen features and all tests
+        run: |
+          python - <<'PY'
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_splits,render_scene
+          from mutual_lab.spatial_prior import load_prior_bundle,fit_pool_hash
+          from mutual_lab.producer_context import build_producer_context_model,preflight_context
+          from mutual_lab.neural import digest,torch
+          config=ExperimentConfig.load('configs/neural.example.json');plan=MasteryPlan.load('configs/mastery-H-plan.json').validate(config)
+          splits=development_splits(config,plan.data_seed);fit=[render_scene(s) for s in splits['train']]
+          pngs=[render_scene(s) for scenes in splits.values() for s in scenes]
+          bundle=load_prior_bundle('runs/producer-context-H-input/prior/prior.pt',expected_fit_pool_sha256=fit_pool_hash(fit))
+          reference=None
+          for context in ('cnn','object_moments'):
+              model=build_producer_context_model(plan.model_profile,plan.b_seed_pair[0],bundle,context=context)
+              tables=preflight_context(model,pngs)
+              actual={'NN':digest(model.state_dict()),'parameters':sum(p.numel() for p in model.parameters()),
+                  'U':digest(model.understanding.state_dict()),'P':digest(model.producer.state_dict()),'tables':tables}
+              if reference is None:reference=actual
+              elif actual!=reference:raise ValueError('H0/H1 must start with identical NN tensors/capacity/U and immutable feature tables')
+              vector=model.producer_visual(pngs[:2])
+              if vector.shape!=(2,128) or not bool(torch.isfinite(vector).all()):raise ValueError('Whole P conditioning must remain finite H128')
+          PY
+          python -m unittest discover -s tests -v
+          python -m pip freeze > runs/producer-context-H-input/provenance/dependencies.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-H-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/producer-context-H-input/
+          if-no-files-found: error
+          retention-days: 30
+
+  phase_h:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+        replica: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-H-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/producer-context-H-input/
+      - name: Preserve one discovery block and its exact original attempt
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          source=Path('runs/producer-context-H-input')
+          context=json.loads((source/'provenance/run-context.json').read_text())
+          request_path=Path('configs/mastery-H-run.request.json');request=json.loads(request_path.read_text())
+          if (os.environ['GITHUB_RUN_ATTEMPT']!='1' or context.get('run_attempt')!='1'
+              or context.get('code_revision')!=os.environ['GITHUB_SHA']
+              or str(context.get('run_id'))!=os.environ['GITHUB_RUN_ID'] or context.get('request')!=request
+              or context.get('request_sha256')!=hashlib.sha256(request_path.read_bytes()).hexdigest()
+              or hashlib.sha256(Path('configs/mastery-H-plan.json').read_bytes()).hexdigest()!=request['plan_sha256']):
+              raise ValueError('The original H discovery attempt, request, plan or source changed')
+          hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('mutual_lab').glob('*.py')}
+          if hashes!=context.get('source_sha256'):raise ValueError('The verified H discovery source differs in this seed cell')
+          admission=json.loads((source/'provenance/admission.json').read_text())
+          if (admission.get('status')!='no_prior_admission' or admission.get('request_sha256')!=context['request_sha256']
+              or str(admission.get('current_run',{}).get('id'))!=os.environ['GITHUB_RUN_ID']):
+              raise ValueError('The single admitted H discovery request/run changed')
+          target=Path('runs/producer-context-H/provenance-${{ matrix.language }}-r${{ matrix.replica }}')
+          shutil.copytree(source/'provenance',target)
+          PY
+          python -m pip freeze > runs/producer-context-H/provenance-${{ matrix.language }}-r${{ matrix.replica }}/dependencies.txt
+      - name: Compare both global producer contexts in one fixed native seed cell
+        run: timeout --signal=INT --kill-after=30s 183m python -m mutual_lab.producer_context_study --language '${{ matrix.language }}' --replica '${{ matrix.replica }}' --plan configs/mastery-H-plan.json --prior-bundle runs/producer-context-H-input/prior/prior.pt --study-request configs/mastery-H-run.request.json --output runs/producer-context-H
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-H-trials-${{ matrix.language }}-r${{ matrix.replica }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/producer-context-H/
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate_h:
+    if: always()
+    needs: [verify,phase_h]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: l1-H-trials-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/producer-context-H-downloads/
+          merge-multiple: true
+      - name: Retain every discovery outcome and apply the preregistered twelve-cell rule
+        run: |
+          mkdir -p runs/producer-context-H-downloads
+          python -m mutual_lab.producer_context_study --aggregate-dir runs/producer-context-H-downloads --plan configs/mastery-H-plan.json --study-request configs/mastery-H-run.request.json --output runs/producer-context-H-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-H-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/producer-context-H-summary.json
+          if-no-files-found: error
+          retention-days: 30

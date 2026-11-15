@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "policy": "same_pair",
+  "selection_mode": "selected",
+  "phase_a_run_id": 43630516311,
+  "phase_a_revision": "5632c752d081ab39f2d47afc59877aaac3bc7d32",
+  "phase_a_summary_sha256": "ba1b41f138c5a46c1e7d097dff595424838961ec373268f8a6f76e8b433513b1",
+  "plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "data_version": "five-colors-three-shapes-v1"
+}

@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "old_sha256": "9ea481a878f57cdd0671c8b4d7ad1ac2b5c9643f368295a3daa3485d5c8789d8",
+  "new_sha256": "7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4",
+  "changed_top_level_nodes": [
+    {
+      "index": 47,
+      "before_kind": "FunctionDef",
+      "after_kind": "FunctionDef",
+      "before_name": "aggregate_cohort_validations",
+      "after_name": "aggregate_cohort_validations"
+    }
+  ],
+  "unchanged_top_level_nodes": 49,
+  "all_other_functions_and_globals_ast_unchanged": true,
+  "unchanged_function_names": [
+    "_validate_plan",
+    "_matches_pair",
+    "_h_module",
+    "_selection",
+    "_source_paths",
+    "_implementation_hashes",
+    "_validate_source_plan",
+    "_source_checks",
+    "_validate_request",
+    "load_candidate_request",
+    "_factory",
+    "_representation",
+    "_checkpoint_evidence",
+    "run_cohort_validation",
+    "main"
+  ]
+}

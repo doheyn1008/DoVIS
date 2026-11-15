@@ -1,0 +1,67 @@
+{
+  "kind": "final-source-validation",
+  "mutual_understanding_torch": {
+    "tests": 442,
+    "passed": 442,
+    "skipped": 0,
+    "elapsed_seconds": 281.436
+  },
+  "mutual_understanding_stdlib": {
+    "tests": 442,
+    "passed": 306,
+    "skipped": 136,
+    "elapsed_seconds": 30.217
+  },
+  "H1_real_cohort": {
+    "models": 12,
+    "checkpoint_states": 48,
+    "all_six_final_criteria_passed": true,
+    "official_workflow_run_id": 43674421396,
+    "independent_audit_sha256": "cfad05b4f81562e09c3d7a50c8055c88d4aab144ef696a6c4a784ab931028c05"
+  },
+  "NN_source_files_unchanged_after_actual_training": 42,
+  "post_training_changes": "workflow admission/report failure paths, optional-test guard, read-only independent audit tools, result documentation only",
+  "native_corpus_training_performed": false,
+  "validation_scope": "Initial b4577cb full-suite records followed by explicitly post-hoc optimizer-integrity hardening; see supplementary summary for later focused tests.",
+  "posthoc_optimizer_integrity": {
+    "kind": "posthoc-optimizer-integrity-review-response",
+    "review_comment_id": 4577074587,
+    "posthoc": true,
+    "preregistered": false,
+    "original_frozen_audit": {
+      "script_sha256": "63f2337c9725d695e05f5c5dfb9d69de39e5460540e6bb76ba516c1fba244ce9",
+      "report_sha256": "cfad05b4f81562e09c3d7a50c8055c88d4aab144ef696a6c4a784ab931028c05",
+      "git_revision": "b4577cb165dd0b2f9ab8a838b62ec3e7513dd33d",
+      "original_code_and_report_unchanged": true
+    },
+    "supplement": {
+      "report": "posthoc-optimizer-moment-supplement.json",
+      "sha256": "8908d8be7e3c98f27332c6dd25dc67a39a3835f9c7dc07783e4fed558ac3f041",
+      "report_written_at_utc": "2026-11-15T05:01:24.814073+00:00",
+      "report_time_basis": "filesystem timestamp at completion of this local run",
+      "validator_script_sha256": "f067b92928bb0e5d8bd14e25cd701275fa46eb339610f482bc294834d1efec02",
+      "status": "pass",
+      "actual_checkpoint_states": 48,
+      "initial_empty_states": 12,
+      "trained_checkpoints": 36,
+      "parameter_states": 792,
+      "moment_tensors": 1584,
+      "moment_elements": 26256600,
+      "full_gradient_or_update_replay": false,
+      "raw_weights_and_scores_unchanged": true
+    },
+    "focused_torch_tests": {
+      "tests": 17,
+      "passed": 17,
+      "elapsed_seconds": 1.686
+    },
+    "focused_stdlib_tests": {
+      "tests": 17,
+      "passed": 8,
+      "skipped": 9,
+      "elapsed_seconds": 0.009
+    },
+    "all_six_previously_delivered_archives_unchanged": true,
+    "model_package_files_unchanged": 42
+  }
+}

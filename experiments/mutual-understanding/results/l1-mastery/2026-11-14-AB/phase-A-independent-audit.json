@@ -1,0 +1,107 @@
+{
+  "status": "pass",
+  "suites": 4,
+  "trials": 24,
+  "checkpoints_verified": 72,
+  "matched_pairs": 12,
+  "cross_language_initials_match": true,
+  "policy": "same_pair",
+  "grand_macro_delta": 0.09092881944444445,
+  "seed_blocks": [
+    0.12825520833333334,
+    0.07161458333333333,
+    0.07291666666666666
+  ],
+  "language_u_deltas": {
+    "ko": 0.08854166666666667,
+    "ja": 0.08854166666666667,
+    "en": -0.09375,
+    "es": 0.0
+  },
+  "raw_deltas": [
+    {
+      "language": "ko",
+      "replica": 0,
+      "u_delta": 0.15625,
+      "macro_delta": 0.17317708333333331,
+      "shape_delta": 0.2708333333333333
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "u_delta": 0.015625,
+      "macro_delta": 0.046875,
+      "shape_delta": 0.375
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "u_delta": 0.09375,
+      "macro_delta": 0.01953125,
+      "shape_delta": 0.0
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "u_delta": 0.109375,
+      "macro_delta": 0.18229166666666669,
+      "shape_delta": 0.16666666666666674
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "u_delta": 0.0,
+      "macro_delta": 0.16276041666666666,
+      "shape_delta": 0.47916666666666663
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "u_delta": 0.15625,
+      "macro_delta": 0.14583333333333331,
+      "shape_delta": 0.5833333333333333
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "u_delta": -0.109375,
+      "macro_delta": 0.07942708333333334,
+      "shape_delta": 0.33333333333333337
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "u_delta": -0.09375,
+      "macro_delta": 0.026041666666666657,
+      "shape_delta": 0.04166666666666663
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "u_delta": -0.078125,
+      "macro_delta": 0.07421875,
+      "shape_delta": 0.25
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "u_delta": 0.03125,
+      "macro_delta": 0.078125,
+      "shape_delta": 0.3125
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "u_delta": 0.03125,
+      "macro_delta": 0.05078125,
+      "shape_delta": 0.25
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "u_delta": -0.0625,
+      "macro_delta": 0.052083333333333315,
+      "shape_delta": 0.33333333333333326
+    }
+  ]
+}

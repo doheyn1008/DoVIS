@@ -1,0 +1,230 @@
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import random
+import sys
+import tempfile
+import unittest
+import zipfile
+
+PACKAGE = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PACKAGE))
+sys.path.insert(0, str(PACKAGE / "scripts"))
+import audit_confirmation as a
+HAS_TORCH = all(importlib.util.find_spec(k) is not None for k in ("torch", "numpy", "PIL"))
+
+
+class PureTests(unittest.TestCase):
+    def official(self):
+        record={'sha256':'a'*64};plan={'budgets':[2400,4800,9600]};spec={'context':'H1'}
+        value={'kind':'cohort-context-validation-v2-comparison','candidate_request':record,'plan':plan,'candidate_spec':spec,
+            'source_condition':'H1','fixed_final_step':9600,'shared_visual_prior':True,'independent_visual_replications':False,
+            'excluded_from_research':True,'eligible_for_fresh_experiment':False,
+            'rows':[{'language':l,'replica':r,'step':s,'status':'completed','seed_pair':list(a.PAIRS[r])}
+                for l in a.LANGUAGES for r in range(3) for s in a.STEPS]}
+        return value,record,plan,spec
+
+    def test_official_requires_all_exact48_native_identities_and_source_labels(self):
+        value,record,plan,spec=self.official()
+        self.assertEqual(len(a.official_rows_index(value,record,plan,spec)),48)
+        for field,bad in [('replica',False),('step',False),('status','cancelled'),('seed_pair',[69007,69009])]:
+            with self.subTest(field=field):
+                fake=copy.deepcopy(value);fake['rows'][0][field]=bad
+                with self.assertRaises(ValueError):a.official_rows_index(fake,record,plan,spec)
+
+    def test_official_rejects_duplicate_rows_even_with_total48(self):
+        value,record,plan,spec=self.official();value['rows'][0]=copy.deepcopy(value['rows'][1])
+        with self.assertRaisesRegex(ValueError,'identities'):a.official_rows_index(value,record,plan,spec)
+
+    def test_official_cannot_change_scope_candidate_or_plan(self):
+        value,record,plan,spec=self.official()
+        for field,bad in [('candidate_request',{}),('plan',{}),('candidate_spec',{}),('source_condition','H0'),
+                ('excluded_from_research',False),('eligible_for_fresh_experiment',True),('fixed_final_step',4800),
+                ('shared_visual_prior',False),('independent_visual_replications',True)]:
+            with self.subTest(field=field):
+                fake=copy.deepcopy(value);fake[field]=bad
+                with self.assertRaises(ValueError):a.official_rows_index(fake,record,plan,spec)
+
+    def test_payload_and_manifest_scope_are_explicit(self):
+        with self.assertRaisesRegex(ValueError, "scope"):
+            a.check_payload({}, {}, {}, 0, a.PAIRS[0], {}, {}, {}, "0"*40, None)
+
+    def test_canonical_plan_normalizes_tuple_list_without_bool_alias(self):
+        self.assertEqual(a.canon(((1, 2),)), a.canon([[1, 2]]))
+        self.assertNotEqual(a.canon(False), a.canon(0))
+
+    def test_zip_authentication_rejects_coordinated_extracted_changes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); name = "test-artifact"; artifact = root / name; artifact.mkdir()
+            (artifact / "report.json").write_text('{"score":1}')
+            archive = root / (name + ".zip")
+            with zipfile.ZipFile(archive, "w") as z:
+                z.write(artifact / "report.json", "report.json")
+            meta = {"id": 1, "name": name, "expired": False, "size_in_bytes": archive.stat().st_size,
+                    "digest": "sha256:"+a.sha(archive), "workflow_run": {"id": 2, "head_sha": "a"*40}}
+            (root / (name + ".artifact.json")).write_text(json.dumps(meta))
+            self.assertTrue(a.authenticate(artifact, name, 2, "a"*40)["verified"])
+            (artifact / "report.json").write_text('{"score":0}')
+            with self.assertRaisesRegex(ValueError, "bytes changed"):
+                a.authenticate(artifact, name, 2, "a"*40)
+
+    def test_zip_rejects_extra_files_and_wrong_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); name = "artifact"; d = root / name; d.mkdir(); p = d / "x.json"; p.write_text('{}')
+            zpath = root / (name+".zip")
+            with zipfile.ZipFile(zpath, "w") as z: z.write(p, "x.json")
+            (root/(name+".artifact.json")).write_text(json.dumps({"id":1,"name":name,"expired":False,
+                "size_in_bytes":zpath.stat().st_size,"digest":"sha256:"+a.sha(zpath),"workflow_run":{"id":2,"head_sha":"a"*40}}))
+            with self.assertRaisesRegex(ValueError, "source run"):
+                a.authenticate(d,name,3,"a"*40)
+            (d/"extra.json").write_text('{}')
+            with self.assertRaisesRegex(ValueError,"file set"):
+                a.authenticate(d,name,2,"a"*40)
+
+    def test_path_traversal_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for value in ("../x", "/x", "x\\y"):
+                with self.subTest(value=value), self.assertRaises(ValueError):a.local(Path(temp), value)
+
+
+@unittest.skipUnless(HAS_TORCH, "Optional CPU Torch, NumPy and Pillow")
+class TensorTests(unittest.TestCase):
+    def fixture(self):
+        from mutual_lab.neural import torch, digest
+        weights = {"understanding.w": torch.tensor([1.,2.]), "producer.w":torch.tensor([3.]), "visual_encoder.w":torch.tensor([4.])}
+        branches = {b:digest({n[len(b)+1:]:v for n,v in weights.items() if n.startswith(b+'.')}) for b in ('understanding','producer','visual_encoder')}
+        group = [{"lr":.001,"params":[0,1,2]}]
+        torch.manual_seed(99009); tr=torch.random.get_rng_state().clone()
+        ref = {"full_state_sha256":digest(weights),"prior_sha256":branches['visual_encoder'],
+            "shapes":{n:(list(v.shape),str(v.dtype)) for n,v in weights.items()},"optimizer_groups":group,
+            "flags":[("understanding.w",True),("producer.w",True),("visual_encoder.w",False)],
+            "torch_rng_sha256":hashlib.sha256(tr.numpy().tobytes()).hexdigest(),"torch_rng_shape":list(tr.shape)}
+        raw = {"language":"ko","phase":"C","condition":"C1","replica":0,"seed_pair":[99007,99009],"model_factory":a.FACTORY,
+            "source_sha256":{"x":"a"*64},"data_sha256":"b"*64,"split":{"x":1},"revision":{"commit":"c"*40,"working_tree_dirty":False},
+            "data_version":"five-colors-three-shapes-v1","prior_metadata":{"x":1},"plan":{"seed_pairs":((99007,99009),)},
+            "batch_size":16,"initial_prior_sha256":branches['visual_encoder'],"final_prior_sha256":branches['visual_encoder'],
+            "frozen_feature_tables":{"step_0":{"x":1},"final":{"x":1}}}
+        rng,neg=random.Random(99009).getstate(),random.Random(199012).getstate()
+        stream={"snapshots":{0:{"training_rng_sha256":hashlib.sha256(a.canon(rng).encode()).hexdigest(),
+            "negative_rng_sha256":hashlib.sha256(a.canon(neg).encode()).hexdigest()}}}
+        p={k:copy.deepcopy(v) for k,v in raw.items() if k not in ('batch_size','initial_prior_sha256','final_prior_sha256')}
+        p.update(format="mutual-mastery-development-v1",kind="development_only",excluded_from_research=True,
+            eligible_for_fresh_experiment=False,step=0,model=weights,optimizer={"state":{},"param_groups":group},
+            training_rng_state=rng,negative_rng_state=neg,torch_rng_state=tr,negative_exposure_offset=0,frozen_feature_policy="per_png_singleton_v1")
+        m={"format":p['format'],"kind":p['kind'],"excluded_from_research":True,"eligible_for_fresh_experiment":False,"step":0,"sha256":"d"*64}
+        return p,m,raw,ref,stream,digest
+
+    def checked(self,p,m,r,ref,stream,digest):
+        return a.check_payload(p,m,r,0,a.PAIRS[0],ref,stream,r['source_sha256'],'c'*40,digest)
+
+    def test_actual_tensor_payload_plan_rng_and_initial_nn_are_verified(self):
+        p,m,r,ref,s,d=self.fixture(); r['plan']=json.loads(json.dumps(r['plan']))
+        self.assertTrue(self.checked(p,m,r,ref,s,d)['actual_rng_and_optimizer_verified'])
+
+    def test_payload_or_manifest_actual_step_mismatch_fails(self):
+        for payload_step,manifest_step in ((1,0),(0,1),(0,False),(False,0)):
+            with self.subTest(payload_step=payload_step,manifest_step=manifest_step):
+                p,m,r,ref,s,d=self.fixture();p['step']=payload_step;m['step']=manifest_step
+                with self.assertRaisesRegex(ValueError,'step mismatch'):self.checked(p,m,r,ref,s,d)
+
+    def test_initial_weight_optimizer_rng_and_shape_tampering_fail(self):
+        cases=['weights','optimizer','main_rng','negative_rng','torch_rng','shape','scope']
+        for case in cases:
+            with self.subTest(case=case):
+                p,m,r,ref,s,d=self.fixture()
+                if case=='weights':p['model']['understanding.w'][0]+=1
+                if case=='optimizer':p['optimizer']['state']={0:{'step':1}}
+                if case=='main_rng':p['training_rng_state']=random.Random(1).getstate()
+                if case=='negative_rng':p['negative_rng_state']=random.Random(2).getstate()
+                if case=='torch_rng':p['torch_rng_state'][0]+=1
+                if case=='shape':p['model']['understanding.w']=p['model']['understanding.w'].view(1,2)
+                if case=='scope':m['eligible_for_fresh_experiment']=True
+                with self.assertRaises(ValueError):self.checked(p,m,r,ref,s,d)
+
+    def test_cache_integrity_requires_same_own_tables_not_cross_host_groups(self):
+        from mutual_lab.neural import digest
+        caches={n:{'entries':count,'sha256':'a'*64} for n,count in {'object_memory_cache':332,'producer_context_cache':332,
+            'spatial_grid_cache':0,'understanding_object_cache':332,'visual_cache':332}.items()}
+        table={'policy':'per_png_singleton_v1','caches':caches};table['sha256']=digest(table)
+        pre={'status':'completed','input_pngs':332,'unique_pngs':332,'successful_pngs':332,'fallback_count':0,
+            'fallback_policy':'raise; no fallback','model_state_unchanged':True,'rng_unchanged':True,'feature_tables':table}
+        self.assertEqual(a.validate_cache({'step_0':table,'final':table},{'memory_preflight':pre},[{'frozen_feature_table_sha256':table['sha256']}],digest),table['sha256'])
+        broken=copy.deepcopy(table);broken['caches']['visual_cache']['sha256']='b'*64
+        with self.assertRaisesRegex(ValueError,'composite digest'):
+            a.validate_cache({'step_0':broken,'final':broken},{'memory_preflight':pre},[],digest)
+        for field in ('fallback_count','rng_unchanged','model_state_unchanged'):
+            fake=copy.deepcopy(pre);fake[field]=1 if field=='fallback_count' else False
+            with self.assertRaises(ValueError):a.validate_cache({'step_0':table,'final':table},{'memory_preflight':fake},[],digest)
+
+
+@unittest.skipUnless(HAS_TORCH, "Optional CPU Torch, NumPy and Pillow")
+class PosthocOptimizerTests(unittest.TestCase):
+    def fixture(self, step=2400):
+        from mutual_lab.neural import torch
+        payload, _, _, reference, _, _ = TensorTests().fixture()
+        optimizer = payload['optimizer']
+        if step:
+            optimizer['state'] = {index: {'step':torch.tensor(float(step)),
+                'exp_avg':torch.full_like(payload['model'][name],.1),
+                'exp_avg_sq':torch.full_like(payload['model'][name],.01)}
+                for index,(name,trainable) in enumerate(reference['flags']) if trainable}
+        return optimizer,payload['model'],reference
+
+    def test_exact_trainable_coverage_and_frozen_absence(self):
+        for step in (0,2400,4800,9600):
+            with self.subTest(step=step):
+                optimizer,weights,reference=self.fixture(step)
+                result=a.validate_adam_optimizer(optimizer,weights,reference,step)
+                self.assertEqual(result['parameters_indexed'],3)
+                self.assertEqual(result['states_verified'],2 if step else 0)
+                self.assertEqual(result['moment_tensors_verified'],4 if step else 0)
+                self.assertTrue(result['frozen_parameter_states_absent'])
+
+    def test_moments_are_required_floating_finite_and_parameter_shaped(self):
+        from mutual_lab.neural import torch
+        for field in ('exp_avg','exp_avg_sq'):
+            for corruption in ('missing','not_tensor','integer','nan','inf','shape','dtype'):
+                with self.subTest(field=field,corruption=corruption):
+                    optimizer,weights,reference=self.fixture();state=optimizer['state'][0]
+                    if corruption=='missing':del state[field]
+                    elif corruption=='not_tensor':state[field]=0.
+                    elif corruption=='integer':state[field]=state[field].long()
+                    elif corruption=='nan':state[field][0]=float('nan')
+                    elif corruption=='inf':state[field][0]=float('inf')
+                    elif corruption=='shape':state[field]=state[field].reshape(1,-1)
+                    elif corruption=='dtype':state[field]=state[field].double()
+                    with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_missing_unexpected_frozen_and_noninteger_state_ids_fail(self):
+        for corruption in ('missing_one','missing_all','unexpected','frozen','string_id'):
+            with self.subTest(corruption=corruption):
+                optimizer,weights,reference=self.fixture();states=optimizer['state']
+                if corruption=='missing_one':del states[0]
+                elif corruption=='missing_all':states.clear()
+                elif corruption=='unexpected':states[99]=copy.deepcopy(states[0])
+                elif corruption=='frozen':states[2]=copy.deepcopy(states[0])
+                elif corruption=='string_id':states['0']=states.pop(0)
+                with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_index_order_hyperparameters_and_step_checks_remain(self):
+        from mutual_lab.neural import torch
+        for corruption in ('index_order','lr','wrong_step','nonfinite_step','vector_step','missing_step','extra_state_field'):
+            with self.subTest(corruption=corruption):
+                optimizer,weights,reference=self.fixture()
+                if corruption=='index_order':optimizer['param_groups']=copy.deepcopy(optimizer['param_groups']);optimizer['param_groups'][0]['params']=[1,0,2]
+                elif corruption=='lr':optimizer['param_groups']=copy.deepcopy(optimizer['param_groups']);optimizer['param_groups'][0]['lr']=.1
+                elif corruption=='wrong_step':optimizer['state'][0]['step']=torch.tensor(2399.)
+                elif corruption=='nonfinite_step':optimizer['state'][0]['step']=torch.tensor(float('nan'))
+                elif corruption=='vector_step':optimizer['state'][0]['step']=torch.tensor([2400.])
+                elif corruption=='missing_step':del optimizer['state'][0]['step']
+                elif corruption=='extra_state_field':optimizer['state'][0]['max_exp_avg_sq']=torch.zeros(2)
+                with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_nonempty_initial_state_is_never_accepted_as_fresh(self):
+        optimizer,weights,reference=self.fixture()
+        with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,0)
+
+
+if __name__=='__main__':unittest.main()

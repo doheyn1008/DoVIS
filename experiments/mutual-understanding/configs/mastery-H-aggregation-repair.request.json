@@ -1,0 +1,94 @@
+{
+  "host_evidence_sha256": "9572bbcc5e68a13265665b803e1d279f92c9644726b4d5c070516efdbbb5f47f",
+  "phase": "H-aggregation-repair",
+  "rationale": "Aggregation-only recovery of original failed aggregate_h132631927039 after verify and all12 original native jobs completed successfully. Preserve original source736 attempt1 overall failure, all24 native models/all96 checkpoints and all raw outcomes. Validate immutable13 original artifacts, all96 states/U pair controls, own immutable feature tables, identical initial NN per seed, and two exact visual-cache host groups already present in690xx authenticated reports. In deep copies only, normalize the two reviewed runtime metadata hash leaves for the original unchanged aggregator; preserve all96 metric rows, original all12/six .9+coverage eligibility/minimum-final-P/tieH0 rule and all failures. No NN training, language-weight resume, source replacement, criteria relaxation, or research promotion. Explicit post-hoc aggregation metadata correction; new990xx confirmation remains separate and unstarted.",
+  "schema_version": 1,
+  "script_sha256": "0e4ce27de62094c6cdb524ea45c344d87b532dd9a675fd5339abf664ddbf0259",
+  "source_artifacts": [
+    {
+      "digest": "sha256:adce33e1a2fdd7001dfbde4395579aa8858d54baca96640d2ae5f93db0473f97",
+      "id": 14135954751,
+      "name": "l1-H-input-43652561578",
+      "size_in_bytes": 8207729
+    },
+    {
+      "digest": "sha256:ea8e75c05bc67146cb9f0620f4ce5ee1007328bf3f3b9d9760773b5ed27df79b",
+      "id": 14137617578,
+      "name": "l1-H-trials-en-r0-43652561578",
+      "size_in_bytes": 31500865
+    },
+    {
+      "digest": "sha256:0bc24d1d5487cd77f7cdcde90fa29cc9a0ff319691ea3ea92e60e0879a26474c",
+      "id": 14136913402,
+      "name": "l1-H-trials-en-r1-43652561578",
+      "size_in_bytes": 31514884
+    },
+    {
+      "digest": "sha256:7a27c2905538c4698ad0b4b9fd8e2c550da7c9c29cd217118a16fe53c6715095",
+      "id": 14137671798,
+      "name": "l1-H-trials-en-r2-43652561578",
+      "size_in_bytes": 31503021
+    },
+    {
+      "digest": "sha256:50d2a1a23f61f00e3e1bccabb53b6f2170a0c742f31de9623fccd8ae4e1cece6",
+      "id": 14137905033,
+      "name": "l1-H-trials-es-r0-43652561578",
+      "size_in_bytes": 31501126
+    },
+    {
+      "digest": "sha256:0dc908f97de2041eac91a7feff54cc4bb0a6ad027e725419919cbcfcc334d516",
+      "id": 14137338945,
+      "name": "l1-H-trials-es-r1-43652561578",
+      "size_in_bytes": 31532281
+    },
+    {
+      "digest": "sha256:18b71bc72307ea738cab257ce177b3892ce74f42ee5c8d859c52ac34cedd399c",
+      "id": 14137826711,
+      "name": "l1-H-trials-es-r2-43652561578",
+      "size_in_bytes": 31515248
+    },
+    {
+      "digest": "sha256:8822ad580981452cdc728fea4b554945a7f4147ac0076ba4659a24ad25ce9a6a",
+      "id": 14137231603,
+      "name": "l1-H-trials-ja-r0-43652561578",
+      "size_in_bytes": 31505988
+    },
+    {
+      "digest": "sha256:593053a1be3bee2e71a39c6cbc21f57846ce4c08d4781c931ec31a006e7833a0",
+      "id": 14137880089,
+      "name": "l1-H-trials-ja-r1-43652561578",
+      "size_in_bytes": 31540486
+    },
+    {
+      "digest": "sha256:342fe8cd754392bce39ce5b03dfbc97163f35bf2814ed13a690fe08e6e61e15c",
+      "id": 14137776507,
+      "name": "l1-H-trials-ja-r2-43652561578",
+      "size_in_bytes": 31546644
+    },
+    {
+      "digest": "sha256:ae6c1bf3de678ef9bd5675dfd4bfddb80824c5e4e30bbc392ed2a042e9f6fa0c",
+      "id": 14137104172,
+      "name": "l1-H-trials-ko-r0-43652561578",
+      "size_in_bytes": 31573208
+    },
+    {
+      "digest": "sha256:e89e2c32421cf283cc757b087b5a3b165c54f87c57755dcfcee2d454818a1f09",
+      "id": 14137786814,
+      "name": "l1-H-trials-ko-r1-43652561578",
+      "size_in_bytes": 31566354
+    },
+    {
+      "digest": "sha256:ccea4a34333d592cc9ea981730c15b230e1864bcf81b29e5db87a8073fe47b5f",
+      "id": 14137282533,
+      "name": "l1-H-trials-ko-r2-43652561578",
+      "size_in_bytes": 31575561
+    }
+  ],
+  "source_failure_job_id": 132631927039,
+  "source_plan_sha256": "a2622ee9bada8ce5f79365fa790d90bf2902a806c8af4d4a389b5081009a962c",
+  "source_request_sha256": "10719b67bcc3a5563253ed2cc9fc933b39109ea250b433566e6a6a40b9d39bba",
+  "source_revision": "736097e5298fb71037a420ec8bd635c73a0154dd",
+  "source_run_attempt": 1,
+  "source_run_id": 43652561578,
+  "source_study_sha256": "1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f"
+}

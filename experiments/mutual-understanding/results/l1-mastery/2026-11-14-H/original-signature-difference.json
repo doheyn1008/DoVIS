@@ -1,0 +1,110 @@
+[
+  {
+    "r": 1,
+    "condition": "H0",
+    "reference": "en",
+    "language": "es",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  },
+  {
+    "r": 1,
+    "condition": "H1",
+    "reference": "en",
+    "language": "es",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  },
+  {
+    "r": 1,
+    "condition": "H0",
+    "reference": "en",
+    "language": "ja",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  },
+  {
+    "r": 1,
+    "condition": "H1",
+    "reference": "en",
+    "language": "ja",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  },
+  {
+    "r": 1,
+    "condition": "H0",
+    "reference": "en",
+    "language": "ko",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  },
+  {
+    "r": 1,
+    "condition": "H1",
+    "reference": "en",
+    "language": "ko",
+    "diff": [
+      [
+        ".initial_state.memory_preflight.feature_tables.caches.visual_cache.sha256",
+        "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+        "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+      ],
+      [
+        ".initial_state.memory_preflight.feature_tables.sha256",
+        "cfe5879b69049ae44b1e27f6703b19adcbf651756e375a44e74fc7d8dabe17ac",
+        "d7d4c59484b95a03f593446b457ca96e84775905b58ef288570475570ee2c8c8"
+      ]
+    ]
+  }
+]

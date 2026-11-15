@@ -1,0 +1,29 @@
+{
+  "vector_singleton_vs_batch3_exact": false,
+  "vector_max_abs": 8.940696716308594e-08,
+  "vector_unequal_values": 365,
+  "grid_singleton_vs_batch3_exact": false,
+  "grid_max_abs": 8.940696716308594e-08,
+  "grid_unequal_values": 197,
+  "cache_target_singleton_vs_batch3_exact": false,
+  "cache_target_max_abs": 8.195638656616211e-08,
+  "first_cache_value_retained": true,
+  "frozen_prior_hash": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+  "expected_prior_hash": "22f4d7a018d15406e48f8cd8d669de9d39e2008a2e20e6a37102f1fe250e6b41",
+  "cache_history_changes_features": true,
+  "cache_history_max_abs": 8.195638656616211e-08,
+  "prior_unchanged": true,
+  "producer_unchanged": true,
+  "one_step_production_control": {
+    "same_caption_batch_and_initial_full_state": true,
+    "only_cache_warmup_grouping_changed": true,
+    "losses": [
+      5.622014999389648,
+      5.622014999389648
+    ],
+    "producer_gradient_exact_match": false,
+    "maximum_gradient_abs_difference": 7.450580596923828e-09,
+    "producer_after_one_identical_Adam_update_exact_match": false,
+    "prior_still_identical": true
+  }
+}

@@ -1,0 +1,43 @@
+name: Native language preparation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/native-language/**'
+      - '.github/workflows/native-language-ci.yml'
+  pull_request:
+    paths:
+      - 'experiments/native-language/**'
+      - '.github/workflows/native-language-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  small-model-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: experiments/native-language
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned CPU runtime
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'numpy==2.5.4'
+      - name: Small-model causality, corpus boundaries and native save/restore tests
+        run: python -m unittest discover -s tests -v
+      - name: Two tiny synthetic updates only
+        run: |
+          python smoke_small.py --steps 2
+          python train_native.py --help

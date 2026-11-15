@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source_c_run_id": 43632332293,
+  "source_c_revision": "8288fb0d345c178d4b5e04139b86eacea0935d7b",
+  "prior_manifest_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+  "plan_sha256": "bfc2900fb2153c4f267a87270d91b8ef2f05313304071b03480ea79ec526fd47",
+  "policy": "same_pair",
+  "fixed_prior_condition": "B1",
+  "data_version": "five-colors-three-shapes-v1",
+  "model": "attentive",
+  "rationale": "Corrected reexecution of the INVALID E comparison: original four pairs failed final producer equality because request-grouped frozen CNN caches persisted from benchmark. Canonical singleton vector/grid extraction and cache reset repair the control. Keep the SAME native data, B1 prior, architecture, seed59007/59009, observation budgets2400/4800/9600 and score/coverage rules; preserve every original failed result. No original E policy winner is assumed.",
+  "parallel_design": {
+    "current_parallel_experiment": "Corrected E2 and new F use canonical per-PNG features. F fixes mixed_blocks as a working hypothesis before any corrected E2 outcome; F is not selecting a winner from original invalid E. Each comparison retains its own matched arms.",
+    "qualification": "A single actual fixed-final checkpoint must meet every target; no splicing or intermediate peak selection."
+  },
+  "execution_id": "E2-singleton-frozen-features",
+  "correction_of_run_id": 43634532997,
+  "frozen_feature_policy": "per_png_singleton_v1",
+  "verification_attempt": 2,
+  "verification_retry_of_run_id": 43639705193,
+  "verification_retry_reason": "The old test compared a grouped-cache legacy baseline with a different cache population history. Apply the canonical singleton feature policy to BOTH fixture models, retaining exact equality assertions. No production/model/budget/seed/criterion change; prior attempt stopped at verification before L1 training."
+}

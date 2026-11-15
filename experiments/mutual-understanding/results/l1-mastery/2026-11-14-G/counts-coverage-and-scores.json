@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "Independent separation of counts/coverage from score targets; raw official summary preserved unchanged",
+  "source_summary_sha256": "0e63760d3812bfdc9aded0208bf8c65a1774d500f3ddd8151d3dd1743f8be762",
+  "original_field_interpretation": "selection.candidate_checks.counts_and_coverage_valid is a combined eligibility check that also includes score targets in this version. A false value alone does NOT mean invalid counts or inadequate coverage. Consult actual rows and categories. No qualification or model calculation is changed.",
+  "rows": [
+    {
+      "condition": "G0",
+      "language": "en",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": false,
+      "original_combined_candidate_check_flag": false
+    },
+    {
+      "condition": "G1",
+      "language": "en",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": true,
+      "original_combined_candidate_check_flag": true
+    },
+    {
+      "condition": "G0",
+      "language": "es",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": false,
+      "original_combined_candidate_check_flag": false
+    },
+    {
+      "condition": "G1",
+      "language": "es",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": true,
+      "original_combined_candidate_check_flag": true
+    },
+    {
+      "condition": "G0",
+      "language": "ja",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": true,
+      "original_combined_candidate_check_flag": true
+    },
+    {
+      "condition": "G1",
+      "language": "ja",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": true,
+      "original_combined_candidate_check_flag": true
+    },
+    {
+      "condition": "G0",
+      "language": "ko",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": false,
+      "original_combined_candidate_check_flag": false
+    },
+    {
+      "condition": "G1",
+      "language": "ko",
+      "fixed_final_step": 9600,
+      "actual_counts_valid": true,
+      "actual_coverage_sufficient": true,
+      "six_score_targets_met": true,
+      "original_combined_candidate_check_flag": true
+    }
+  ],
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false
+}

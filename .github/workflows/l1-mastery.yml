@@ -1,0 +1,202 @@
+name: Fit-only negatives and frozen spatial L1 priors
+on:
+  push:
+    branches: [codex/l1-mastery]
+    paths:
+      - 'experiments/mutual-understanding/configs/mastery-plan.json'
+      - 'experiments/mutual-understanding/configs/mastery-run.request.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: l1-mastery-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONUNBUFFERED: '1'
+defaults:
+  run:
+    working-directory: experiments/mutual-understanding
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - run: |
+          python -m unittest discover -s tests -p test_fit_distractors.py -v
+          python -m unittest discover -s tests -p test_spatial_prior.py -v
+          python -m unittest discover -s tests -p test_mastery_lab.py -v
+          python -m unittest discover -s tests -p test_development_world.py -v
+  phase_a:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Compare A0 and A1 for all three fixed seed pairs
+        run: timeout --signal=INT --kill-after=30s 92m python -m mutual_lab.mastery_lab --phase A --language '${{ matrix.language }}' --plan configs/mastery-plan.json --output runs/mastery-A
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-A-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-A/
+          if-no-files-found: error
+          retention-days: 30
+  image_prior:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Pretrain only on the forty fixed fit PNGs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.native_preparation import PreparationPlan
+          from mutual_lab.composition_diagnostics import balanced_splits
+          from mutual_lab.images import scene_png
+          from mutual_lab.spatial_prior import pretrain_prior, save_prior_bundle
+          from mutual_lab.diagnostics import safe_json
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-plan.json')
+          fit = balanced_splits(config, PreparationPlan(data_seed=plan.data_seed))['train']
+          pngs = [scene_png(scene) for scene in fit]
+          settings = plan.metadata['b_prior']
+          bundle = pretrain_prior(pngs, seed=settings['seed'], dim=plan.model_profile.hidden_dim,
+                                  steps=settings['steps'], batch_size=settings['batch_size'],
+                                  learning_rate=settings['learning_rate'], max_seconds=settings['max_seconds'])
+          save_prior_bundle(bundle, 'runs/mastery-prior/prior.pt')
+          safe_json(Path('runs/mastery-prior/report.json'), bundle['report'])
+          if bundle['report']['status'] != 'completed':
+              raise RuntimeError('The fixed image-pretraining budget did not complete')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-prior-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-prior/
+          if-no-files-found: error
+          retention-days: 30
+  aggregate_a:
+    if: always()
+    needs: phase_a
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      policy: ${{ steps.select.outputs.policy }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: l1-A-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-A-downloads/
+          merge-multiple: true
+      - run: python -m mutual_lab.mastery_lab --phase A --aggregate-dir runs/mastery-A-downloads --output runs/mastery-A-summary.json
+      - id: select
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = json.loads(Path('runs/mastery-A-summary.json').read_text())
+          policy = result['b_policy_selection']['policy']
+          if policy not in ('same_pair', 'attributes'):
+              policy = 'same_pair'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('policy=' + policy + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-A-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-A-summary.json
+          retention-days: 30
+  phase_b:
+    needs: [aggregate_a, image_prior]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-prior-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-prior/
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-A-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-B/selection/
+      - name: Compare the shared random and pretrained frozen CNN
+        run: timeout --signal=INT --kill-after=30s 35m python -m mutual_lab.mastery_lab --phase B --language '${{ matrix.language }}' --plan configs/mastery-plan.json --policy '${{ needs.aggregate_a.outputs.policy }}' --prior-bundle runs/mastery-prior/prior.pt --output runs/mastery-B
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-B-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-B/
+          if-no-files-found: error
+          retention-days: 30
+  aggregate_b:
+    if: always()
+    needs: phase_b
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: l1-B-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-B-downloads/
+          merge-multiple: true
+      - run: python -m mutual_lab.mastery_lab --phase B --aggregate-dir runs/mastery-B-downloads --output runs/mastery-B-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-B-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/mastery-B-summary.json
+          retention-days: 30

@@ -1,0 +1,282 @@
+name: Frozen-model negative-policy development comparison
+
+on:
+  push:
+    branches: [codex/l1-mastery]
+    paths:
+      - 'experiments/mutual-understanding/configs/mastery-E-run.request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: l1-negative-E-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PYTHONHASHSEED: '0'
+  PYTHONUNBUFFERED: '1'
+
+defaults:
+  run:
+    working-directory: experiments/mutual-understanding
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      model: ${{ steps.request.outputs.model }}
+      prior_condition: ${{ steps.request.outputs.prior_condition }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - name: Validate the explicit E request and unchanged C plan
+        id: request
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, shutil
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import VERSION, development_manifest
+          request_path = Path('configs/mastery-E-run.request.json')
+          if not request_path.is_file():
+              raise RuntimeError('Create configs/mastery-E-run.request.json with a pinned C prior and activation rationale before requesting E')
+          directory = Path('runs/negative-E-input/provenance')
+          directory.mkdir(parents=True, exist_ok=True)
+          shutil.copyfile(request_path, directory / 'request.json')
+          request = json.loads(request_path.read_text())
+          if type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+              raise ValueError('Unsupported E request schema')
+          if request.get('policy') != 'same_pair':
+              raise ValueError('E requires the source C same_pair baseline policy')
+          if request.get('frozen_feature_policy') != 'per_png_singleton_v1':
+              raise ValueError('Corrected E requires canonical per-PNG frozen features')
+          if request.get('fixed_prior_condition') not in ('B0', 'B1'):
+              raise ValueError('E requires an explicit fixed B0 or B1 prior')
+          if request.get('model') not in ('standard', 'attentive'):
+              raise ValueError('E requires an explicit fixed standard or attentive model')
+          if not isinstance(request.get('rationale'), str) or not request['rationale'].strip():
+              raise ValueError('An explicit E activation rationale is required')
+          source_id = request.get('source_c_run_id')
+          if type(source_id) is not int or source_id <= 0:
+              raise ValueError('A positive source_c_run_id is required')
+          for key, length in (('source_c_revision', 40), ('prior_manifest_sha256', 64), ('plan_sha256', 64)):
+              if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{' + str(length) + '}', request[key]):
+                  raise ValueError('Invalid pinned source hash: ' + key)
+          plan_path = Path('configs/mastery-C-plan.json')
+          if hashlib.sha256(plan_path.read_bytes()).hexdigest() != request['plan_sha256']:
+              raise ValueError('E must use exactly the pinned, unchanged C plan')
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load(plan_path).validate(config)
+          if plan.max_trial_seconds > 3600 or plan.max_suite_seconds > 10800:
+              raise ValueError('The plan exceeds this workflow CPU time allowance')
+          manifest = development_manifest(config, plan.data_seed)
+          if request.get('data_version') != VERSION or plan.metadata.get('data_version') != VERSION:
+              raise ValueError('E must explicitly preserve the expanded C data population')
+          if plan.metadata.get('data_pair_sha256') != manifest['pair_sha256']:
+              raise ValueError('The frozen C semantic split changed')
+          if manifest['scene_counts'] != {'train': 220, 'dev': 112} or manifest['protected_pairs_excluded'] != 22:
+              raise ValueError('Expanded coverage or protected-pair exclusion changed')
+          shutil.copyfile(plan_path, directory / 'plan.json')
+          (directory / 'data-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('model=' + request['model'] + '\n')
+              output.write('prior_condition=' + request['fixed_prior_condition'] + '\n')
+              output.write('source_run_id=' + str(source_id) + '\n')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-C-prior-${{ steps.request.outputs.source_run_id }}
+          run-id: ${{ steps.request.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: experiments/mutual-understanding/runs/negative-E-input/prior/
+      - name: Verify the inherited C prior, policy, plan, and source revision
+        env:
+          SOURCE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, urllib.request
+          from pathlib import Path
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_manifest, development_splits, render_scene
+          from mutual_lab.spatial_prior import FORMAT, fit_pool_hash
+          from mutual_lab.fit_distractors import negative_policy_manifest
+          directory = Path('runs/negative-E-input')
+          request_path = Path('configs/mastery-E-run.request.json')
+          request = json.loads(request_path.read_text())
+          prior = directory / 'prior'
+          manifest_path = prior / 'prior.json'
+          if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != request['prior_manifest_sha256']:
+              raise ValueError('The C prior manifest differs from its pinned SHA256')
+          manifest = json.loads(manifest_path.read_text())
+          if manifest.get('format') != FORMAT or manifest.get('kind') != 'development_only' or manifest.get('excluded_from_research') is not True:
+              raise ValueError('Expected a development-only C spatial prior')
+          if hashlib.sha256((prior / 'prior.pt').read_bytes()).hexdigest() != manifest['sha256']:
+              raise ValueError('The C prior checkpoint does not match its manifest')
+          inherited = prior / 'provenance'
+          c_request = json.loads((inherited / 'request.json').read_text())
+          c_context = json.loads((inherited / 'run-context.json').read_text())
+          if (c_request.get('schema_version') != 1 or c_request.get('policy') != 'same_pair'
+                  or c_request.get('plan_sha256') != request['plan_sha256']
+                  or c_request.get('data_version') != request['data_version']):
+              raise ValueError('E differs from its source C policy, plan, or data version')
+          if hashlib.sha256((inherited / 'plan.json').read_bytes()).hexdigest() != request['plan_sha256']:
+              raise ValueError('The source C plan differs from the plan used by E')
+          if (c_context.get('code_revision') != request['source_c_revision']
+                  or str(c_context.get('run_id')) != str(request['source_c_run_id'])
+                  or c_context.get('repository') != os.environ['GITHUB_REPOSITORY']
+                  or c_context.get('request') != c_request):
+              raise ValueError('The source C provenance does not match the requested run')
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-C-plan.json').validate(config)
+          if json.loads((inherited / 'data-manifest.json').read_text()) != development_manifest(config, plan.data_seed):
+              raise ValueError('The source C data population differs from E')
+          pngs = [render_scene(scene) for scene in development_splits(config, plan.data_seed)['train']]
+          png_hashes = [hashlib.sha256(png).hexdigest() for png in pngs]
+          report, settings = manifest['report'], plan.metadata['b_prior']
+          if (report.get('status') != 'completed' or report.get('image_count') != 220
+                  or report.get('fit_png_sha256') != sorted(png_hashes)
+                  or report.get('fit_png_order_sha256') != png_hashes
+                  or report.get('fit_pool_sha256') != fit_pool_hash(pngs)):
+              raise ValueError('The inherited prior must be completed and trained on exactly the same 220 fit PNGs')
+          expected = {'seed': settings['seed'], 'steps': settings['steps'], 'steps_completed': settings['steps'],
+                      'batch_size': settings['batch_size'], 'learning_rate': settings['learning_rate'],
+                      'runtime_allowance_seconds': settings['max_seconds'], 'dimension': plan.model_profile.hidden_dim}
+          if any(report.get(key) != value for key, value in expected.items()):
+              raise ValueError('The source C image-pretraining protocol differs from the fixed C plan')
+          for name in ('spatial_prior.py', 'neural.py'):
+              if report.get('source_sha256', {}).get(name) != hashlib.sha256((Path('mutual_lab') / name).read_bytes()).hexdigest():
+                  raise ValueError('The visual prior implementation changed since C: ' + name)
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          endpoint = ('https://api.github.com/repos/' + os.environ['GITHUB_REPOSITORY']
+                      + '/actions/runs/' + str(request['source_c_run_id']))
+          query = urllib.request.Request(endpoint, headers={
+              'Authorization': 'Bearer ' + os.environ['SOURCE_GITHUB_TOKEN'],
+              'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+          with urllib.request.build_opener(NoRedirect()).open(query, timeout=30) as response:
+              run = json.load(response)
+          if (run['id'] != request['source_c_run_id'] or run['head_sha'] != request['source_c_revision']
+                  or run.get('path') != '.github/workflows/l1-mastery-C.yml'
+                  or run.get('event') not in ('push', 'workflow_dispatch')
+                  or run.get('repository', {}).get('full_name') != os.environ['GITHUB_REPOSITORY']):
+              raise ValueError('The source run is not the pinned C workflow in this repository')
+          source_hashes = {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                           for path in sorted(Path('mutual_lab').glob('*.py'))}
+          context = {'code_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
+                     'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'repository': os.environ['GITHUB_REPOSITORY'],
+                     'request_sha256': hashlib.sha256(request_path.read_bytes()).hexdigest(),
+                     'source_sha256': source_hashes, 'request': request,
+                     'source_c': {key: run.get(key) for key in ('id', 'head_sha', 'html_url', 'path', 'event', 'status', 'conclusion')},
+                     'inherited_asset': 'Identical completed C image-only prior bundle; fixed B0 random or B1 pretrained state, no C language-model checkpoint is resumed',
+                     'source_c_l1_results_verified_by_this_workflow': False,
+                     'fixed_prior_condition': request['fixed_prior_condition'], 'model': request['model'],
+                     'capacity_matched': True,
+                     'negative_policies': {name: negative_policy_manifest(policy) for name, policy in
+                                           (('E0', 'same_pair'), ('E1', 'mixed_blocks'))},
+                     'interpretation': 'Development-only negative-policy comparison with the same fixed model and prior; one shared seed across languages is not independent replication or research qualification'}
+          (directory / 'provenance/run-context.json').write_text(json.dumps(context, indent=2) + '\n')
+          print('Verified inherited C prior, unchanged C plan, and policy:', request['policy'])
+          PY
+      - name: Install pinned numerical dependencies
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - name: Verify the saved prior tensor hashes before sharing it
+        run: |
+          python - <<'PY'
+          from mutual_lab.config import ExperimentConfig
+          from mutual_lab.mastery_lab import MasteryPlan
+          from mutual_lab.development_world import development_splits, render_scene
+          from mutual_lab.spatial_prior import fit_pool_hash, load_prior_bundle
+          config = ExperimentConfig.load('configs/neural.example.json')
+          plan = MasteryPlan.load('configs/mastery-C-plan.json').validate(config)
+          pngs = [render_scene(scene) for scene in development_splits(config, plan.data_seed)['train']]
+          bundle = load_prior_bundle('runs/negative-E-input/prior/prior.pt', expected_fit_pool_sha256=fit_pool_hash(pngs))
+          if bundle['report']['status'] != 'completed':
+              raise ValueError('Only a completed source C prior bundle may be reused')
+          PY
+      - name: Run the complete regression and neural test suite
+        run: python -m unittest discover -s tests -v
+      - name: Record the resolved verification runtime
+        run: python -m pip freeze > runs/negative-E-input/provenance/dependencies.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-E-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/negative-E-input/
+          if-no-files-found: error
+          retention-days: 30
+
+  phase_e:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ko, ja, en, es]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r configs/composition-cpu-requirements.txt
+          python -m pip install -e . --no-deps
+      - uses: actions/download-artifact@v4
+        with:
+          name: l1-E-input-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/negative-E-input/
+      - name: Preserve source, request, and runtime provenance with each language
+        run: |
+          mkdir -p runs/negative-E/provenance-${{ matrix.language }}
+          cp -R runs/negative-E-input/provenance/. runs/negative-E/provenance-${{ matrix.language }}/
+          python -m pip freeze > runs/negative-E/provenance-${{ matrix.language }}/language-dependencies.txt
+      - name: Compare E0 and E1 using the same fixed model and frozen prior
+        run: timeout --signal=INT --kill-after=30s 183m python -m mutual_lab.negative_policy_study --language '${{ matrix.language }}' --plan configs/mastery-C-plan.json --model '${{ needs.verify.outputs.model }}' --prior-condition '${{ needs.verify.outputs.prior_condition }}' --prior-bundle runs/negative-E-input/prior/prior.pt --output runs/negative-E
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-E-trials-${{ matrix.language }}-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/negative-E/
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate_e:
+    if: always()
+    needs: phase_e
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.16'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: l1-E-trials-*-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/negative-E-downloads/
+          merge-multiple: true
+      - name: Aggregate negative-policy manifests and preserve failed or missing coverage
+        run: python -m mutual_lab.negative_policy_study --aggregate-dir runs/negative-E-downloads --output runs/negative-E-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: l1-E-summary-${{ github.run_id }}
+          path: experiments/mutual-understanding/runs/negative-E-summary.json
+          if-no-files-found: error
+          retention-days: 30

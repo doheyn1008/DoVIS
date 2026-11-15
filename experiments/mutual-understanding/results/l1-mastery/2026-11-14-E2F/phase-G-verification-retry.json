@@ -1,0 +1,15 @@
+{
+  "run_id": 43644142219,
+  "source_revision": "22aca7813cbe6eaf1bbb994d19f279ef44c9b221",
+  "stage": "workflow_cli_before_any_l1_training",
+  "verification_passed": true,
+  "all4_language_jobs_started_training": false,
+  "language_checkpoints_created": 0,
+  "causes": [
+    "Workflow passed unsupported --policy to fixed-policy G CLI in training and aggregation.",
+    "Request phaseG required by canonical CLI was omitted and will be added before retry."
+  ],
+  "correction": "Actual literal workflow training/aggregation command regression through canonical CLI, unchanged NN/data/seed/budget/criteria; original failure preserved.",
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false
+}

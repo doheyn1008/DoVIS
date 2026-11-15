@@ -1,0 +1,13 @@
+{
+  "archive": "DoVIS-H1-L2-development-pilot-01.zip",
+  "bytes": 61383338,
+  "sha256": "721a3936298edef189783d35e4fca3e685ba7e78b2080b995dbfb6b05ff3ae78",
+  "payload_members": 48,
+  "crc_and_all_member_sha_verified": true,
+  "paired_acquisition_checkpoints": 8,
+  "acquisition_learner_states": 16,
+  "original_l1_inputs": 2,
+  "shared_prior": 1,
+  "excluded_from_research": true,
+  "preparation_revision": "99abc1ca0575dc7ce75709c7e00999ba9c5cc4a7"
+}

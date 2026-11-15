@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "kind": "h1-development-acquisition-smoke-plan-v1",
+  "candidate_version": "h1-finite-scene-v1",
+  "development_only": true,
+  "excluded_from_research": true,
+  "eligible_for_l2": false,
+  "eligible_for_fresh_experiment": false,
+  "source": {
+    "repository": "https://github.com/doheyn1008/DoVIS",
+    "training_revision": "b2be650797152e91b71ede62f3fe34adadbeb27d",
+    "reviewed_merge_revision": "3f48c73ccd971e92ff0d06c3240bc7334788c2c5",
+    "run_id": 43674421396,
+    "run_attempt": 1,
+    "factory": "mutual_lab.producer_context_study.RecordingFactory.H1",
+    "checkpoint_format": "mutual-mastery-development-v1",
+    "archive_filename": "DoVIS-L1-H1-12-validated-models.zip",
+    "archive_sha256": "78bee0bc13b8f91b414c42125020bf88f0d6a52362825ef0463a93afdb36fd16",
+    "blueprint_sha256": "d8900aad4ed14d51998dface65c4c745a18c45514c8473cc65c61fceae1b8a99",
+    "selection": "Predeclared ko/ja replica0 at the fixed final9600; no score-based choice, checkpoint substitution, or retry selection"
+  },
+  "languages": [
+    "ko",
+    "ja"
+  ],
+  "replica": 0,
+  "seed_pair": [
+    99007,
+    99009
+  ],
+  "fixed_l1_step": 9600,
+  "checkpoints": {
+    "ko": {
+      "sha256": "e1107aadf37713bd426850bbe4ce9a0b9c4a75cdda60c4e440525dd574d662e2",
+      "member": "stages/H1_confirmation/ko/r0-99007-99009/C1-583d7e83528f7c1c/step-009600.pt",
+      "sidecar_member": "stages/H1_confirmation/ko/r0-99007-99009/C1-583d7e83528f7c1c/step-009600.json",
+      "sidecar_sha256": "c177224a31bcc28d5b5a549b91e5bf7bf86ed94d4a7f71e3fd97c5e03f53e3ca"
+    },
+    "ja": {
+      "sha256": "ee41c07e24e36e39d3c2f55d9b58dcc7c5c819d1c7df060254a28fccba04f930",
+      "member": "stages/H1_confirmation/ja/r0-99007-99009/C1-b493c50d4c606b2c/step-009600.pt",
+      "sidecar_member": "stages/H1_confirmation/ja/r0-99007-99009/C1-b493c50d4c606b2c/step-009600.json",
+      "sidecar_sha256": "8e4695ec6818bf1f2402828ed4fe68f629ebdf95d3b5d8c61a4a2f402b0894b0"
+    }
+  },
+  "prior": {
+    "sha256": "862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d",
+    "sidecar_sha256": "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7e272a6",
+    "fit_pool_sha256": "fac1721d690c18a837e5570fb0b11bd4d48024349f21016901bbc9c4a2d5d268",
+    "member": "priors/862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d/prior.pt",
+    "sidecar_member": "priors/862eed3ec93a4567019075adcce59faf75295987a5cf6b816cace607da926e6d/prior.json"
+  },
+  "data_version": "five-colors-three-shapes-v1",
+  "data_seed": 59003,
+  "data_pair_sha256": "1c3c190107ce23ce8245fb17c402c17d21f836ed4e96b5b13172b082a6ed26f6",
+  "exposures": 32,
+  "evaluate_at": [
+    0,
+    8,
+    16,
+    32
+  ],
+  "conditions": [
+    "aligned",
+    "no_update",
+    "shuffled",
+    "reset_understanding"
+  ],
+  "seeds": {
+    "stream": 119003,
+    "evaluation": 119011,
+    "shuffle": 119031,
+    "learner": 119021
+  },
+  "optimizer": {
+    "name": "Adam",
+    "learning_rate": 0.001,
+    "updates_per_exposure": 1,
+    "parameters": "understanding_only",
+    "fresh_per_condition": true,
+    "native_replay_per_update": 0,
+    "foreign_replay_per_update": 0
+  },
+  "exposure_policy": {
+    "scene_pool": "unchanged development train55pairs/220scenes only",
+    "distractor_pool": "The three other role/relation variants of the same fit-only unordered object pair",
+    "negatives_per_update": 3,
+    "both_emit_before_either_update": true,
+    "training_text": "actual frozen peer generation only; never authored foreign gold captions",
+    "peer_output_filtering": "none; retain wrong, malformed, or nonterminated outputs and annotate them researcher-side",
+    "shared_stream_across_conditions": true,
+    "shuffled": "Seed119031 fixes one nonidentity derangement of the32 peer-text slots, reused in both directions; preserves marginal text/PNG pools but changes text order and text-to-PNG association; record surface/meaning collisions without score-dependent repair",
+    "no_update": "Record all exposures and diagnostics while performing zero optimizer updates",
+    "reset_understanding": "Reconstruct the same H1 understanding architecture at its declared pristine initialization; retain the same frozen producer and visual paths",
+    "selection": "Random(119003).sample over the stable development-fit scene order:32 unique scenes without replacement"
+  },
+  "evaluation": {
+    "scene_pool": "unchanged development dev28pairs/112scenes; held out from current L2 exposures only",
+    "native_retention": "four authored own-language caption templates, four-choice accuracy",
+    "foreign_authored": "four authored peer-language caption templates, four-choice accuracy; evaluation only",
+    "foreign_peer_generated": "actual frozen peer generations, separately reported from authored-query accuracy",
+    "native_generation": "greedy free generation trace and researcher-side validity, color/shape/role diagnostics",
+    "raw_four_choice_chance": 0.25,
+    "measure_initial_baseline": true,
+    "force_initial_zero": false,
+    "evaluation_updates": 0,
+    "preserve_model_optimizer_and_rng": true,
+    "protected_splits_used": [],
+    "native_generation_baseline_scenes": 112,
+    "native_generation_recheck_scenes": 3,
+    "native_generation_recheck_selection": "First three fixed development-dev scenes; compare actual regenerated traces with their fixed baseline after each condition",
+    "batch_size": 32
+  },
+  "mechanism_checks": {
+    "understanding_changes_when_updates_run": true,
+    "producer_and_visual_tensors_frozen": true,
+    "evaluation_state_unchanged": true,
+    "continuous_vs_saved_resumed_exact": true,
+    "no_update_weights_unchanged": true,
+    "original_checkpoint_and_prior_files_unchanged": true,
+    "keep_existing_native_checkpoint_admission_guards": true
+  },
+  "qualification": {
+    "smoke_success": "Mechanism, provenance, freezing, evaluation, and exact-resume invariants only",
+    "required_foreign_accuracy_gain": null,
+    "protected_native_gate_executed": false,
+    "research_native_reclassification": false,
+    "formal_l2_admission": false,
+    "interpretation": "One development model block and one pair; fixed-speaker cross-situational grounding, not adaptive clarification or a language-distance result"
+  }
+}

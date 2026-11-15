@@ -14,7 +14,6 @@ import zlib
 
 OLD = "9ea481a878f57cdd0671c8b4d7ad1ac2b5c9643f368295a3daa3485d5c8789d8"
 NEW = "7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4"
-UNCHANGED_AST = "63972190bff8b0d4cb42233f4c35b58a16c9a17b4b73b754eff08fe5aae05371"
 REVISION = "736097e5298fb71037a420ec8bd635c73a0154dd"
 # Exact authenticated source-commit wrapper; compressed to keep this fixture self-contained.
 OLD_SOURCE = zlib.decompress(base64.b64decode("""eNrlPWtv40aS3/0rGH6hlNAa28lmd+jlAbMTJxNcNhPMTA53JwgELVE2dyRSS1L2eA3/96tHv7speeYeWOACJDHJ7urq6up6dyuO
@@ -226,8 +225,9 @@ class HConfirmationCompatibilityTests(unittest.TestCase):
 
     def test_all_training_and_other_top_level_ast_nodes_are_identical(self):
         source = (PACKAGE / "cohort_context_validation.py").read_bytes()
+        # AST layouts vary by Python release; compare both authenticated
+        # snapshots under the same interpreter instead of pinning a 3.12 dump.
         self.assertEqual(nonaggregate_ast(source), nonaggregate_ast(OLD_SOURCE))
-        self.assertEqual(hashlib.sha256(nonaggregate_ast(source).encode()).hexdigest(), UNCHANGED_AST)
         old_aggregate = [n for n in ast.parse(OLD_SOURCE).body if isinstance(n, ast.FunctionDef) and n.name == "aggregate_cohort_validations"]
         new_aggregate = [n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "aggregate_cohort_validations"]
         self.assertEqual(len(old_aggregate), 1)

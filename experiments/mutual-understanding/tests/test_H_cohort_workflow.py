@@ -275,7 +275,7 @@ class HConfirmationWorkflowTests(unittest.TestCase):
         for number, block in enumerate(blocks):
             compile(textwrap.dedent(block), f"{WORKFLOW}:block{number}", "exec")
 
-    def test_h_confirmation_routes_and_no_v1_compatibility_exception(self):
+    def test_h_confirmation_routes_with_only_reviewed_aggregation_compatibility(self):
         source = WORKFLOW.read_text()
         self.assertIn("--source-plan configs/mastery-H-plan.json", source)
         for name in ("mastery-H-plan.json", "mastery-H-cohort-plan.json"):
@@ -287,7 +287,10 @@ class HConfirmationWorkflowTests(unittest.TestCase):
         self.assertNotIn("830c3a81", source)
         self.assertNotIn("mastery-cohort-run.request.json", source)
         self.assertNotIn("mutual_lab.cohort_validation", source)
-        self.assertIn("context.get('source_sha256') != current_hashes", source)
+        self.assertIn("recorded_hashes = context.get('source_sha256')", source)
+        self.assertIn("changed != {name}", source)
+        self.assertIn("7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4", source)
+        self.assertIn("nonaggregation(old_tree) != nonaggregation(new_tree)", source)
         self.assertIn("source_run.get('path') != '.github/workflows/l1-producer-context-H.yml'", source)
         self.assertIn("name: l1-H-cohort-trial-${{ matrix.language }}-r${{ matrix.replica }}-${{ github.run_id }}", source)
         self.assertIn("'kind': 'cohort-context-validation-v2-comparison'", source)

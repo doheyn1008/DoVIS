@@ -1,4 +1,5 @@
-# Preparation is inert: no request file is created by this workflow prototype.
+# Preparation is inert: replacement H confirmation verifier for the sole known aggregation-only H failure.
+# Intended deployed path remains .github/workflows/l1-H-cohort-validation.yml with the same global admission lock.
 name: Fixed H producer-context fresh native-seed confirmation
 
 on:
@@ -33,6 +34,7 @@ jobs:
     timeout-minutes: 20
     outputs:
       source_run_id: ${{ steps.request.outputs.source_run_id }}
+      aggregation_repair_run_id: ${{ steps.request.outputs.aggregation_repair_run_id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -73,6 +75,23 @@ jobs:
                   'prior_manifest_sha256', 'prior_checkpoint_sha256', 'confirmation_implementation_sha256'):
               if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{64}', request[key]):
                   raise ValueError('Pin exact H evidence/implementation bytes: ' + key)
+          # This exception is restricted to the already executed original H native grid.
+          if (request['source_run_id'] != 43652561578 or request['source_run_attempt'] != 1
+                  or request['source_revision'] != '736097e5298fb71037a420ec8bd635c73a0154dd'):
+              raise ValueError('Only the one known H run whose native cells succeeded may use aggregation repair')
+          for key in ('aggregation_repair_run_id', 'aggregation_repair_run_attempt'):
+              if type(request.get(key)) is not int or request[key] <= 0:
+                  raise ValueError('Pin the separate successful repair run/attempt: ' + key)
+          if request['aggregation_repair_run_attempt'] != 1 or request['aggregation_repair_run_id'] == request['source_run_id']:
+              raise ValueError('The repair must be a separate single first-attempt aggregation-only workflow')
+          if not isinstance(request.get('aggregation_repair_revision'), str) or not re.fullmatch('[0-9a-f]{40}', request['aggregation_repair_revision']):
+              raise ValueError('Pin the full immutable aggregation repair revision')
+          for key in ('aggregation_repair_request_sha256', 'aggregation_repair_script_sha256',
+                  'aggregation_repair_manifest_sha256', 'aggregation_repair_provenance_sha256'):
+              if not isinstance(request.get(key), str) or not re.fullmatch('[0-9a-f]{64}', request[key]):
+                  raise ValueError('Pin the separate aggregation repair evidence: ' + key)
+          if request['aggregation_repair_script_sha256'] != '0e4ce27de62094c6cdb524ea45c344d87b532dd9a675fd5339abf664ddbf0259':
+              raise ValueError('Use only the exact reviewed additive H aggregation repair script')
           if not isinstance(request.get('rationale'), str) or not request['rationale'].strip():
               raise ValueError('Record the preregistered selection rationale')
           if _implementation_hashes(request) != request.get('candidate_source_sha256'):
@@ -111,6 +130,7 @@ jobs:
           (directory / 'data-manifest.json').write_text(json.dumps(data, indent=2) + '\n')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write('source_run_id=' + str(request['source_run_id']) + '\n')
+              output.write('aggregation_repair_run_id=' + str(request['aggregation_repair_run_id']) + '\n')
           PY
       - name: Reject a previously admitted identical cohort request across both branches
         id: admission
@@ -312,16 +332,16 @@ jobs:
           path: experiments/mutual-understanding/runs/H-cohort-input/source-input/
       - uses: actions/download-artifact@v4
         with:
-          name: l1-H-summary-${{ steps.request.outputs.source_run_id }}
-          run-id: ${{ steps.request.outputs.source_run_id }}
+          name: l1-H-aggregation-repair-summary-${{ steps.request.outputs.aggregation_repair_run_id }}
+          run-id: ${{ steps.request.outputs.aggregation_repair_run_id }}
           github-token: ${{ github.token }}
           path: experiments/mutual-understanding/runs/H-cohort-input/source-summary/
-      - name: Verify the completed H discovery, exact frozen source and sole shared C prior
+      - name: Verify the sole failed aggregation, successful separate repair and original unchanged H native grid
         env:
           SOURCE_GITHUB_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
-          import hashlib, json, os, re, shutil, urllib.parse, urllib.request
+          import ast, base64, hashlib, json, os, re, shutil, urllib.parse, urllib.request
           from pathlib import Path
           from mutual_lab.config import ExperimentConfig
           from mutual_lab.mastery_lab import MasteryPlan
@@ -350,8 +370,206 @@ jobs:
                   or source_run.get('path') != '.github/workflows/l1-producer-context-H.yml'
                   or source_run.get('head_branch') not in ('codex/l1-mastery','codex/l1-memory')
                   or source_run.get('repository',{}).get('full_name') != repository
-                  or source_run.get('status') != 'completed' or source_run.get('conclusion') != 'success'):
-              raise ValueError('The pinned H discovery workflow revision/attempt/identity did not complete successfully')
+                  or source_run.get('status') != 'completed' or source_run.get('conclusion') != 'failure'):
+              raise ValueError('The original H run must retain its actual known aggregate-only failure')
+          # BEGIN fixed H source aggregation repair
+          # Inspect the immutable FIRST attempt, never the latest attempt's outcomes.
+          source_jobs, seen_job_pages, page = [], set(), 1
+          while True:
+              payload = github('/actions/runs/43652561578/attempts/1/jobs?'
+                  + urllib.parse.urlencode({'per_page': 100, 'page': page}))
+              batch = payload.get('jobs')
+              if not isinstance(batch, list):
+                  raise ValueError('The original H native job history is unavailable')
+              if not batch:
+                  break
+              ids = tuple(job.get('id') if isinstance(job, dict) else None for job in batch)
+              if any(type(job_id) is not int or job_id <= 0 for job_id in ids) or ids in seen_job_pages:
+                  raise ValueError('Original H first-attempt job pagination is invalid')
+              seen_job_pages.add(ids); source_jobs.extend(batch); page += 1
+          expected_jobs = {'verify', 'aggregate_h'} | {f'phase_h ({language}, {replica})'
+              for language in ('ko', 'ja', 'en', 'es') for replica in range(3)}
+          if (len(source_jobs) != 14 or {job.get('name') for job in source_jobs} != expected_jobs
+                  or any(job.get('status') != 'completed' for job in source_jobs)):
+              raise ValueError('The original H grid must have exactly verify plus all12 native jobs and aggregate')
+          for job in source_jobs:
+              if job['name'] == 'aggregate_h':
+                  if job['id'] != 132631927039 or job.get('conclusion') != 'failure':
+                      raise ValueError('Only the one known original aggregate_h job failure may be repaired')
+              elif job.get('conclusion') != 'success':
+                  raise ValueError('A failed, cancelled or missing H native cell can never be replaced by aggregation repair')
+          repair_run = github('/actions/runs/' + str(request['aggregation_repair_run_id'])
+              + '/attempts/' + str(request['aggregation_repair_run_attempt']))
+          if (repair_run.get('id') != request['aggregation_repair_run_id'] or repair_run.get('run_attempt') != 1
+                  or repair_run.get('head_sha') != request['aggregation_repair_revision']
+                  or repair_run.get('path') != '.github/workflows/l1-H-aggregation-repair.yml'
+                  or repair_run.get('head_branch') not in ('codex/l1-mastery', 'codex/l1-memory')
+                  or repair_run.get('repository', {}).get('full_name') != repository
+                  or repair_run.get('event') not in ('push', 'workflow_dispatch')
+                  or repair_run.get('status') != 'completed' or repair_run.get('conclusion') != 'success'):
+              raise ValueError('A separate pinned first-attempt aggregation-only repair workflow must succeed')
+          def repair_bytes(path):
+              item = github('/contents/' + path + '?' + urllib.parse.urlencode({'ref': request['aggregation_repair_revision']}))
+              if item.get('type') != 'file' or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str):
+                  raise ValueError('An immutable reviewed aggregation repair source file is unavailable')
+              return base64.b64decode(''.join(item['content'].split()), validate=True)
+          repair_request_bytes = repair_bytes('experiments/mutual-understanding/configs/mastery-H-aggregation-repair.request.json')
+          if hashlib.sha256(repair_request_bytes).hexdigest() != request['aggregation_repair_request_sha256']:
+              raise ValueError('The repair request differs from its exact immutable source bytes')
+          repair_request = json.loads(repair_request_bytes)
+          fixed_repair = {'schema_version': 1, 'phase': 'H-aggregation-repair', 'source_run_id': 43652561578,
+              'source_revision': '736097e5298fb71037a420ec8bd635c73a0154dd', 'source_run_attempt': 1,
+              'source_failure_job_id': 132631927039,
+              'source_request_sha256': '10719b67bcc3a5563253ed2cc9fc933b39109ea250b433566e6a6a40b9d39bba',
+              'source_plan_sha256': 'a2622ee9bada8ce5f79365fa790d90bf2902a806c8af4d4a389b5081009a962c',
+              'source_study_sha256': '1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f',
+              'script_sha256': request['aggregation_repair_script_sha256']}
+          if (any(repair_request.get(key) != value for key, value in fixed_repair.items())
+                  or any(type(repair_request.get(key)) is not int for key in ('schema_version', 'source_run_id', 'source_run_attempt', 'source_failure_job_id'))):
+              raise ValueError('The repair request is not restricted to the one known H aggregate failure')
+          script_bytes = repair_bytes('experiments/mutual-understanding/scripts/repair_H_aggregation.py')
+          if hashlib.sha256(script_bytes).hexdigest() != request['aggregation_repair_script_sha256']:
+              raise ValueError('The immutable additive repair script differs from its exact reviewed pin')
+          host_bytes = repair_bytes('experiments/mutual-understanding/scripts/H-runtime-host-evidence.json')
+          if hashlib.sha256(host_bytes).hexdigest() != repair_request.get('host_evidence_sha256'):
+              raise ValueError('The repair host evidence differs from its immutable reviewed pin')
+          repair_files = {}
+          for name in ('producer-context-H-summary.json', 'repair-manifest.json', 'aggregation-repair-provenance.json', 'repair-request.json'):
+              matches = list((directory / 'source-summary').rglob(name))
+              if len(matches) != 1 or not matches[0].is_file() or matches[0].is_symlink():
+                  raise ValueError('Expected exactly one known aggregation repair artifact file: ' + name)
+              repair_files[name] = matches[0]
+          actual_repair_members = {path.relative_to(directory / 'source-summary').as_posix()
+              for path in (directory / 'source-summary').rglob('*') if path.is_file()}
+          if actual_repair_members != set(repair_files):
+              raise ValueError('The repair summary artifact may contain only the four exact known evidence files')
+          for name, key in (('producer-context-H-summary.json', 'source_summary_sha256'),
+                  ('repair-manifest.json', 'aggregation_repair_manifest_sha256'),
+                  ('aggregation-repair-provenance.json', 'aggregation_repair_provenance_sha256'),
+                  ('repair-request.json', 'aggregation_repair_request_sha256')):
+              if hashlib.sha256(repair_files[name].read_bytes()).hexdigest() != request[key]:
+                  raise ValueError('The separate aggregation repair artifact differs from its pinned evidence: ' + name)
+          repair_provenance = json.loads(repair_files['aggregation-repair-provenance.json'].read_text())
+          expected_provenance = {'schema_version': 1, 'kind': 'H-aggregation-repair-provenance-v1',
+              'status': 'verified_repair', 'source_run_id': 43652561578,
+              'source_revision': '736097e5298fb71037a420ec8bd635c73a0154dd', 'source_run_attempt': 1,
+              'source_failure_job_id': 132631927039, 'source_original_conclusion': 'failure',
+              'run_id': request['aggregation_repair_run_id'], 'revision': request['aggregation_repair_revision'],
+              'run_attempt': 1, 'request_sha256': request['aggregation_repair_request_sha256'],
+              'script_sha256': request['aggregation_repair_script_sha256'],
+              'summary_sha256': request['source_summary_sha256'],
+              'repair_manifest_sha256': request['aggregation_repair_manifest_sha256'],
+              'source_all_twelve_native_jobs_success': True, 'no_native_training_or_checkpoint_replacement': True,
+              'scientific_aggregator_unchanged': True, 'original_H_workflow_overall_success': False}
+          if (any(repair_provenance.get(key) != value for key, value in expected_provenance.items())
+                  or any(type(repair_provenance.get(key)) is not int for key in ('schema_version', 'source_run_id', 'source_run_attempt', 'source_failure_job_id', 'run_id', 'run_attempt'))):
+              raise ValueError('The repair provenance does not bind the known original failure and separate successful repair')
+          for key in ('source_all_twelve_native_jobs_success', 'no_native_training_or_checkpoint_replacement', 'scientific_aggregator_unchanged'):
+              if repair_provenance.get(key) is not True:
+                  raise ValueError('The repair must retain every original native cell and scientific aggregator')
+          if repair_provenance.get('original_H_workflow_overall_success') is not False:
+              raise ValueError('The original H overall failure must remain explicit')
+          repair_manifest = json.loads(repair_files['repair-manifest.json'].read_text())
+          expected_manifest = {'source_run_id': 43652561578,
+              'source_revision': '736097e5298fb71037a420ec8bd635c73a0154dd', 'source_run_attempt': 1,
+              'source_failure_job_id': 132631927039, 'script_sha256': request['aggregation_repair_script_sha256'],
+              'summary_sha256': request['source_summary_sha256']}
+          if (not isinstance(repair_manifest, dict)
+                  or any(repair_manifest.get(key) != value for key, value in expected_manifest.items())
+                  or repair_manifest.get('source_original_aggregation_failed') is not True
+                  or any(type(repair_manifest.get(key)) is not int for key in ('source_run_id', 'source_run_attempt', 'source_failure_job_id'))):
+              raise ValueError('The exact repair manifest must preserve and identify the sole original aggregation failure')
+          listed = repair_request.get('source_artifacts')
+          expected_artifacts = {'l1-H-input-43652561578'} | {f'l1-H-trials-{language}-r{replica}-43652561578'
+              for language in ('ko', 'ja', 'en', 'es') for replica in range(3)}
+          if (not isinstance(listed, list) or len(listed) != 13
+                  or {entry.get('name') for entry in listed if isinstance(entry, dict)} != expected_artifacts
+                  or repair_provenance.get('source_artifacts') != listed):
+              raise ValueError('The repair must bind precisely the original H input and all12 native trial artifacts')
+          if any(type(entry.get('id')) is not int or entry['id'] <= 0
+                  or not isinstance(entry.get('digest'), str) or not re.fullmatch('sha256:[0-9a-f]{64}', entry['digest'])
+                  or type(entry.get('size_in_bytes')) is not int or entry['size_in_bytes'] <= 0 for entry in listed):
+              raise ValueError('An original H artifact identity/digest/size is invalid')
+          def exact_repair_runtime(value):
+              return (isinstance(value, dict) and set(value) == {'run_id', 'revision', 'run_attempt'}
+                  and str(value.get('run_id')) == str(request['aggregation_repair_run_id'])
+                  and value.get('revision') == request['aggregation_repair_revision']
+                  and str(value.get('run_attempt')) == '1')
+          repaired_summary = json.loads(repair_files['producer-context-H-summary.json'].read_text())
+          summary_repair = repaired_summary.get('aggregation_repair')
+          expected_summary_repair = {'original_run_id': 43652561578,
+              'original_revision': '736097e5298fb71037a420ec8bd635c73a0154dd', 'original_run_attempt': 1,
+              'original_failure_job_id': 132631927039, 'script_sha256': request['aggregation_repair_script_sha256'],
+              'source_study_sha256': '1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f'}
+          if (not isinstance(summary_repair, dict)
+                  or any(summary_repair.get(key) != value for key, value in expected_summary_repair.items())
+                  or summary_repair.get('original_aggregation_failed') is not True
+                  or type(summary_repair.get('original_run_attempt')) is not int
+                  or not exact_repair_runtime(summary_repair.get('repair_run'))
+                  or not exact_repair_runtime(repair_manifest.get('repair_run'))):
+              raise ValueError('Both the repaired summary and manifest must bind the original failed H run and actual separate repair run')
+          manifest_flags = {'schema_version': 1, 'kind': 'dovis-H-posthoc-metadata-repair',
+              'posthoc_metadata_repair': True, 'metric_rows_unchanged': True,
+              'original_selection_rule_unchanged': True, 'nn_training_rerun': False,
+              'original_failed_run_preserved': True, 'excluded_from_research': True,
+              'eligible_for_fresh_experiment': False,
+              'source_study_sha256': '1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f',
+              'plan_sha256': 'a2622ee9bada8ce5f79365fa790d90bf2902a806c8af4d4a389b5081009a962c'}
+          if any(repair_manifest.get(key) != value for key, value in manifest_flags.items()):
+              raise ValueError('The repair manifest changed scientific rows, selection, source, plan or training scope')
+          for key, value in manifest_flags.items():
+              if type(value) is bool and repair_manifest.get(key) is not value:
+                  raise ValueError('The repair manifest scientific scope flag is uncertain: ' + key)
+          checkpoint_audits = repair_manifest.get('actual_checkpoint_audits')
+          if (not isinstance(checkpoint_audits, list) or len(checkpoint_audits) != 96
+                  or len({entry.get('path') for entry in checkpoint_audits if isinstance(entry, dict)}) != 96
+                  or any(type(entry.get('step')) is not int or entry['step'] not in (0, 2400, 4800, 9600) for entry in checkpoint_audits)
+                  or any(sum(entry['step'] == step for entry in checkpoint_audits) != 24 for step in (0, 2400, 4800, 9600))):
+              raise ValueError('The repair must audit every one of the96 original H checkpoint payloads')
+          expected_manifest_pins = sorted((entry['name'], entry['id'], entry['digest'][7:]) for entry in listed)
+          manifest_pins = repair_manifest.get('artifact_pins')
+          if (not isinstance(manifest_pins, list) or len(manifest_pins) != 13
+                  or sorted((entry.get('name'), entry.get('id'), entry.get('sha256')) for entry in manifest_pins) != expected_manifest_pins):
+              raise ValueError('The repair manifest must audit the exact13 original artifact archives')
+          original_before, original_after = repair_manifest.get('original_files_sha256_before'), repair_manifest.get('original_files_sha256_after')
+          if not isinstance(original_before, dict) or not original_before or original_before != original_after:
+              raise ValueError('Original authenticated H artifact files changed during repair')
+          repaired_rows = json.loads(repair_files['producer-context-H-summary.json'].read_text()).get('rows')
+          encoded_rows = (json.dumps(repaired_rows, sort_keys=True, ensure_ascii=True, indent=2, allow_nan=False) + '\n').encode()
+          if hashlib.sha256(encoded_rows).hexdigest() != repair_manifest.get('original_rows_sha256'):
+              raise ValueError('The repaired summary rows must be exactly the original frozen H metric rows')
+          original_artifacts, artifact_pages, page = {}, set(), 1
+          while True:
+              result = github('/actions/runs/43652561578/artifacts?' + urllib.parse.urlencode({'per_page': 100, 'page': page}))
+              batch = result.get('artifacts')
+              if not isinstance(batch, list):
+                  raise ValueError('Original H artifact API history is unavailable')
+              if not batch:
+                  break
+              ids = tuple(entry.get('id') if isinstance(entry, dict) else None for entry in batch)
+              if any(type(artifact_id) is not int or artifact_id <= 0 for artifact_id in ids) or ids in artifact_pages:
+                  raise ValueError('Original H artifact pagination is invalid')
+              artifact_pages.add(ids)
+              for entry in batch:
+                  if entry.get('name') in expected_artifacts:
+                      if entry['name'] in original_artifacts:
+                          raise ValueError('Ambiguous duplicate original H artifact names')
+                      original_artifacts[entry['name']] = entry
+              page += 1
+          if set(original_artifacts) != expected_artifacts:
+              raise ValueError('An original H native artifact is missing from the source run')
+          for entry in listed:
+              actual = original_artifacts[entry['name']]
+              if (actual.get('expired') is not False or any(actual.get(key) != entry[key] for key in ('id', 'name', 'digest', 'size_in_bytes'))
+                      or actual.get('workflow_run', {}).get('id') != 43652561578
+                      or actual.get('workflow_run', {}).get('head_sha') != '736097e5298fb71037a420ec8bd635c73a0154dd'):
+                  raise ValueError('The repair used a different, replaced or unavailable original H native artifact')
+          repair_evidence = {'source_original_run': source_run, 'source_first_attempt_jobs': source_jobs,
+              'repair_run': repair_run, 'repair_request': repair_request,
+              'repair_provenance': repair_provenance,
+              'manifest': repair_manifest,
+              'native_cells_rerun': False, 'source_original_conclusion_preserved': 'failure'}
+          # END fixed H source aggregation repair
           paths = list((directory / 'source-summary').rglob('producer-context-H-summary.json'))
           if len(paths) != 1 or hashlib.sha256(paths[0].read_bytes()).hexdigest() != request['source_summary_sha256']:
               raise ValueError('Expected exactly the pinned complete H discovery summary')
@@ -366,6 +584,7 @@ jobs:
                   or str(context.get('run_attempt')) != str(request['source_run_attempt'])
                   or context.get('repository') != repository or context.get('request') != source_request
                   or context.get('request_sha256') != hashlib.sha256(source_request_path.read_bytes()).hexdigest()
+                  or hashlib.sha256(source_request_path.read_bytes()).hexdigest() != '10719b67bcc3a5563253ed2cc9fc933b39109ea250b433566e6a6a40b9d39bba'
                   or context.get('fixed_prior_condition') != 'B1'
                   or source_request.get('fixed_prior_condition') != 'B1'
                   or source_request.get('prior_manifest_sha256') != request['prior_manifest_sha256']
@@ -373,8 +592,41 @@ jobs:
                   or source_request.get('policy') != request['policy']):
               raise ValueError('H discovery provenance differs from its pinned source run/request/prior')
           current_hashes = {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('mutual_lab').glob('*.py'))}
-          if context.get('source_sha256') != current_hashes:
-              raise ValueError('Every NN/data/training/H/confirmation module must be frozen before discovery, with no compatibility exception')
+          # BEGIN fixed H aggregation compatibility
+          compatibility = {}
+          recorded_hashes = context.get('source_sha256')
+          if not isinstance(recorded_hashes, dict) or set(recorded_hashes) != set(current_hashes):
+              raise ValueError('The complete H source package membership changed')
+          changed = {name for name in current_hashes if recorded_hashes[name] != current_hashes[name]}
+          if changed:
+              name = 'cohort_context_validation.py'
+              old_pin = '9ea481a878f57cdd0671c8b4d7ad1ac2b5c9643f368295a3daa3485d5c8789d8'
+              new_pin = '7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4'
+              if (changed != {name} or recorded_hashes[name] != old_pin or current_hashes[name] != new_pin
+                      or request.get('confirmation_implementation_sha256') != new_pin):
+                  raise ValueError('Only the exact reviewed H confirmation aggregation fix is allowed; all other source remains byte-identical')
+              item = github('/contents/experiments/mutual-understanding/mutual_lab/' + name + '?'
+                  + urllib.parse.urlencode({'ref': request['source_revision']}))
+              if item.get('type') != 'file' or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str):
+                  raise ValueError('The immutable original H confirmation source is unavailable')
+              old_bytes = base64.b64decode(''.join(item['content'].split()), validate=True)
+              if hashlib.sha256(old_bytes).hexdigest() != old_pin:
+                  raise ValueError('The immutable H source wrapper differs from the known original hash')
+              new_bytes = (Path('mutual_lab') / name).read_bytes()
+              old_tree, new_tree = ast.parse(old_bytes), ast.parse(new_bytes)
+              def nonaggregation(tree):
+                  return [ast.dump(node, include_attributes=False) for node in tree.body
+                      if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name != 'aggregate_cohort_validations']
+              def aggregation(tree):
+                  return [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'aggregate_cohort_validations']
+              if (len(aggregation(old_tree)) != 1 or len(aggregation(new_tree)) != 1
+                      or nonaggregation(old_tree) != nonaggregation(new_tree)):
+                  raise ValueError('A function, import, constant or native-training path outside aggregation changed')
+              compatibility = {'module': name, 'source_sha256': old_pin, 'confirmation_sha256': new_pin,
+                  'changed_top_level_function': 'aggregate_cohort_validations', 'all_other_top_level_ast_identical': True,
+                  'native_training_functions_ast_identical': True, 'other_package_files_byte_identical': len(current_hashes) - 1,
+                  'scope': 'Confirmation assessment only: actual H preflight omits optional invalid_pngs; retain strict completed332/fallback/state/RNG/cache checks'}
+          # END fixed H aggregation compatibility
           if _implementation_hashes(request) != request['candidate_source_sha256']:
               raise ValueError('The original selected H factory differs from its exact architecture/training pins')
           if hashlib.sha256((inherited / 'plan.json').read_bytes()).hexdigest() != request['source_plan_sha256']:
@@ -406,7 +658,9 @@ jobs:
               'run_attempt':os.environ['GITHUB_RUN_ATTEMPT'],'repository':repository,'request':request,
               'request_sha256':record['sha256'],'source_sha256':current_hashes,'candidate_spec':spec,
               'source_condition':condition,'original_factory':factory,'source_run':source_run,
+              'aggregation_repair_evidence':repair_evidence,
               'confirmation_implementation_sha256':request['confirmation_implementation_sha256'],
+              'confirmation_aggregation_compatibility':compatibility,
               'source_language_checkpoints_downloaded_or_resumed':False,'admission':admission,
               'fresh_seed_pairs':[[99007,99009],[99017,99019],[99027,99029]],
               'qualification_scope':'All12 final native-seed cells must pass all six .9 targets and coverage8/2; selected development data and shared C prior only; no research promotion'}

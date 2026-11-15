@@ -1,0 +1,79 @@
+{
+  "status": "passed",
+  "OFFLINE_CONTRACT_PROOF_NOT_OFFICIAL_REPAIR_OR_CONFIRMATION": true,
+  "source_producer_proof": "/tmp/dovis-H-aggregation-repair-workflow-OFFLINE-proof.json",
+  "source_producer_proof_sha256": "a57b98d06e88f134de7dfe428583c60129d2d6551d48a33f65a7d27761f7f003",
+  "stage": "/workspace/scratch/7adff8a3b4a7/DoVIS-H-proofs/dovis-H-confirmation-repair-consumer-OFFLINE-v1h3zwue",
+  "source_original_run": 43652561578,
+  "source_original_conclusion": "failure",
+  "actual_original_source_jobs": 14,
+  "actual_original_H_artifact_archives": 13,
+  "original_actual_checkpoints_audited_by_producer": 96,
+  "repair_transport_identity_is_fake": true,
+  "repair_script_sha256": "0e4ce27de62094c6cdb524ea45c344d87b532dd9a675fd5339abf664ddbf0259",
+  "workflow_sha256": "da20479a7d4b4ba24be07a1ee006bec45a3356971f13f0f86edae9a545778ca7",
+  "builder_sha256": "08b74e6b9795cea7dfbfac80fd8f3d5a294a7f1718389fc464332c3dfd7880d2",
+  "actual_new_builder_main_with_authentic_source_bytes": "passed",
+  "actual_verification_blocks": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "actual_cell_guards": 12,
+  "literal_cli_training_dispatches": [
+    [
+      "ko",
+      0
+    ],
+    [
+      "ko",
+      1
+    ],
+    [
+      "ko",
+      2
+    ],
+    [
+      "ja",
+      0
+    ],
+    [
+      "ja",
+      1
+    ],
+    [
+      "ja",
+      2
+    ],
+    [
+      "en",
+      0
+    ],
+    [
+      "en",
+      1
+    ],
+    [
+      "en",
+      2
+    ],
+    [
+      "es",
+      0
+    ],
+    [
+      "es",
+      1
+    ],
+    [
+      "es",
+      2
+    ]
+  ],
+  "only_native_training_mocked": true,
+  "empty_actual_aggregate_retains_missing_cells": 12,
+  "native_training_updates_executed": 0,
+  "activation_paths_modified": false,
+  "scope": "Real original H input/13ZIP digests/96 checkpoint audit manifest/actual14 source jobs/repaired96metric rows/Cprior and full42frozen scientific source; fake4file repair artifactZIP and repair API transport are EXPLICITLY OFFLINE. Real builder main, canonical request/prior loaders, all four actual confirmation verification blocks, all12 actual cell guards,12 literal native CLIs with trainer mocked, actual empty aggregate. Never actual repair/confirmation success or activation evidence."
+}

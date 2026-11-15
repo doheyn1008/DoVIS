@@ -1,0 +1,166 @@
+{
+  "status": "passed",
+  "OFFLINE_CONTRACT_PROOF_NOT_OFFICIAL_REPAIR_RUN": true,
+  "stage": "/workspace/scratch/7adff8a3b4a7/DoVIS-H-proofs/dovis-H-aggregation-repair-WF-OFFLINE-gmda28m1",
+  "workflow_sha256": "d595f68b671f721605405156f9c1aa93ccbcf5f71e29efa36a70bf33d0a47a6b",
+  "script_sha256": "0e4ce27de62094c6cdb524ea45c344d87b532dd9a675fd5339abf664ddbf0259",
+  "source_run_id": 43652561578,
+  "source_original_conclusion": "failure",
+  "source_actual_api_jobs": 14,
+  "original_H_artifact_zips_verified": 13,
+  "old_host_report_evidence_only": 2,
+  "old_language_tensors_loaded": false,
+  "original_frozen_NN_module_sha256": "1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f",
+  "actual_checkpoints_verified": 96,
+  "original_files_unchanged": true,
+  "summary_kind": "producer-context-study-v1-comparison",
+  "source_selected_condition": "H1",
+  "repair_provenance": {
+    "schema_version": 1,
+    "source_run_id": 43652561578,
+    "source_revision": "736097e5298fb71037a420ec8bd635c73a0154dd",
+    "source_run_attempt": 1,
+    "source_failure_job_id": 132631927039,
+    "source_original_conclusion": "failure",
+    "source_all_twelve_native_jobs_success": true,
+    "run_id": 99999999993,
+    "revision": "4444444444444444444444444444444444444444",
+    "run_attempt": 1,
+    "request_sha256": "0ab9dc3575d5c9c590dfaed361b4e46428a93fd681482b5f839118c2f2125d57",
+    "script_sha256": "0e4ce27de62094c6cdb524ea45c344d87b532dd9a675fd5339abf664ddbf0259",
+    "source_artifacts": [
+      {
+        "digest": "sha256:adce33e1a2fdd7001dfbde4395579aa8858d54baca96640d2ae5f93db0473f97",
+        "id": 14135954751,
+        "name": "l1-H-input-43652561578",
+        "size_in_bytes": 8207729
+      },
+      {
+        "digest": "sha256:ea8e75c05bc67146cb9f0620f4ce5ee1007328bf3f3b9d9760773b5ed27df79b",
+        "id": 14137617578,
+        "name": "l1-H-trials-en-r0-43652561578",
+        "size_in_bytes": 31500865
+      },
+      {
+        "digest": "sha256:0bc24d1d5487cd77f7cdcde90fa29cc9a0ff319691ea3ea92e60e0879a26474c",
+        "id": 14136913402,
+        "name": "l1-H-trials-en-r1-43652561578",
+        "size_in_bytes": 31514884
+      },
+      {
+        "digest": "sha256:7a27c2905538c4698ad0b4b9fd8e2c550da7c9c29cd217118a16fe53c6715095",
+        "id": 14137671798,
+        "name": "l1-H-trials-en-r2-43652561578",
+        "size_in_bytes": 31503021
+      },
+      {
+        "digest": "sha256:50d2a1a23f61f00e3e1bccabb53b6f2170a0c742f31de9623fccd8ae4e1cece6",
+        "id": 14137905033,
+        "name": "l1-H-trials-es-r0-43652561578",
+        "size_in_bytes": 31501126
+      },
+      {
+        "digest": "sha256:0dc908f97de2041eac91a7feff54cc4bb0a6ad027e725419919cbcfcc334d516",
+        "id": 14137338945,
+        "name": "l1-H-trials-es-r1-43652561578",
+        "size_in_bytes": 31532281
+      },
+      {
+        "digest": "sha256:18b71bc72307ea738cab257ce177b3892ce74f42ee5c8d859c52ac34cedd399c",
+        "id": 14137826711,
+        "name": "l1-H-trials-es-r2-43652561578",
+        "size_in_bytes": 31515248
+      },
+      {
+        "digest": "sha256:8822ad580981452cdc728fea4b554945a7f4147ac0076ba4659a24ad25ce9a6a",
+        "id": 14137231603,
+        "name": "l1-H-trials-ja-r0-43652561578",
+        "size_in_bytes": 31505988
+      },
+      {
+        "digest": "sha256:593053a1be3bee2e71a39c6cbc21f57846ce4c08d4781c931ec31a006e7833a0",
+        "id": 14137880089,
+        "name": "l1-H-trials-ja-r1-43652561578",
+        "size_in_bytes": 31540486
+      },
+      {
+        "digest": "sha256:342fe8cd754392bce39ce5b03dfbc97163f35bf2814ed13a690fe08e6e61e15c",
+        "id": 14137776507,
+        "name": "l1-H-trials-ja-r2-43652561578",
+        "size_in_bytes": 31546644
+      },
+      {
+        "digest": "sha256:ae6c1bf3de678ef9bd5675dfd4bfddb80824c5e4e30bbc392ed2a042e9f6fa0c",
+        "id": 14137104172,
+        "name": "l1-H-trials-ko-r0-43652561578",
+        "size_in_bytes": 31573208
+      },
+      {
+        "digest": "sha256:e89e2c32421cf283cc757b087b5a3b165c54f87c57755dcfcee2d454818a1f09",
+        "id": 14137786814,
+        "name": "l1-H-trials-ko-r1-43652561578",
+        "size_in_bytes": 31566354
+      },
+      {
+        "digest": "sha256:ccea4a34333d592cc9ea981730c15b230e1864bcf81b29e5db87a8073fe47b5f",
+        "id": 14137282533,
+        "name": "l1-H-trials-ko-r2-43652561578",
+        "size_in_bytes": 31575561
+      }
+    ],
+    "original_source_sha256": {
+      "config.py": "cab629ba49726b6f4a0c71f4a31311fe50f287ef6eaf4c9d55f082ded35ce2e9",
+      "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "attentive_spatial.py": "fabaf3b480b230c32a7f71cbd8b5616a1b6f5b56dd8d461884cbcaadcc4b9c15",
+      "decoder_study.py": "9a579a02cc7ff16a5ce901ae0e65eb231adb2fab1261dff4b047d98d1f6483c7",
+      "understanding_memory.py": "7a68b5b8498f2563efad2cacee0d2b8b3177e47be8752616f98a624a04e47bcb",
+      "__init__.py": "97bc80f131104a389e2135b8fee22591d2436b4d93a29dfacf941ec79ba42abf",
+      "native_preparation.py": "6b3319a69c0b19b8ac7467084ea2f0e1066ebfdd8af11976ca199fe7bdbdd665",
+      "grid.py": "36c2264d637d5e05e92b039a43c6da5f43bbb718a3619a1538b8a7399ff1b299",
+      "neural.py": "6c118cc91304cb6212348637acc88f4c95387b332401917ce381821ab8bfae75",
+      "memory_study.py": "570e81a21901748b25dbd15cd2730df4d2f50868c2b32037405f105ac91da867",
+      "screening_plan.py": "4226e4bfc4f75c4c1aa8f6f9678b418b401454b59c2643eedc82ec102f85d93a",
+      "mastery_infer.py": "ea7b76728d1fe0f4807c098e94ec157fd949b2175aa0699a33f6e7a24c237bac",
+      "composition_diagnostics.py": "deb03953ab7dea7d5deb1cce203853ddccf69e7e133a658fa967c3e7bef60c39",
+      "producer_context.py": "19733707041fecc4a6e240e87531ed72affe1644d59ca498c4de561dd5154ad7",
+      "runner.py": "133cf5f816314c0b4db861bb8abedc03f6ffafd6af68e2b2c03858640eb8880b",
+      "cohort_validation.py": "3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19",
+      "prompts.py": "b87831f08fe9c5fcb9108f81fed282ef829d3f3b3a46e2a232489a9920d78313",
+      "development_world.py": "4ddb1f05af38970c14cc0f0801f4c550b33129a8e026e0538d52d2d064fa244a",
+      "world.py": "42d0a33062656e6f7057d29d28b957e7d8ef4056d5144f15b2a3aa3b713a1bfe",
+      "profiles.py": "77de48e6cf5443f43c79a37c3385012abf73b4767933156377a075f4e90afb06",
+      "storage.py": "1c44b083274670b08e3254b98a0fea4295fa9060193b75ae0777a50da486bf55",
+      "mastery_lab.py": "d2cdb759564aeed19d1ac43d302e8c7ec90e3ffc1d4600224f45aac09cbabe9f",
+      "spatial_prior.py": "d97e72364b24801f428764c59a4655ac7773d4713f2b9da40ffc6164a2371d1b",
+      "diagnostics.py": "5601b16cecd8e5bd89a091c2e33234b9c1af57d7e27a8ce8ff71cb9f6a16153d",
+      "development_models.py": "84df083ef1c21fc15627295dab343362f7d880e73b641865dfa9ee373fd51fc9",
+      "frozen_features.py": "3a6c1d99e9c5322e7ec6cf1ff74f28abe3fa866826d7dccff058235525f21d5b",
+      "research.py": "514ab3b54bdcf22e0dd565c510d19e97a111faa358f79847a49d0b413630257c",
+      "composition_suite.py": "2ff0a3c4cf0eab943dffef12b7351af5987b4ede11bac7ee80eb0ce8d8322c62",
+      "grounding_study.py": "04218ce20cc8ab28199a1081d92927f35788fc0e9ce28261da0e1355e81bf63d",
+      "candidate_validation.py": "d5c29ddafc2d3dd98aa241adc16c63b44cf863bfc0b479ac3a8f4f50f7913d8e",
+      "cli.py": "59a77b302c9f3ee70f6dbaada19595f0a6bcaf508a9fe8d8cc305f43e4fecb7f",
+      "agents.py": "955afd4b2efc23e50adf32c61180282a0754c281d9d05cb5ca7ad594457f7a01",
+      "images.py": "ad5ba91d34e8edb941397fbf402faa4be6b9b25256df40b8b151197e0a084fab",
+      "server.py": "302250a31fac2eb45b374f54d50e205d498d3ead65c483f09bb45e9760f3c768",
+      "negative_policy_study.py": "299b5ff2e31a4b294aa56e749d9911eaec7caa6bf73b14740eaa7eb16b1c938c",
+      "cohort_context_validation.py": "9ea481a878f57cdd0671c8b4d7ad1ac2b5c9643f368295a3daa3485d5c8789d8",
+      "fit_distractors.py": "c56e648f6d942b8f1ad1263cd12c299282fc6f566dae1365ff5fd15c8701bb9d",
+      "backend.py": "191b7789c4b61d67a1ba809cbfcb4473cf9ee71128d24a19da7f522572f5544b",
+      "languages.py": "f724a369115d6c8a496a012c7d75a21d52bfb57afd542f4b93576654d08bcc92",
+      "producer_context_study.py": "1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f",
+      "metrics.py": "c512e14db018c96458b74744caf9d99aced25c14a3554c9e44ad436365765eef",
+      "object_memory.py": "0003db8ce10cc07773372644435d868e1a7737138eac7d5af3651bed84bd4fc7"
+    },
+    "host_evidence_sha256": "9572bbcc5e68a13265665b803e1d279f92c9644726b4d5c070516efdbbb5f47f",
+    "no_native_training_or_checkpoint_replacement": true,
+    "kind": "H-aggregation-repair-provenance-v1",
+    "status": "verified_repair",
+    "summary_sha256": "f695d0a73976e7d36a06690728ca7d8bb1da02f0076d3e3ba74c4d0bead88b22",
+    "repair_manifest_sha256": "e2362b5623515d8d24a302ec841ef5de7d2eb2e45c01ccdcc7e2068cc616be75",
+    "scientific_aggregator_unchanged": true,
+    "original_H_workflow_overall_success": false,
+    "interpretation": "Aggregation metadata repair only; all24 original language models and96 checkpoints retained, no retry or parameter updates. Original source aggregation failure remains recorded."
+  },
+  "scope": "Both actual WF inline blocks and actual additive CLI executed on authentic source input/12trials ZIPs with frozen736 code and CPUtorch. Only authenticated GitHub API transport/download substituted with already-verified local original files. No training, source rewrite, GH mutation or real repair run."
+}

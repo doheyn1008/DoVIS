@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "dovis-known-frozen-feature-host-groups",
+  "source_run_id": 43647997707,
+  "source_revision": "c65ab2752c117ddf66c98c4e871f553cf9c8f95a",
+  "policy": "per_png_singleton_v1",
+  "cache": "visual_cache",
+  "allowed_sha256": [
+    "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+    "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0"
+  ],
+  "evidence_files": [
+    {
+      "artifact": {
+        "id": 14135346265,
+        "name": "l1-cohort-trial-en-r0-43647997707",
+        "size_in_bytes": 15967760,
+        "url": "https://api.github.com/repos/doheyn1008/DoVIS/actions/artifacts/14135346265",
+        "archive_download_url": "https://api.github.com/repos/doheyn1008/DoVIS/actions/artifacts/14135346265/zip",
+        "expired": false,
+        "created_at": "2026-11-14T22:38:48Z",
+        "expires_at": "2026-12-14T22:38:46Z",
+        "updated_at": "2026-11-14T22:38:48Z",
+        "digest": "sha256:d2fa2145ca22a5f0ccd6e92d7cc62e001242de0fa8db83a942923661681dc547",
+        "workflow_run": {
+          "id": 43647997707,
+          "repository_id": 1330308574,
+          "head_repository_id": 1330308574,
+          "head_branch": "codex/l1-mastery",
+          "head_sha": "c65ab2752c117ddf66c98c4e871f553cf9c8f95a"
+        }
+      },
+      "report_relative_path": "cohort-en-r0-b4f88954/raw-engine/C1-r0-9672575a/report.json",
+      "report_sha256": "c12c0bd7cd0cbf5944f4c02f4056b689e4b9e7f5aea98035f671b27ace4831a9",
+      "visual_cache_sha256": "f08f116ae2a9489f206551e073f9f43000a79ce256884faf8608830c8ffad8b0",
+      "feature_table_sha256": "4296297e97f3bac343e467dc95c0298a938bff715c9ed1bef39b15f18bc025fd",
+      "frozen_feature_policy": "per_png_singleton_v1",
+      "original_report_path": "/workspace/scratch/7adff8a3b4a7/DoVIS-mastery-results/official-cohort/l1-cohort-trial-en-r0-43647997707/cohort-en-r0-b4f88954/raw-engine/C1-r0-9672575a/report.json"
+    },
+    {
+      "artifact": {
+        "id": 14135337469,
+        "name": "l1-cohort-trial-ko-r2-43647997707",
+        "size_in_bytes": 15996679,
+        "url": "https://api.github.com/repos/doheyn1008/DoVIS/actions/artifacts/14135337469",
+        "archive_download_url": "https://api.github.com/repos/doheyn1008/DoVIS/actions/artifacts/14135337469/zip",
+        "expired": false,
+        "created_at": "2026-11-14T22:40:55Z",
+        "expires_at": "2026-12-14T22:40:53Z",
+        "updated_at": "2026-11-14T22:40:55Z",
+        "digest": "sha256:08813398d2f6eeafb6f6b8174627a8c504ab032a13d49107786f908d0f1284a0",
+        "workflow_run": {
+          "id": 43647997707,
+          "repository_id": 1330308574,
+          "head_repository_id": 1330308574,
+          "head_branch": "codex/l1-mastery",
+          "head_sha": "c65ab2752c117ddf66c98c4e871f553cf9c8f95a"
+        }
+      },
+      "report_relative_path": "cohort-ko-r2-d2eb21eb/raw-engine/C1-r2-f7486a38/report.json",
+      "report_sha256": "26e6eae7025f764cc36d1e5187bd9208252676ac9d0c7eb890838a6c1fc6faef",
+      "visual_cache_sha256": "e8666a8dcfa27ff9b51ef9dc7c3409806c1c53323820eafc2810f5d1c76a349b",
+      "feature_table_sha256": "aba33873880e8c6bf39598fdc9459238bc82de45358f1ccd4149ca82265ee51a",
+      "frozen_feature_policy": "per_png_singleton_v1",
+      "original_report_path": "/workspace/scratch/7adff8a3b4a7/DoVIS-mastery-results/official-cohort/l1-cohort-trial-ko-r2-43647997707/cohort-ko-r2-d2eb21eb/raw-engine/C1-r2-f7486a38/report.json"
+    }
+  ],
+  "original_cohort_assessment": "targets_not_met",
+  "predates_H_training": true
+}

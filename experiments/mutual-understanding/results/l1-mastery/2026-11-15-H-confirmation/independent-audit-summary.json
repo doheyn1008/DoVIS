@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "audit_complete": true,
+  "audit_sha256": "cfad05b4f81562e09c3d7a50c8055c88d4aab144ef696a6c4a784ab931028c05",
+  "bytes": 700557,
+  "actual_states": 48,
+  "final_candidates": 12,
+  "robust": true,
+  "errors": [],
+  "official_summary_sha256": "d24a4991d6dcfb3cafd98480c9f1631f548e2df538df17eb58e976424e70378c",
+  "raw_rows": {
+    "generation_rows": 15936,
+    "native_rows": 63744,
+    "binary_rows": 75264
+  },
+  "bounded_restored_queries": {
+    "generation_queries": 36,
+    "four_choice_queries": 144
+  },
+  "min_final_U": 0.9620535714285714,
+  "min_final_P": 0.9375,
+  "min_final_binary": {
+    "role_reversal": 0.9620535714285714,
+    "color_only": 0.9866071428571429,
+    "shape_only": 0.9953703703703703,
+    "binding_swap": 1.0
+  },
+  "feature_table_groups": 2,
+  "original_H_failure_preserved": true,
+  "audit_script_sha256": "63f2337c9725d695e05f5c5dfb9d69de39e5460540e6bb76ba516c1fba244ce9",
+  "rows_helper_sha256": "e926fdbd78cf51f7aab358e18a13484a9cdb4702c00333e686c77f00abe935cd",
+  "elapsed_seconds": 62.231030745999306
+}

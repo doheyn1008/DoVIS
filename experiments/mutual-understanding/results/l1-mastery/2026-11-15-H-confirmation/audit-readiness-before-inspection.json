@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "kind": "independent-H1-confirmation-audit-framework-readiness",
+  "status": "frozen_before_inspecting_confirmation_outcomes",
+  "prepared_at_utc": "2026-11-15T04:05:45.605520+00:00",
+  "request_sha256": "eb78a12365c62da6ccc89236a65aff4d5b6d4bc99664402702d568a0e1992b3d",
+  "confirmation_run_id": 43674421396,
+  "confirmation_revision": "b2be650797152e91b71ede62f3fe34adadbeb27d",
+  "source_pins": {
+    "spatial_prior.py": "d97e72364b24801f428764c59a4655ac7773d4713f2b9da40ffc6164a2371d1b",
+    "native_preparation.py": "6b3319a69c0b19b8ac7467084ea2f0e1066ebfdd8af11976ca199fe7bdbdd665",
+    "fit_distractors.py": "c56e648f6d942b8f1ad1263cd12c299282fc6f566dae1365ff5fd15c8701bb9d",
+    "grounding_study.py": "04218ce20cc8ab28199a1081d92927f35788fc0e9ce28261da0e1355e81bf63d",
+    "mastery_infer.py": "ea7b76728d1fe0f4807c098e94ec157fd949b2175aa0699a33f6e7a24c237bac",
+    "development_world.py": "4ddb1f05af38970c14cc0f0801f4c550b33129a8e026e0538d52d2d064fa244a",
+    "runner.py": "133cf5f816314c0b4db861bb8abedc03f6ffafd6af68e2b2c03858640eb8880b",
+    "backend.py": "191b7789c4b61d67a1ba809cbfcb4473cf9ee71128d24a19da7f522572f5544b",
+    "world.py": "42d0a33062656e6f7057d29d28b957e7d8ef4056d5144f15b2a3aa3b713a1bfe",
+    "development_models.py": "84df083ef1c21fc15627295dab343362f7d880e73b641865dfa9ee373fd51fc9",
+    "server.py": "302250a31fac2eb45b374f54d50e205d498d3ead65c483f09bb45e9760f3c768",
+    "prompts.py": "b87831f08fe9c5fcb9108f81fed282ef829d3f3b3a46e2a232489a9920d78313",
+    "memory_study.py": "570e81a21901748b25dbd15cd2730df4d2f50868c2b32037405f105ac91da867",
+    "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "screening_plan.py": "4226e4bfc4f75c4c1aa8f6f9678b418b401454b59c2643eedc82ec102f85d93a",
+    "__init__.py": "97bc80f131104a389e2135b8fee22591d2436b4d93a29dfacf941ec79ba42abf",
+    "languages.py": "f724a369115d6c8a496a012c7d75a21d52bfb57afd542f4b93576654d08bcc92",
+    "composition_diagnostics.py": "deb03953ab7dea7d5deb1cce203853ddccf69e7e133a658fa967c3e7bef60c39",
+    "storage.py": "1c44b083274670b08e3254b98a0fea4295fa9060193b75ae0777a50da486bf55",
+    "decoder_study.py": "9a579a02cc7ff16a5ce901ae0e65eb231adb2fab1261dff4b047d98d1f6483c7",
+    "producer_context.py": "19733707041fecc4a6e240e87531ed72affe1644d59ca498c4de561dd5154ad7",
+    "metrics.py": "c512e14db018c96458b74744caf9d99aced25c14a3554c9e44ad436365765eef",
+    "diagnostics.py": "5601b16cecd8e5bd89a091c2e33234b9c1af57d7e27a8ce8ff71cb9f6a16153d",
+    "research.py": "514ab3b54bdcf22e0dd565c510d19e97a111faa358f79847a49d0b413630257c",
+    "grid.py": "36c2264d637d5e05e92b039a43c6da5f43bbb718a3619a1538b8a7399ff1b299",
+    "mastery_lab.py": "d2cdb759564aeed19d1ac43d302e8c7ec90e3ffc1d4600224f45aac09cbabe9f",
+    "config.py": "cab629ba49726b6f4a0c71f4a31311fe50f287ef6eaf4c9d55f082ded35ce2e9",
+    "agents.py": "955afd4b2efc23e50adf32c61180282a0754c281d9d05cb5ca7ad594457f7a01",
+    "cohort_validation.py": "3e5bc9318a98bc8775988059d5654103e0136330987a7dad1854b8d618596c19",
+    "understanding_memory.py": "7a68b5b8498f2563efad2cacee0d2b8b3177e47be8752616f98a624a04e47bcb",
+    "cli.py": "59a77b302c9f3ee70f6dbaada19595f0a6bcaf508a9fe8d8cc305f43e4fecb7f",
+    "frozen_features.py": "3a6c1d99e9c5322e7ec6cf1ff74f28abe3fa866826d7dccff058235525f21d5b",
+    "neural.py": "6c118cc91304cb6212348637acc88f4c95387b332401917ce381821ab8bfae75",
+    "profiles.py": "77de48e6cf5443f43c79a37c3385012abf73b4767933156377a075f4e90afb06",
+    "candidate_validation.py": "d5c29ddafc2d3dd98aa241adc16c63b44cf863bfc0b479ac3a8f4f50f7913d8e",
+    "images.py": "ad5ba91d34e8edb941397fbf402faa4be6b9b25256df40b8b151197e0a084fab",
+    "producer_context_study.py": "1edff52e0a044d240bed6a1b570ea8cd08310ae7212cdf55d7a05bd6062ce26f",
+    "composition_suite.py": "2ff0a3c4cf0eab943dffef12b7351af5987b4ede11bac7ee80eb0ce8d8322c62",
+    "object_memory.py": "0003db8ce10cc07773372644435d868e1a7737138eac7d5af3651bed84bd4fc7",
+    "negative_policy_study.py": "299b5ff2e31a4b294aa56e749d9911eaec7caa6bf73b14740eaa7eb16b1c938c",
+    "cohort_context_validation.py": "7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4",
+    "attentive_spatial.py": "fabaf3b480b230c32a7f71cbd8b5616a1b6f5b56dd8d461884cbcaadcc4b9c15"
+  },
+  "scripts": {
+    "audit_confirmation.py": "63f2337c9725d695e05f5c5dfb9d69de39e5460540e6bb76ba516c1fba244ce9",
+    "audit_rows.py": "e926fdbd78cf51f7aab358e18a13484a9cdb4702c00333e686c77f00abe935cd",
+    "test_audit_confirmation.py": "e895126bf19bf5a54ef820a863d7e3f8e6f12675c3f8e0456e562e889af621ec",
+    "test_audit_rows.py": "b0fb7bd1f3cb78b3a40a16ee4c22e6d5ca30394afc2c2fce89cf68bdfaf37a53"
+  },
+  "tests": {
+    "main": {
+      "passed": 12,
+      "seconds": 1.846
+    },
+    "rows": {
+      "passed": 15,
+      "seconds": 8.9
+    },
+    "peer_review": "Rowhelper and mainboundedreview passed after strict official row/scope/source-label gaps corrected; no NN/evaluation/source criteria relaxed"
+  },
+  "independent_references": {
+    "file": "fresh-reference-before-outcomes-v2.json",
+    "sha256": "f1300f619a47afb934208e34f6617f4424aa1d91414b36b816a1e338592192d9",
+    "three_fresh_initial_constructors": true,
+    "initial_models_used_only_C_image_prior": true,
+    "native_training_performed": false,
+    "main_and_negative_rng_snapshots_all_four_budgets": true,
+    "each_native_exposure_stream": 153600,
+    "all_four_caption_hash_streams": true,
+    "reference_generation_script_sha256": "94773001aeb52a37c108eb73a7dac31effd8edd74f807d9413493496467da64a",
+    "later_auditor_changes": "Only official-summary strict identity/source/scope and raw report label guards; no reference/scoring changes"
+  },
+  "actual_input_schema_proof": {
+    "file": "actual-input-schema-proof.json",
+    "sha256": "ba16cfd86bd3cfb17d4f49b5ffa92cbf0e9d1037d17c83e58417b36fa19c5172",
+    "authenticated_files": 66,
+    "original_failed_H_aggregation_preserved": true,
+    "separate_actual_repair_pinned": true
+  },
+  "planned_actual_data_checks": {
+    "exact_models": 12,
+    "actual_checkpoints": 48,
+    "budgets": [
+      0,
+      2400,
+      4800,
+      9600
+    ],
+    "fresh_seed_pairs": [
+      [
+        99007,
+        99009
+      ],
+      [
+        99017,
+        99019
+      ],
+      [
+        99027,
+        99029
+      ]
+    ],
+    "row_counts_per_model": {
+      "generation": 1328,
+      "native": 5312,
+      "binary": 6272
+    },
+    "all_six_same_final_scores": 0.9,
+    "coverage_minimum": {
+      "anchors": 8,
+      "pairs": 2
+    },
+    "first_fixed_dev_images_per_model": 3,
+    "caption_forms_per_fixed_image": 4,
+    "all_twelve_required": true,
+    "cross_host_features_required_bit_equal": false
+  },
+  "no_confirmation_model_outcomes_read": true,
+  "no_artifact_downloads_or_GitHub_mutations": true,
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false
+}

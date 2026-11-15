@@ -1,0 +1,25 @@
+{
+  "kind": "final-source-validation",
+  "mutual_understanding_torch": {
+    "tests": 442,
+    "passed": 442,
+    "skipped": 0,
+    "elapsed_seconds": 281.436
+  },
+  "mutual_understanding_stdlib": {
+    "tests": 442,
+    "passed": 306,
+    "skipped": 136,
+    "elapsed_seconds": 30.217
+  },
+  "H1_real_cohort": {
+    "models": 12,
+    "checkpoint_states": 48,
+    "all_six_final_criteria_passed": true,
+    "official_workflow_run_id": 43674421396,
+    "independent_audit_sha256": "cfad05b4f81562e09c3d7a50c8055c88d4aab144ef696a6c4a784ab931028c05"
+  },
+  "NN_source_files_unchanged_after_actual_training": 42,
+  "post_training_changes": "workflow admission/report failure paths, optional-test guard, read-only independent audit tools, result documentation only",
+  "native_corpus_training_performed": false
+}

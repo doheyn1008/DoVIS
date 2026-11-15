@@ -6,7 +6,7 @@
   "source_H_input_ZIP_SHA_verified": true,
   "actual_repair_summary_ZIP_SHA_verified": true,
   "source_run_id": 43652561578,
-  "source_revision": "0267ca740c936e720f18876e9216ee07f919cacc",
+  "source_revision": "736097e5298fb71037a420ec8bd635c73a0154dd",
   "repair_run_id": 43657319705,
   "repair_revision": "da1630dd3d8fc09aeba97cf427e7f466e2b9a1f9",
   "source_summary_sha256": "50075f5b62e8a623476dd0556d405ac3958ed277c1d5ed75e8814cfad519d88a",
@@ -43,5 +43,8 @@
   "only_confirmation_aggregation_AST_changed": true,
   "actual_prior_tensor_and_220_fit_images_verified": true,
   "native_weights_loaded": false,
-  "activation_performed": false
+  "activation_performed": false,
+  "recovery_checkout_revision": "0267ca740c936e720f18876e9216ee07f919cacc",
+  "record_scope": "pre-activation recovery snapshot; activation flags describe that earlier point in time",
+  "metadata_correction": "source_revision is the original H source_run_id commit; former0267 recovery checkout recorded separately. Request bytes/pins remain unchanged."
 }

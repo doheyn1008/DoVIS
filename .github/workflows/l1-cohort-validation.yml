@@ -166,7 +166,8 @@ jobs:
           WORKFLOW_PATH = '.github/workflows/l1-cohort-validation.yml'
           REQUEST_PATH = 'experiments/mutual-understanding/configs/mastery-cohort-run.request.json'
           BRANCHES = ('codex/l1-mastery', 'codex/l1-memory')
-          request_sha = hashlib.sha256(Path('configs/mastery-cohort-run.request.json').read_bytes()).hexdigest()
+          request_bytes = Path('configs/mastery-cohort-run.request.json').read_bytes()
+          request_sha = hashlib.sha256(request_bytes).hexdigest()
           evidence_path = Path('runs/cohort-input/provenance/admission.json')
           evidence_path.parent.mkdir(parents=True, exist_ok=True)
           audit = {'schema_version': 1, 'status': 'checking', 'request_sha256': request_sha,
@@ -177,6 +178,10 @@ jobs:
           
           def save():
               evidence_path.write_text(json.dumps(audit, indent=2) + '\n')
+          
+          def canonical_request(contents):
+              return json.dumps(json.loads(contents.decode('utf-8')), sort_keys=True,
+                  separators=(',', ':'), ensure_ascii=True, allow_nan=False)
           
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -191,6 +196,9 @@ jobs:
               return result
           
           try:
+              request_identity = canonical_request(request_bytes)
+              audit['request_identity_policy'] = 'canonical_parsed_json_v1'
+              audit['request_identity_sha256'] = hashlib.sha256(request_identity.encode('ascii')).hexdigest()
               if os.environ['GITHUB_RUN_ATTEMPT'] != '1':
                   raise ValueError('Only the original cohort workflow attempt may be admitted')
               raw_id = os.environ['GITHUB_RUN_ID']
@@ -281,10 +289,11 @@ jobs:
                       if item.get('type') != 'file' or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str):
                           raise ValueError('A historical request file cannot be verified')
                       contents = base64.b64decode(''.join(item['content'].split()), validate=True)
-                      if hashlib.sha256(contents).hexdigest() != request_sha:
+                      if canonical_request(contents) != request_identity:
                           continue
                       prior = {key: run.get(key) for key in ('id', 'html_url', 'head_sha', 'head_branch',
                           'created_at', 'status', 'conclusion', 'run_attempt')}
+                      prior['request_sha256'] = hashlib.sha256(contents).hexdigest()
                       audit['matching_prior_requests'].append(prior)
                       jobs, job_pages, job_page = [], set(), 1
                       while True:
@@ -330,7 +339,8 @@ jobs:
                   page += 1
               audit['status'] = 'no_prior_admission'
               save()
-              print('No earlier first-attempt verify success for pinned request SHA256 ' + request_sha)
+              print('No earlier first-attempt verify success for canonical request identity '
+                  + audit['request_identity_sha256'] + ' (raw SHA256 ' + request_sha + ')')
           except Exception as error:
               if audit['status'] != 'previously_admitted':
                   audit['status'] = 'blocked_uncertain'

@@ -101,7 +101,8 @@ print(json.dumps({'models':results,'negative_cases':negative,'scope':'DEVELOPMEN
 '''
 
 
-@unittest.skipUnless(importlib.util.find_spec("torch"), "requires optional CPU torch")
+@unittest.skipUnless(all(importlib.util.find_spec(name) for name in ("torch", "numpy", "PIL")),
+                     "requires optional CPU torch, NumPy and Pillow")
 class FutureHLoaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

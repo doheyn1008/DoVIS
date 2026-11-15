@@ -123,6 +123,64 @@ class CohortAdmissionTests(unittest.TestCase):
             evidence = json.loads((directory / self.evidence_path).read_text())
         return evidence, error, calls
 
+    def test_first_admission_records_canonical_identity_and_raw_provenance(self):
+        content = {"candidate": "H1", "rationale": "모국어 cohort", "seed_pair": [99007, 99009]}
+        first = json.dumps(content, ensure_ascii=False, indent=2).encode("utf-8")
+        reordered = json.dumps(dict(reversed(tuple(content.items()))), ensure_ascii=True).encode("utf-8")
+        fingerprints = []
+        for current in (first, reordered):
+            with self.subTest(current=current), patch.dict(globals(), {"REQUEST": current}):
+                evidence, error, _ = self.execute()
+                self.assertIsNone(error)
+                self.assertEqual(evidence["status"], "no_prior_admission")
+                self.assertEqual(evidence["request_sha256"], hashlib.sha256(current).hexdigest())
+                self.assertEqual(evidence["request_identity_policy"], "canonical_parsed_json_v1")
+                fingerprints.append(evidence["request_identity_sha256"])
+        self.assertNotEqual(hashlib.sha256(first).hexdigest(), hashlib.sha256(reordered).hexdigest())
+        self.assertEqual(fingerprints[0], fingerprints[1])
+
+    def test_whitespace_and_key_order_cannot_replace_an_admitted_request(self):
+        content = {"candidate": "H1", "rationale": "모국어 cohort", "seed_pair": [99007, 99009]}
+        current = json.dumps(content, ensure_ascii=False, indent=2).encode("utf-8")
+        variants = (json.dumps(content, ensure_ascii=True, separators=(",", ":")).encode("utf-8"),
+                    json.dumps(dict(reversed(tuple(content.items()))), ensure_ascii=False, indent=4).encode("utf-8"))
+        prior = run_record(100, branch="codex/l1-memory")
+        for historical in variants:
+            with self.subTest(historical=historical), patch.dict(globals(), {"REQUEST": current}):
+                self.assertNotEqual(hashlib.sha256(current).hexdigest(), hashlib.sha256(historical).hexdigest())
+                evidence, error, _ = self.execute(history={1: [prior]},
+                    contents={prior["head_sha"]: historical}, jobs={(100, 1): [verify_job(100)]})
+                self.assertIsInstance(error, RuntimeError)
+                self.assertEqual(evidence["status"], "previously_admitted")
+                self.assertEqual(evidence["blocking_run"]["id"], 100)
+                self.assertEqual(evidence["request_sha256"], hashlib.sha256(current).hexdigest())
+                self.assertEqual(evidence["blocking_run"]["request_sha256"], hashlib.sha256(historical).hexdigest())
+
+    def test_malformed_historical_request_fails_closed_before_admission(self):
+        prior = run_record(100)
+        for historical in (b"not JSON", b"\xff", b'{"x":NaN}', b'{"x":Infinity}', b'{"x":-Infinity}'):
+            with self.subTest(historical=historical):
+                evidence, error, calls = self.execute(history={1: [prior]},
+                    contents={prior["head_sha"]: historical}, jobs={(100, 1): [verify_job(100)]})
+                self.assertIsNotNone(error)
+                self.assertEqual(evidence["status"], "blocked_uncertain")
+                self.assertFalse(any("/attempts/" in call for call in calls))
+
+    def test_distinct_parsed_candidate_or_rationale_remains_independent(self):
+        content = {"candidate": "H1", "rationale": "same native cohort"}
+        current = json.dumps(content).encode("utf-8")
+        prior = run_record(100)
+        for historical_content in (dict(content, candidate="H0"),
+                                   dict(content, rationale="a different declared experiment")):
+            with self.subTest(historical_content=historical_content), patch.dict(globals(), {"REQUEST": current}):
+                historical = json.dumps(historical_content).encode("utf-8")
+                evidence, error, calls = self.execute(history={1: [prior]},
+                    contents={prior["head_sha"]: historical}, jobs={(100, 1): [verify_job(100)]})
+                self.assertIsNone(error)
+                self.assertEqual(evidence["status"], "no_prior_admission")
+                self.assertEqual(evidence["matching_prior_requests"], [])
+                self.assertFalse(any("/attempts/" in call for call in calls))
+
     def test_global_concurrency_serializes_both_allowed_branches(self):
         source = WORKFLOW.read_text()
         found = re.search(r"(?m)^concurrency:\n  group: ([^\n]+)\n  cancel-in-progress: false$", source)
@@ -212,7 +270,7 @@ class CohortAdmissionTests(unittest.TestCase):
     def test_history_and_first_attempt_jobs_are_fully_paginated(self):
         a, b = run_record(100), run_record(200, branch="codex/l1-memory")
         evidence, error, calls = self.execute(history={1: [a], 2: [b], 3: []},
-            contents={a["head_sha"]: b"another request", b["head_sha"]: REQUEST},
+            contents={a["head_sha"]: b'{"different":"request-a"}', b["head_sha"]: REQUEST},
             jobs={(200, 1): [{"id": 2001, "name": "validate_candidate (ko, 0)",
                               "status": "completed", "conclusion": "failure"}],
                   (200, 2): [verify_job(200)]})
@@ -249,7 +307,7 @@ class CohortAdmissionTests(unittest.TestCase):
     def test_repeated_history_page_fails_instead_of_silently_capping_search(self):
         prior = run_record(100)
         evidence, error, _ = self.execute(history={1: [prior], 2: [prior]},
-            contents={prior["head_sha"]: b"different"})
+            contents={prior["head_sha"]: b'{"different":"request-b"}'})
         self.assertIsInstance(error, ValueError)
         self.assertEqual(evidence["status"], "blocked_uncertain")
 

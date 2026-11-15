@@ -28,6 +28,7 @@ PRIOR_MANIFEST_SHA = "3ef0e0ce056c4c553468a0572f42098b09d3b3d7f9d68fe9021a5832a7
 SOURCE_SUMMARY_SHA = "50075f5b62e8a623476dd0556d405ac3958ed277c1d5ed75e8814cfad519d88a"
 COHORT_SHA = "7ede9cd0a40a585d11fc94d08738d8a74abc2607b252c3ccc6e4b4614ef6eba4"
 FACTORY = "mutual_lab.producer_context_study.RecordingFactory.H1"
+OPTIMIZER_INTEGRITY_VERSION = "posthoc-finite-adam-moments-v1"
 REPAIR = {
     "aggregation_repair_run_id": 43657319705,
     "aggregation_repair_run_attempt": 1,
@@ -276,6 +277,66 @@ def validate_repair_context(ctx, input_directory):
             "original_native_cells_rerun": False}
 
 
+def validate_adam_optimizer(optimizer, weights, reference, step):
+    """Additive post-hoc integrity check; not the original frozen audit claim.
+
+    The fixed H1 loss uses every trainable U/P parameter, including zero but
+    present first-step attention gradients. Its eight frozen CNN parameters
+    receive no gradients. Thus expected state coverage is precisely the fresh
+    reference's trainable parameter IDs, not all IDs in Adam's parameter group.
+    This checks saved moment integrity, not a replay of every Adam update.
+    """
+    import torch
+    require(type(step) is int and step >= 0, "Invalid optimizer budget")
+    require(isinstance(optimizer, dict) and isinstance(optimizer.get("state"), dict), "Adam state must be a mapping")
+    same(optimizer.get("param_groups"), reference["optimizer_groups"], "Actual Adam hyperparameters differ")
+    ids = [i for group in reference["optimizer_groups"] for i in group["params"]]
+    flags = reference["flags"]
+    require(len(ids) == len(flags) and len(ids) == len(set(ids)) and all(type(i) is int and i >= 0 for i in ids),
+            "Invalid reference Adam parameter indexing")
+    require(all(isinstance(row, (tuple, list)) and len(row) == 2 and isinstance(row[0], str)
+                and type(row[1]) is bool for row in flags) and len({row[0] for row in flags}) == len(flags),
+            "Invalid reference named parameter mapping")
+    mapping = []
+    for index, (name, trainable) in zip(ids, flags):
+        require(name in weights and isinstance(weights[name], torch.Tensor) and weights[name].is_floating_point(),
+                "Adam parameter is missing or not a floating tensor: " + name)
+        parameter = weights[name]
+        same((list(parameter.shape), str(parameter.dtype)), reference["shapes"][name], "Adam parameter mapping shape/dtype differs")
+        mapping.append({"id": index, "name": name, "trainable": trainable,
+                        "shape": list(parameter.shape), "dtype": str(parameter.dtype)})
+    states = optimizer["state"]
+    require(all(type(index) is int for index in states), "Adam state IDs must be integers")
+    expected = {row["id"] for row in mapping if row["trainable"]} if step else set()
+    require(set(states) == expected,
+            "Adam state coverage differs: missing trainable state or unexpected/frozen parameter ID")
+    for row in mapping:
+        if row["id"] not in expected:
+            continue
+        state, parameter = states[row["id"]], weights[row["name"]]
+        require(isinstance(state, dict) and set(state) == {"step", "exp_avg", "exp_avg_sq"},
+                "Adam moment fields are missing or unexpected: " + row["name"])
+        actual_step = state["step"]
+        if isinstance(actual_step, torch.Tensor):
+            require(actual_step.ndim == 0 and actual_step.dtype != torch.bool and not actual_step.is_complex()
+                    and bool(torch.isfinite(actual_step).item()), "Adam step is not a finite scalar")
+        else:
+            require(type(actual_step) in (int, float), "Adam step is not a numeric scalar")
+        require(float(actual_step) == step, "Adam step differs from fixed checkpoint")
+        for field in ("exp_avg", "exp_avg_sq"):
+            moment = state[field]
+            require(isinstance(moment, torch.Tensor) and moment.is_floating_point(),
+                    "Adam moment is not a floating tensor: " + row["name"] + "." + field)
+            require(moment.shape == parameter.shape and moment.dtype == parameter.dtype,
+                    "Adam moment shape/dtype differs from its indexed parameter: " + row["name"] + "." + field)
+            require(bool(torch.isfinite(moment).all().item()), "Nonfinite Adam moment: " + row["name"] + "." + field)
+    return {"version": OPTIMIZER_INTEGRITY_VERSION, "parameters_indexed": len(mapping),
+            "expected_state_ids": sorted(expected), "states_verified": len(states), "moment_tensors_verified": 2 * len(states),
+            "moment_elements_verified": 2 * sum(weights[row["name"]].numel() for row in mapping if row["id"] in expected),
+            "parameter_mapping_sha256": hashlib.sha256(canon(mapping).encode()).hexdigest(),
+            "frozen_parameter_states_absent": True, "step": step}
+
+
 def check_payload(payload, manifest, raw, step, pair, reference, stream, source_map, revision, digest):
     require(payload.get("format") == "mutual-mastery-development-v1" and payload.get("kind") == "development_only"
             and payload.get("excluded_from_research") is True and payload.get("eligible_for_fresh_experiment") is False, "Wrong tensor artifact scope")
@@ -302,11 +363,7 @@ def check_payload(payload, manifest, raw, step, pair, reference, stream, source_
     require(hashes["visual_encoder"] == reference["prior_sha256"] == raw["initial_prior_sha256"] == raw["final_prior_sha256"], "Frozen prior actual tensors changed")
     if step == 0:
         require(digest(weights) == reference["full_state_sha256"], "Actual initial NN is not independently reconstructed fresh NN")
-        require(not payload["optimizer"]["state"], "Actual initial Adam contains state")
-    else:
-        require(payload["optimizer"]["state"], "Actual trained Adam is empty")
-        require(all(float(state["step"]) == step for state in payload["optimizer"]["state"].values()), "Adam step differs from fixed checkpoint")
-    same(payload["optimizer"]["param_groups"], reference["optimizer_groups"], "Actual Adam hyperparameters differ")
+    optimizer_integrity = validate_adam_optimizer(payload["optimizer"], weights, reference, step)
     state = stream["snapshots"][step]
     require(hashlib.sha256(canon(payload["training_rng_state"]).encode()).hexdigest() == state["training_rng_sha256"], "Actual meaning/caption RNG differs")
     require(hashlib.sha256(canon(payload["negative_rng_state"]).encode()).hexdigest() == state["negative_rng_sha256"], "Actual negative RNG differs")
@@ -315,7 +372,7 @@ def check_payload(payload, manifest, raw, step, pair, reference, stream, source_
     require(payload.get("frozen_feature_policy") == "per_png_singleton_v1", "Actual tensor missing singleton policy")
     same(payload.get("frozen_feature_tables"), raw.get("frozen_feature_tables"), "Actual tensor feature tables differ")
     return {"step": step, "sha256": manifest["sha256"], "full_state_sha256": digest(weights), "branches": hashes,
-            "actual_rng_and_optimizer_verified": True}
+            "actual_rng_and_optimizer_verified": True, "posthoc_optimizer_integrity": optimizer_integrity}
 
 
 def fixed_inference(checkpoint, prior, directory, raw, splits):

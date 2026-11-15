@@ -99,6 +99,7 @@ class TensorTests(unittest.TestCase):
         torch.manual_seed(99009); tr=torch.random.get_rng_state().clone()
         ref = {"full_state_sha256":digest(weights),"prior_sha256":branches['visual_encoder'],
             "shapes":{n:(list(v.shape),str(v.dtype)) for n,v in weights.items()},"optimizer_groups":group,
+            "flags":[("understanding.w",True),("producer.w",True),("visual_encoder.w",False)],
             "torch_rng_sha256":hashlib.sha256(tr.numpy().tobytes()).hexdigest(),"torch_rng_shape":list(tr.shape)}
         raw = {"language":"ko","phase":"C","condition":"C1","replica":0,"seed_pair":[99007,99009],"model_factory":a.FACTORY,
             "source_sha256":{"x":"a"*64},"data_sha256":"b"*64,"split":{"x":1},"revision":{"commit":"c"*40,"working_tree_dirty":False},
@@ -156,6 +157,74 @@ class TensorTests(unittest.TestCase):
         for field in ('fallback_count','rng_unchanged','model_state_unchanged'):
             fake=copy.deepcopy(pre);fake[field]=1 if field=='fallback_count' else False
             with self.assertRaises(ValueError):a.validate_cache({'step_0':table,'final':table},{'memory_preflight':fake},[],digest)
+
+
+@unittest.skipUnless(HAS_TORCH, "Optional CPU Torch, NumPy and Pillow")
+class PosthocOptimizerTests(unittest.TestCase):
+    def fixture(self, step=2400):
+        from mutual_lab.neural import torch
+        payload, _, _, reference, _, _ = TensorTests().fixture()
+        optimizer = payload['optimizer']
+        if step:
+            optimizer['state'] = {index: {'step':torch.tensor(float(step)),
+                'exp_avg':torch.full_like(payload['model'][name],.1),
+                'exp_avg_sq':torch.full_like(payload['model'][name],.01)}
+                for index,(name,trainable) in enumerate(reference['flags']) if trainable}
+        return optimizer,payload['model'],reference
+
+    def test_exact_trainable_coverage_and_frozen_absence(self):
+        for step in (0,2400,4800,9600):
+            with self.subTest(step=step):
+                optimizer,weights,reference=self.fixture(step)
+                result=a.validate_adam_optimizer(optimizer,weights,reference,step)
+                self.assertEqual(result['parameters_indexed'],3)
+                self.assertEqual(result['states_verified'],2 if step else 0)
+                self.assertEqual(result['moment_tensors_verified'],4 if step else 0)
+                self.assertTrue(result['frozen_parameter_states_absent'])
+
+    def test_moments_are_required_floating_finite_and_parameter_shaped(self):
+        from mutual_lab.neural import torch
+        for field in ('exp_avg','exp_avg_sq'):
+            for corruption in ('missing','not_tensor','integer','nan','inf','shape','dtype'):
+                with self.subTest(field=field,corruption=corruption):
+                    optimizer,weights,reference=self.fixture();state=optimizer['state'][0]
+                    if corruption=='missing':del state[field]
+                    elif corruption=='not_tensor':state[field]=0.
+                    elif corruption=='integer':state[field]=state[field].long()
+                    elif corruption=='nan':state[field][0]=float('nan')
+                    elif corruption=='inf':state[field][0]=float('inf')
+                    elif corruption=='shape':state[field]=state[field].reshape(1,-1)
+                    elif corruption=='dtype':state[field]=state[field].double()
+                    with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_missing_unexpected_frozen_and_noninteger_state_ids_fail(self):
+        for corruption in ('missing_one','missing_all','unexpected','frozen','string_id'):
+            with self.subTest(corruption=corruption):
+                optimizer,weights,reference=self.fixture();states=optimizer['state']
+                if corruption=='missing_one':del states[0]
+                elif corruption=='missing_all':states.clear()
+                elif corruption=='unexpected':states[99]=copy.deepcopy(states[0])
+                elif corruption=='frozen':states[2]=copy.deepcopy(states[0])
+                elif corruption=='string_id':states['0']=states.pop(0)
+                with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_index_order_hyperparameters_and_step_checks_remain(self):
+        from mutual_lab.neural import torch
+        for corruption in ('index_order','lr','wrong_step','nonfinite_step','vector_step','missing_step','extra_state_field'):
+            with self.subTest(corruption=corruption):
+                optimizer,weights,reference=self.fixture()
+                if corruption=='index_order':optimizer['param_groups']=copy.deepcopy(optimizer['param_groups']);optimizer['param_groups'][0]['params']=[1,0,2]
+                elif corruption=='lr':optimizer['param_groups']=copy.deepcopy(optimizer['param_groups']);optimizer['param_groups'][0]['lr']=.1
+                elif corruption=='wrong_step':optimizer['state'][0]['step']=torch.tensor(2399.)
+                elif corruption=='nonfinite_step':optimizer['state'][0]['step']=torch.tensor(float('nan'))
+                elif corruption=='vector_step':optimizer['state'][0]['step']=torch.tensor([2400.])
+                elif corruption=='missing_step':del optimizer['state'][0]['step']
+                elif corruption=='extra_state_field':optimizer['state'][0]['max_exp_avg_sq']=torch.zeros(2)
+                with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,2400)
+
+    def test_nonempty_initial_state_is_never_accepted_as_fresh(self):
+        optimizer,weights,reference=self.fixture()
+        with self.assertRaises(ValueError):a.validate_adam_optimizer(optimizer,weights,reference,0)
 
 
 if __name__=='__main__':unittest.main()

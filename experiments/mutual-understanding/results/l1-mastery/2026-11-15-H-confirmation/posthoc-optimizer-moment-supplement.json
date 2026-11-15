@@ -1,0 +1,2622 @@
+{
+  "schema_version": 1,
+  "kind": "posthoc-additive-H1-optimizer-moment-integrity-supplement",
+  "status": "pass",
+  "posthoc_additive_hardening": true,
+  "scope": "Finite floating Adam moment integrity and exact trusted parameter-ID/name/shape/dtype coverage; not a gradient/update replay or a change to model qualification criteria.",
+  "original_frozen_audit_sha256": "cfad05b4f81562e09c3d7a50c8055c88d4aab144ef696a6c4a784ab931028c05",
+  "original_frozen_audit_script_sha256": "63f2337c9725d695e05f5c5dfb9d69de39e5460540e6bb76ba516c1fba244ce9",
+  "original_frozen_audit_preserved": true,
+  "original_frozen_audit_regenerated": false,
+  "new_validator_script_sha256": "f067b92928bb0e5d8bd14e25cd701275fa46eb339610f482bc294834d1efec02",
+  "supplement_runner_sha256": "ca252b1e4cc581b923815ac130f6cefe6638082786641ebf4e15175083946993",
+  "trusted_pre_outcome_reference_sha256": "f1300f619a47afb934208e34f6617f4424aa1d91414b36b816a1e338592192d9",
+  "reference_constructor_and_optimizer_order": "Ordered fresh model.named_parameters flags paired with fresh Adam param_groups parameter IDs. All22 trainable U/P parameters occur in the two H1 losses; zero-but-present attention gradients create state. All8 frozen CNN parameters must have no states.",
+  "parameter_mappings_by_replica": {
+    "0": [
+      {
+        "id": 0,
+        "name": "understanding.base.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 1,
+        "name": "understanding.base.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 2,
+        "name": "understanding.base.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 3,
+        "name": "understanding.base.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 4,
+        "name": "understanding.base.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 5,
+        "name": "understanding.base.head.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 6,
+        "name": "understanding.base.head.bias",
+        "trainable": true,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 7,
+        "name": "understanding.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 8,
+        "name": "understanding.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 9,
+        "name": "understanding.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 10,
+        "name": "understanding.residual_output.weight",
+        "trainable": true,
+        "shape": [
+          1,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 11,
+        "name": "producer.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 12,
+        "name": "producer.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          192
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 13,
+        "name": "producer.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 14,
+        "name": "producer.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 15,
+        "name": "producer.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 16,
+        "name": "producer.output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 17,
+        "name": "producer.output.bias",
+        "trainable": true,
+        "shape": [
+          259
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 18,
+        "name": "producer.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 19,
+        "name": "producer.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 20,
+        "name": "producer.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 21,
+        "name": "producer.attention_output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 22,
+        "name": "visual_encoder.features.0.weight",
+        "trainable": false,
+        "shape": [
+          16,
+          3,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 23,
+        "name": "visual_encoder.features.0.bias",
+        "trainable": false,
+        "shape": [
+          16
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 24,
+        "name": "visual_encoder.features.2.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          16,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 25,
+        "name": "visual_encoder.features.2.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 26,
+        "name": "visual_encoder.features.4.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 27,
+        "name": "visual_encoder.features.4.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 28,
+        "name": "visual_encoder.readout.weight",
+        "trainable": false,
+        "shape": [
+          128,
+          768
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 29,
+        "name": "visual_encoder.readout.bias",
+        "trainable": false,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      }
+    ],
+    "1": [
+      {
+        "id": 0,
+        "name": "understanding.base.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 1,
+        "name": "understanding.base.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 2,
+        "name": "understanding.base.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 3,
+        "name": "understanding.base.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 4,
+        "name": "understanding.base.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 5,
+        "name": "understanding.base.head.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 6,
+        "name": "understanding.base.head.bias",
+        "trainable": true,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 7,
+        "name": "understanding.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 8,
+        "name": "understanding.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 9,
+        "name": "understanding.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 10,
+        "name": "understanding.residual_output.weight",
+        "trainable": true,
+        "shape": [
+          1,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 11,
+        "name": "producer.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 12,
+        "name": "producer.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          192
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 13,
+        "name": "producer.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 14,
+        "name": "producer.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 15,
+        "name": "producer.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 16,
+        "name": "producer.output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 17,
+        "name": "producer.output.bias",
+        "trainable": true,
+        "shape": [
+          259
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 18,
+        "name": "producer.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 19,
+        "name": "producer.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 20,
+        "name": "producer.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 21,
+        "name": "producer.attention_output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 22,
+        "name": "visual_encoder.features.0.weight",
+        "trainable": false,
+        "shape": [
+          16,
+          3,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 23,
+        "name": "visual_encoder.features.0.bias",
+        "trainable": false,
+        "shape": [
+          16
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 24,
+        "name": "visual_encoder.features.2.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          16,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 25,
+        "name": "visual_encoder.features.2.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 26,
+        "name": "visual_encoder.features.4.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 27,
+        "name": "visual_encoder.features.4.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 28,
+        "name": "visual_encoder.readout.weight",
+        "trainable": false,
+        "shape": [
+          128,
+          768
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 29,
+        "name": "visual_encoder.readout.bias",
+        "trainable": false,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      }
+    ],
+    "2": [
+      {
+        "id": 0,
+        "name": "understanding.base.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 1,
+        "name": "understanding.base.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 2,
+        "name": "understanding.base.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 3,
+        "name": "understanding.base.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 4,
+        "name": "understanding.base.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 5,
+        "name": "understanding.base.head.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 6,
+        "name": "understanding.base.head.bias",
+        "trainable": true,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 7,
+        "name": "understanding.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 8,
+        "name": "understanding.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 9,
+        "name": "understanding.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 10,
+        "name": "understanding.residual_output.weight",
+        "trainable": true,
+        "shape": [
+          1,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 11,
+        "name": "producer.embedding.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          64
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 12,
+        "name": "producer.gru.weight_ih_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          192
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 13,
+        "name": "producer.gru.weight_hh_l0",
+        "trainable": true,
+        "shape": [
+          384,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 14,
+        "name": "producer.gru.bias_ih_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 15,
+        "name": "producer.gru.bias_hh_l0",
+        "trainable": true,
+        "shape": [
+          384
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 16,
+        "name": "producer.output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 17,
+        "name": "producer.output.bias",
+        "trainable": true,
+        "shape": [
+          259
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 18,
+        "name": "producer.query.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 19,
+        "name": "producer.key.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 20,
+        "name": "producer.value.weight",
+        "trainable": true,
+        "shape": [
+          128,
+          34
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 21,
+        "name": "producer.attention_output.weight",
+        "trainable": true,
+        "shape": [
+          259,
+          128
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 22,
+        "name": "visual_encoder.features.0.weight",
+        "trainable": false,
+        "shape": [
+          16,
+          3,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 23,
+        "name": "visual_encoder.features.0.bias",
+        "trainable": false,
+        "shape": [
+          16
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 24,
+        "name": "visual_encoder.features.2.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          16,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 25,
+        "name": "visual_encoder.features.2.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 26,
+        "name": "visual_encoder.features.4.weight",
+        "trainable": false,
+        "shape": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 27,
+        "name": "visual_encoder.features.4.bias",
+        "trainable": false,
+        "shape": [
+          32
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 28,
+        "name": "visual_encoder.readout.weight",
+        "trainable": false,
+        "shape": [
+          128,
+          768
+        ],
+        "dtype": "torch.float32"
+      },
+      {
+        "id": 29,
+        "name": "visual_encoder.readout.bias",
+        "trainable": false,
+        "shape": [
+          128
+        ],
+        "dtype": "torch.float32"
+      }
+    ]
+  },
+  "all42_NN_source_files_unchanged": true,
+  "request_sha256": "eb78a12365c62da6ccc89236a65aff4d5b6d4bc99664402702d568a0e1992b3d",
+  "run_id": 43674421396,
+  "training_revision": "b2be650797152e91b71ede62f3fe34adadbeb27d",
+  "checkpoints_checked": 48,
+  "initial_empty_optimizer_checkpoints": 12,
+  "trained_optimizer_checkpoints": 36,
+  "optimizer_parameter_states_verified": 792,
+  "moment_tensors_verified": 1584,
+  "moment_elements_verified": 26256600,
+  "rows": [
+    {
+      "language": "ko",
+      "replica": 0,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ko-r0-43674421396/cohort-ko-r0-750336e5/raw-engine/C1-r0-f0ff53e0/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "23d66933ef87d245c5d44d81f9c8fcdba01d0d243362a02403ac6bb5d35b5de8",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ko-r0-43674421396/cohort-ko-r0-750336e5/raw-engine/C1-r0-f0ff53e0/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "7babe0551b0d5f9eca240826bd3fadafe623ad77f82a9a5ec232cdaa42eefbea",
+      "optimizer_state_sha256": "801e3764a85b63f4846bcd14a7770c0436d6674b4a4288986123d0658df35770",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ko-r0-43674421396/cohort-ko-r0-750336e5/raw-engine/C1-r0-f0ff53e0/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "8edcb45e30bd18a5b1bdfa05eac4c93c6ff45b506eda4507f0282bbb2875eb99",
+      "optimizer_state_sha256": "84e1abd34076154961236c6f12d0adca7da9114ade7dba095dff3e7d16d8eb81",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 0,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ko-r0-43674421396/cohort-ko-r0-750336e5/raw-engine/C1-r0-f0ff53e0/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "e1107aadf37713bd426850bbe4ce9a0b9c4a75cdda60c4e440525dd574d662e2",
+      "optimizer_state_sha256": "ecccd4ff992d600621947378d34168108e341655eaf34afe9b4c9ee4a8030870",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ko-r1-43674421396/cohort-ko-r1-73642fef/raw-engine/C1-r1-b7c45ee2/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "fb4cf4ffbea27f05dd5287086eda85d3c4dfe634cbdea022089b5ad4a1c0a725",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ko-r1-43674421396/cohort-ko-r1-73642fef/raw-engine/C1-r1-b7c45ee2/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "c87e772cd22931a96b435eb88df6d7ef3e637ffbe4c6d7c915d31d8fa0e044b5",
+      "optimizer_state_sha256": "e36cf839b348f5b799c43ae0f8f23d2b40157c6ccdaa50568009f475655bc20c",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ko-r1-43674421396/cohort-ko-r1-73642fef/raw-engine/C1-r1-b7c45ee2/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "2da42547f3d96d1cb0921cd20e1f049afe5eaddb146b6cfc5187ec56fa2505af",
+      "optimizer_state_sha256": "736d983d9b6da83e7a6ba5af2443c0e4a692ce52e25ddfcf33dddf855e593915",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 1,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ko-r1-43674421396/cohort-ko-r1-73642fef/raw-engine/C1-r1-b7c45ee2/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "33ffeffa700db17592f6b78937f7db7cac2c8670b9b19c1620b98e49620024f8",
+      "optimizer_state_sha256": "5696709e034b8dd0a359bfb99e823b612abcf661e510689a6ed496f7d4bd0170",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ko-r2-43674421396/cohort-ko-r2-2071ad6d/raw-engine/C1-r2-9099eb0b/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "d6a80e08da3682d5f6e59265d6be3fc05a61035bbea26c75497cfcb2c71b7135",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ko-r2-43674421396/cohort-ko-r2-2071ad6d/raw-engine/C1-r2-9099eb0b/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "6f7108b88e0ef25064d2ce1b8d348620f16348c71caeaafe85faaea88ced4990",
+      "optimizer_state_sha256": "b9f2f94900bf83d6d1946ac6d161015a228ac596ea223026b3bd37963c65b355",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ko-r2-43674421396/cohort-ko-r2-2071ad6d/raw-engine/C1-r2-9099eb0b/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "7affbe4e104fbeb9bdd9f3f6ce0d3331bccfbae54fbf9b28ee509c06a0b044fb",
+      "optimizer_state_sha256": "11d88c66b494018e6d875710c267dba446f6786bcb3025c6a439777158d05368",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ko",
+      "replica": 2,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ko-r2-43674421396/cohort-ko-r2-2071ad6d/raw-engine/C1-r2-9099eb0b/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "479a65168e7e107eb240b0f642c1985367fed68efaf7d4c75c17363ff3ec3e04",
+      "optimizer_state_sha256": "01dbf1ee5950d6f3fbc05073820f44a883939e3f28e04fd2571a413a1550bd5e",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ja-r0-43674421396/cohort-ja-r0-f4789912/raw-engine/C1-r0-b42c7ab1/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "1984cf3008d3c1044bf326946c204579e81d70d04085fa0a7d84d41d55059afe",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ja-r0-43674421396/cohort-ja-r0-f4789912/raw-engine/C1-r0-b42c7ab1/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "9a460a0029251295a70bda7397cdb3ae2770bc46390d096d84504c300714f4bc",
+      "optimizer_state_sha256": "872edabd09d64652ba594462ee35effffedf3327b46e37bd4e1862f2815c18c8",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ja-r0-43674421396/cohort-ja-r0-f4789912/raw-engine/C1-r0-b42c7ab1/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "65bb81ed94b167651435b054be4ddcb1d3581f4ea76d9f0d41ab058692b1f370",
+      "optimizer_state_sha256": "423b7916b1bc25da18b9d3f07231f7c308d31f7d8d1a3c0c0c123886f1959d24",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 0,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ja-r0-43674421396/cohort-ja-r0-f4789912/raw-engine/C1-r0-b42c7ab1/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "ee41c07e24e36e39d3c2f55d9b58dcc7c5c819d1c7df060254a28fccba04f930",
+      "optimizer_state_sha256": "28153b6742e52e7e507a6aa1c2f68f1adb3e881f215014320dd85a05f3000bff",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ja-r1-43674421396/cohort-ja-r1-9357d9f1/raw-engine/C1-r1-09a40675/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "f7d8158e836b3958097fb7cc3b0589659256f49793bf960cfcaee5411db812cb",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ja-r1-43674421396/cohort-ja-r1-9357d9f1/raw-engine/C1-r1-09a40675/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "c50c7f76e8084745bb31a2a9c2060370f429e0d19178ece55f87f0aff69b3721",
+      "optimizer_state_sha256": "182996050e4762e7400f3b3e4e5ba1295d0ba99b3efbb660843c77df8928ed5b",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ja-r1-43674421396/cohort-ja-r1-9357d9f1/raw-engine/C1-r1-09a40675/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "d77afa3946179c514b18e38d3b870f86f7e0d05547a713e7a7b1a999add90966",
+      "optimizer_state_sha256": "42f0ce27aba3a8d6a73acabf8c50fa1aaca59745f4738070972b5cde2a4c36e1",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 1,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ja-r1-43674421396/cohort-ja-r1-9357d9f1/raw-engine/C1-r1-09a40675/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "fabbfbee776a182b4ba9bb86258246ea3bd3a4afa301deeb9e078c8541158ef7",
+      "optimizer_state_sha256": "bb8799c4ac531704ee4cc4bd78ab493f3352b0df84f12a31089abf39ee6ff54c",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-ja-r2-43674421396/cohort-ja-r2-af92bacf/raw-engine/C1-r2-ed86a325/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "670151e291d58ca0f263ff9deac71e9eb4f66f96075e0bd66073af7c6e68cf9f",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-ja-r2-43674421396/cohort-ja-r2-af92bacf/raw-engine/C1-r2-ed86a325/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "521da555c599bc7726b6864882725e4b576a8dc8514cb75a1f1fe573aa9aff7a",
+      "optimizer_state_sha256": "e59b4911b3ceb439199121fcaa6cd2b1e9cc09bd8e225fc87f528b3c4f9bf1c9",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-ja-r2-43674421396/cohort-ja-r2-af92bacf/raw-engine/C1-r2-ed86a325/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "a670fe443c8c353d37e35d3f4da8c48d19f1349111cc9f1a33dfd202fca25bde",
+      "optimizer_state_sha256": "0c2d8c00428b1aeef2f80593586cdf5d265b512cc6f3766dc34f2fb9cfacbb27",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "ja",
+      "replica": 2,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-ja-r2-43674421396/cohort-ja-r2-af92bacf/raw-engine/C1-r2-ed86a325/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "f631643851395eab63c1c473908e6dde4884c850c0eb6ad01b36ef14e853e53c",
+      "optimizer_state_sha256": "08c06a5fa61078d49897b9ca9f35b707b7034a895c4091685c8af8f53f24c1d1",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-en-r0-43674421396/cohort-en-r0-e6eeb4fb/raw-engine/C1-r0-5a63c0b4/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "0e922b28a81ab4674ccdff9ea8d977530a77e1a4e3e1212adb711edd02b06d26",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-en-r0-43674421396/cohort-en-r0-e6eeb4fb/raw-engine/C1-r0-5a63c0b4/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "0731eb0cc43b662dcc3a12bdb0679f049a2bc84f2e67c5b6c1b06f91b5d7c800",
+      "optimizer_state_sha256": "62b5178bf8fb52d3204202320b246d66a863aa57bcd71f6d732dc93ea51981c2",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-en-r0-43674421396/cohort-en-r0-e6eeb4fb/raw-engine/C1-r0-5a63c0b4/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "f0e7019250181c42793c864887c52dc556d0628a12d822da33427594b5ab25d9",
+      "optimizer_state_sha256": "7159cb31d979b5190df190ae793027c24ae687e2fcc7ea42e37d371c3f67cf68",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 0,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-en-r0-43674421396/cohort-en-r0-e6eeb4fb/raw-engine/C1-r0-5a63c0b4/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "cd8601db7f5bcddd907453e2a575383f3d7f03627b3c5900757d209dafd10a61",
+      "optimizer_state_sha256": "7623d37cf4e6765dc3a7d886cf1528b98c0b6adf60fdda6acd310c3f5ef36fd0",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-en-r1-43674421396/cohort-en-r1-b94df9a9/raw-engine/C1-r1-ac4b6eef/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "d1fda69d0ffed71c5e9f52bce471066fd6e429bdafe82e158ea258274fc35f9a",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-en-r1-43674421396/cohort-en-r1-b94df9a9/raw-engine/C1-r1-ac4b6eef/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "c35f98866496b64359f5387d2d6308527f12851f33eadb9d4d9608ae10bb24da",
+      "optimizer_state_sha256": "06b9dc5cac757106a25072783326155c8e2b5d66840e20c1360adc0f022fd23f",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-en-r1-43674421396/cohort-en-r1-b94df9a9/raw-engine/C1-r1-ac4b6eef/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "8cdfc70c3f6070429d69917d5c1b3d5d7c4a9e343eb7a0d00d5e7f2f039b3841",
+      "optimizer_state_sha256": "0650cf82defd45126bced0e185669463872897fa7dab92b8ab3da4c1879e3898",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 1,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-en-r1-43674421396/cohort-en-r1-b94df9a9/raw-engine/C1-r1-ac4b6eef/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "8c0b4f0e367bc8e04479e4256ab79aa9f6a4ad2015146fdff8b4a133fd9a34c9",
+      "optimizer_state_sha256": "4cca1d38713c711627c0cee95d8bf3d4a9557f36a2c1e20ae32fb89b1c98ef1f",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-en-r2-43674421396/cohort-en-r2-c807f21d/raw-engine/C1-r2-65f02c3f/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "4cc3f8f6faf680c45dde0d2d3df2225bc5ead32b62e34a10d1bf84719d0144ea",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-en-r2-43674421396/cohort-en-r2-c807f21d/raw-engine/C1-r2-65f02c3f/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "3d83f1371da731ff93fce852406e83d993dd49990ab72b2aae1da6c948bdb7d7",
+      "optimizer_state_sha256": "2642d5d09f6e394954f30d8cfda864e9068676e4a80c79b88b3b123ea6b7522a",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-en-r2-43674421396/cohort-en-r2-c807f21d/raw-engine/C1-r2-65f02c3f/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "47ff2efa28049653423ca552abe83c928e153921c8ac3766b35075eedbd0d2f2",
+      "optimizer_state_sha256": "98e450fa62f97a12948215c5ee6c310f45391b8f8a64781de26f08f005a249a0",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "en",
+      "replica": 2,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-en-r2-43674421396/cohort-en-r2-c807f21d/raw-engine/C1-r2-65f02c3f/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "6c386c82489298d9c6ddf127e69ea5beff17cbf02819f3f8a4035f04f8eac4d4",
+      "optimizer_state_sha256": "46a820fd74c551d5a40ad6ca77dd00cac6af7f3177449095794acd5f7b612015",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-es-r0-43674421396/cohort-es-r0-1b28c5b5/raw-engine/C1-r0-a5241aae/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "18014cdbb78da1c6c2392333bf7fbc88ff1a93f5be17567c45e9f5e7755b3385",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-es-r0-43674421396/cohort-es-r0-1b28c5b5/raw-engine/C1-r0-a5241aae/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "03cb8d608fe4d2a335bfbc4f70dd9f559ae70b1532c47c028ac8e74f087b3b9b",
+      "optimizer_state_sha256": "98be96e3ee2412a0076cb1cf5fdaa0ae602bb2f84769e12ea823eaacee199e55",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-es-r0-43674421396/cohort-es-r0-1b28c5b5/raw-engine/C1-r0-a5241aae/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "43648c0bad28b22223076a5d0d2b274671ba753960b01269e8dc6320c1e3ac55",
+      "optimizer_state_sha256": "78ed77ee201a252f4dd2471ded4c5df194454dc61f121ceadcd6f98d0528231b",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 0,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-es-r0-43674421396/cohort-es-r0-1b28c5b5/raw-engine/C1-r0-a5241aae/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "793e8250a4e150dad85f5d8a4658913d2b2400750193ea0cda41c30509223ba0",
+      "optimizer_state_sha256": "ccc0e363e90db02000afd61229e89d387a7c2d6d1ec5333a701603c542c6c133",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-es-r1-43674421396/cohort-es-r1-6bb9040f/raw-engine/C1-r1-f009dc1f/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "92eefad3c039931af8ab150cd3bbfec7a00c16c9d660a3bbc757f51c6ed79760",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-es-r1-43674421396/cohort-es-r1-6bb9040f/raw-engine/C1-r1-f009dc1f/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "0973a0a96f8baeb63dd79a60a9cbe6cfd5c7bd657a65901eb9992a5e769340b9",
+      "optimizer_state_sha256": "8483aa4de2923988c21365dc5bc870b52f75be9158c7945f129e43adad0ca856",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-es-r1-43674421396/cohort-es-r1-6bb9040f/raw-engine/C1-r1-f009dc1f/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "c50f1a5440d7a7ed0a6ebb37b3e46db48fffd5748635074d56a7d7964379593d",
+      "optimizer_state_sha256": "ece95d24808605f1b8466fb119be49c96e6b2934e0efbc48025cc44c0d0e398d",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 1,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-es-r1-43674421396/cohort-es-r1-6bb9040f/raw-engine/C1-r1-f009dc1f/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "de2c6ff016a012cfa14d0611079e3b9d8e3df99bd4a0ffcfd23b70b4fd22a423",
+      "optimizer_state_sha256": "74ea0c4ce3c10b97d40907231ed5ac0fb335981a2fff112423d8a51e5d306d17",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "step": 0,
+      "checkpoint": "l1-H-cohort-trial-es-r2-43674421396/cohort-es-r2-cc0006ab/raw-engine/C1-r2-e573a573/step-000000.pt",
+      "status": "pass",
+      "checkpoint_sha256": "40c0f615c0a3908c37f26e97772c5907c73c43c6378e11c0544fb40dd42aa4fb",
+      "optimizer_state_sha256": "9c4c9ea3ea69346a12ac9f6c917f956b7d8af423375161f5aa5fa8cd3ce222b7",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [],
+      "states_verified": 0,
+      "moment_tensors_verified": 0,
+      "moment_elements_verified": 0,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "step": 2400,
+      "checkpoint": "l1-H-cohort-trial-es-r2-43674421396/cohort-es-r2-cc0006ab/raw-engine/C1-r2-e573a573/step-002400.pt",
+      "status": "pass",
+      "checkpoint_sha256": "01dd155a9bae22d4d6c4e80077afc6289962649536cb692582d9e2fd48447c67",
+      "optimizer_state_sha256": "b763ee2c1cca822941703d5660106a83c37e783f0f8fde883c295ddd69dd48fb",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "step": 4800,
+      "checkpoint": "l1-H-cohort-trial-es-r2-43674421396/cohort-es-r2-cc0006ab/raw-engine/C1-r2-e573a573/step-004800.pt",
+      "status": "pass",
+      "checkpoint_sha256": "25664e6f5816608a72f06c2d769136075fcacb4b967a14f3675ce7983b8b238f",
+      "optimizer_state_sha256": "8e27c39ddf2eddba98a591b5e96520fd503815d1c985528a63829996290320e1",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    },
+    {
+      "language": "es",
+      "replica": 2,
+      "step": 9600,
+      "checkpoint": "l1-H-cohort-trial-es-r2-43674421396/cohort-es-r2-cc0006ab/raw-engine/C1-r2-e573a573/step-009600.pt",
+      "status": "pass",
+      "checkpoint_sha256": "46f08d1ab9c5c95f77af66e9735dbfa17b7e82be7d7d544e2062a02a10bf4491",
+      "optimizer_state_sha256": "23a7129c99d49bcac6bb880c8897e0b5605e12b34bdcf0df400678dd7ee6f176",
+      "validator_did_not_mutate_optimizer": true,
+      "version": "posthoc-finite-adam-moments-v1",
+      "parameters_indexed": 30,
+      "expected_state_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "states_verified": 22,
+      "moment_tensors_verified": 44,
+      "moment_elements_verified": 729350,
+      "parameter_mapping_sha256": "a4ba4af8f932d0d204f53588d74bffd5d010ec484138015f656a041db06f151f",
+      "frozen_parameter_states_absent": true
+    }
+  ],
+  "errors": [],
+  "model_checkpoint_files_unchanged": true,
+  "native_model_training_performed": false,
+  "qualification_scores_or_thresholds_changed": false,
+  "excluded_from_research": true,
+  "eligible_for_fresh_experiment": false,
+  "elapsed_seconds": 3.2266089040003862
+}
